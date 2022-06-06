@@ -1,0 +1,3 @@
+export declare const DATABASE_DRIVER = "DATABASE_DRIVER";
+export declare const DATABASE_CONFIG = "DATABASE_CONFIG";
+export declare const DATABASE_CONNECTION = "DATABASE_CONNECTION";
