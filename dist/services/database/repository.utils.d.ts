@@ -9,6 +9,8 @@ export declare class RepositoryQuery {
     addDependencies(deps: string[], willReturn?: boolean): RepositoryQuery;
     beginWithUser(id: string): RepositoryQuery;
     attachExternalEntitiesByParent(childEntity: string, parentEntity: string, attachArchived?: boolean): RepositoryQuery;
+    fetchAllByEntityId(entityId: number, entity: string): RepositoryQuery;
+    fetchDescendantTreeByUserId(userId: number): RepositoryQuery;
     attachExternalEntityByParent(childEntity: string, parentEntity: string, attachArchived?: boolean): RepositoryQuery;
     attachExternalEntityByParentList(childEntity: string, parentEntity: string): RepositoryQuery;
     attachInternalEntitiesByParent(childEntity: string, parentEntity: string, attachArchived?: boolean): RepositoryQuery;

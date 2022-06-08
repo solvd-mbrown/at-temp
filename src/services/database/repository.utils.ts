@@ -67,6 +67,29 @@ export class RepositoryQuery {
     return this;
   }
 
+  public fetchAllByEntityId(
+    entityId: number,
+    entity: string,
+  ): RepositoryQuery {
+    this.query.raw(
+      `MATCH (${entity}:${entity}) WHERE ID(${entity}) = ${entityId}
+       MATCH (${entity})-[rList*..10]-(nList)`,
+    );
+    this.returns.push(`${entity}`, 'rList', 'nList');
+    return this;
+  }
+
+  public fetchDescendantTreeByUserId(
+    userId: number,
+  ): RepositoryQuery {
+    this.query.raw(
+      `MATCH (User:User) WHERE ID(User) = ${userId}
+       MATCH (User)-[rList:USER_DESCENDANT_USER*..10]-(nList)`,
+    );
+    this.returns.push(`User`, 'rList', 'nList');
+    return this;
+  }
+
   public attachExternalEntityByParent(
     childEntity: string,
     parentEntity: string,

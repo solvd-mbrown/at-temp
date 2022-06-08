@@ -7,6 +7,7 @@ export declare class TreeRepository {
     constructor(connection: Connection, configService: ConfigService);
     private query;
     addNewTree(treeData: any): Promise<Tree[]>;
+    getTreeMember(id: any): Promise<Tree[]>;
     getTree(id: any): Promise<Tree[]>;
     joinToTreeDescendant(id: any, treeProperties: any): Promise<any>;
     joinToTreeMarried(id: any, treeProperties: any): Promise<any>;

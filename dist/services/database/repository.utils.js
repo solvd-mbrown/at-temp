@@ -186,6 +186,18 @@ class RepositoryQuery {
         this.returns.push(`${childEntity}List`);
         return this;
     }
+    fetchAllByEntityId(entityId, entity) {
+        this.query.raw(`MATCH (${entity}:${entity}) WHERE ID(${entity}) = ${entityId}
+       MATCH (${entity})-[rList*..10]-(nList)`);
+        this.returns.push(`${entity}`, 'rList', 'nList');
+        return this;
+    }
+    fetchDescendantTreeByUserId(userId) {
+        this.query.raw(`MATCH (User:User) WHERE ID(User) = ${userId}
+       MATCH (User)-[rList:USER_DESCENDANT_USER*..10]-(nList)`);
+        this.returns.push(`User`, 'rList', 'nList');
+        return this;
+    }
     attachExternalEntityByParent(childEntity, parentEntity, attachArchived = false) {
         this.query.raw(` 
         WITH *

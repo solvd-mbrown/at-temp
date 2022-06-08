@@ -38,12 +38,24 @@ let TreeRepository = class TreeRepository {
             return Object.assign({ id: data.Tree.identity }, data.Tree.properties);
         }
     }
-    async getTree(id) {
+    async getTreeMember(id) {
         const result = await this.query()
+            .fetchAllByEntityId(id, 'Tree')
             .commitWithReturnEntity();
         if (result) {
             const data = result.data;
-            return Object.assign({ id: data.Tree.identity }, data.Tree.properties);
+            console.log('data', data);
+            return Object.assign(Object.assign({ id: data.Tree.identity }, data.Tree.properties), { treeMembers: data.nList, relations: data.r });
+        }
+    }
+    async getTree(id) {
+        const result = await this.query()
+            .fetchAllByEntityId(id, 'Tree')
+            .commitWithReturnEntity();
+        if (result) {
+            const data = result.data;
+            console.log('data', data);
+            return Object.assign(Object.assign({ id: data.Tree.identity }, data.Tree.properties), { treeMembers: data.nList, relations: data.rList });
         }
     }
     async joinToTreeDescendant(id, treeProperties) {

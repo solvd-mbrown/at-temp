@@ -35,16 +35,36 @@ export class TreeRepository {
     }
   }
 
-  async getTree(id: any): Promise<Tree[]> {
+  async getTreeMember(id: any): Promise<Tree[]> {
     const result = await this.query()
-
+    .fetchAllByEntityId(id, 'Tree')
     .commitWithReturnEntity();
 
     if (result) {
       const data = result.data;
+      console.log('data', data);
       return {
         id: data.Tree.identity,
         ...data.Tree.properties,
+        treeMembers: data.nList,
+        relations: data.r
+      };
+    }
+  }
+
+  async getTree(id: any): Promise<Tree[]> {
+    const result = await this.query()
+    .fetchAllByEntityId(id, 'Tree')
+    .commitWithReturnEntity();
+
+    if (result) {
+      const data = result.data;
+      console.log('data', data);
+      return {
+        id: data.Tree.identity,
+        ...data.Tree.properties,
+        treeMembers: data.nList,
+        relations: data.rList
       };
     }
   }
