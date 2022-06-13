@@ -658,6 +658,20 @@ export class RepositoryQuery {
       );
     }
     return this;
+  } 
+  
+  public deleteEntityById(
+    parentEntity: string,
+    id: number,
+  ): RepositoryQuery {
+    this.query.raw(
+      ` 
+            MATCH (${parentEntity})
+            WHERE ID(${parentEntity}) = ${id}
+            DETACH DELETE ${parentEntity}
+          `,
+    );
+    return this;
   }
 
   public deleteEntitiesByParents(

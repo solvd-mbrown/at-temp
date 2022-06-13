@@ -32,5 +32,17 @@ export class UserRepository {
       };
     }
   }
-  
+
+  async deleteUser(id: number): Promise<any> {
+    const result = await this.query()
+    .deleteEntityById('User', id)
+    .commitWithReturnEntity();
+    if (result) {
+      const data = result.data;
+      return  {
+        "response": "done"
+      };
+    }
+  }
+
 }

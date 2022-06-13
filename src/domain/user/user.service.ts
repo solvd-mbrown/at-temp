@@ -10,7 +10,6 @@ export class UserService {
   ) {}
   
   async create(usersProperties): Promise<any> {
-    console.log('usersProperties', usersProperties);
     const result = await this.userRepository.addNewUser(usersProperties);
     return result;
   }
@@ -27,7 +26,8 @@ export class UserService {
     return `This action updates a #${id} user`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    const result = await this.userRepository.deleteUser(id);
+    return result;
   }
 }

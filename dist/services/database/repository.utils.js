@@ -559,6 +559,14 @@ class RepositoryQuery {
         }
         return this;
     }
+    deleteEntityById(parentEntity, id) {
+        this.query.raw(` 
+            MATCH (${parentEntity})
+            WHERE ID(${parentEntity}) = ${id}
+            DETACH DELETE ${parentEntity}
+          `);
+        return this;
+    }
     deleteEntitiesByParents(childEntity, parentEntity) {
         this.query.raw(` 
           MATCH (${parentEntity}List)-[${parentEntity}${childEntity}Relation:${parentEntity.toUpperCase()}_INCLUDES_${childEntity.toUpperCase()}]->(${childEntity}List:${childEntity})

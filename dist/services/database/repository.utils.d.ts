@@ -42,6 +42,7 @@ export declare class RepositoryQuery {
     customWith(query: string): RepositoryQuery;
     deleteEntity(entity: string): RepositoryQuery;
     deleteEntityByParent(childEntity: string, parentEntity: string, id: number): RepositoryQuery;
+    deleteEntityById(parentEntity: string, id: number): RepositoryQuery;
     deleteEntitiesByParents(childEntity: string, parentEntity: string): RepositoryQuery;
     deleteEntities(entity: string): RepositoryQuery;
     deleteRelationsByName(relationName: string): RepositoryQuery;
