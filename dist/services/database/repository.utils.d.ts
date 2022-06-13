@@ -115,5 +115,11 @@ export declare function addUpdateDateToProperties(entity: string, properties?: {
 export declare const processEmptyNestedArray: (arr: any) => any;
 export declare const processEntityIds: (array: any) => string;
 export declare const processArrayProperty: (array: any) => any;
+export declare const buildTree: (data: any) => any;
+export declare const getDescendantRel: (data: any) => any;
+export declare const getMarriedRel: (data: any) => any;
+export declare const removeDuplicates: (originalArray: any, prop: any) => any[];
+export declare const getRootUser: (members: any, descendantRels: any, marriedRel: any) => any;
+export declare const buildTreeFromRelations: (rootUser: any, members: any, descendantRels: any, marriedRel: any) => any[];
 export declare const Return: (array: any, ...args: any[]) => any[];
 export declare const mapCypherResultToEntity: (input: any, expand?: any) => any;

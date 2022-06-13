@@ -1898,6 +1898,7 @@ export const processEntityIds = (array: any): string => {
     return '-1';
   }
 };
+
 export const processArrayProperty = (array: any) => {
   if (array?.length > 0) {
     return array.map((o) => {
@@ -1907,9 +1908,182 @@ export const processArrayProperty = (array: any) => {
     return [];
   }
 };
+
+export const buildTree = (data: any) => {
+  // @ts-ignore
+  let descendant = this.getDescendantRel(data.rList);
+  // @ts-ignore
+  let married = this.getMarriedRel(data.rList);
+  // @ts-ignore
+  let rootUser = this.getRootUser(data.nList, descendant, married);
+  // @ts-ignore
+  let tree = this.buildTreeFromRelations(rootUser, data.nList, descendant, married);
+
+  return tree;
+};
+
+export const getDescendantRel = (data: any) => {
+  let result = [];
+  for (let rel of data) {
+    for (let item of rel) {
+      if (item.label === 'USER_DESCENDANT_USER') {
+        result.push(item);
+      }
+    }
+  }
+  // @ts-ignore
+  let res = this.removeDuplicates(result, "identity");
+  return res;
+};
+
+export const getMarriedRel = (data: any) => {
+  let result = [];
+  for (let rel of data) {
+    for (let item of rel) {
+      if (item.label === "USER_MARRIED_USER") {
+        result.push(item);
+      }
+    }
+  }
+  // @ts-ignore
+  let res = this.removeDuplicates(result, "identity");
+  return res;
+};
+
+export const removeDuplicates = (originalArray, prop) => {
+  var newArray = [];
+  var lookupObject  = {};
+
+  for(var i in originalArray) {
+    lookupObject[originalArray[i][prop]] = originalArray[i];
+  }
+
+  for(i in lookupObject) {
+    newArray.push(lookupObject[i]);
+  }
+  return newArray;
+};
+
+export const getRootUser = (members, descendantRels, marriedRel) => {
+  const resultWithoutDescendantRels = members.filter(e => !descendantRels.find(a => e.identity == a.start));
+  const resultWithoutMarriedRel = resultWithoutDescendantRels.filter(e => !marriedRel .find(a => e.identity == a.start));
+  const rootUser = resultWithoutMarriedRel.filter(object => {
+    return object.labels[0] !== 'Tree';
+  });
+  return rootUser;
+};
+
+export const buildTreeFromRelations = (rootUser, members, descendantRels, marriedRel) => {
+
+  descendantRels = descendantRels.filter(object => {
+    return object.end !== object.start;
+  });
+
+  descendantRels.push({
+    identity: 'ROOT',
+    start: rootUser[0].identity,
+    end: 'ROOT',
+    label: 'USER_DESCENDANT_USER',
+    properties: {}
+  });
+
+  members = members.filter(object => {
+    return object.labels[0] !== 'Tree';
+  });
+  //   for (let item of descendantRels) {
+  //     for (let itemMember of members) {
+  //       if (!tree.length) {
+  //         let resultMember = members.filter(obj => {
+  //           return obj.identity == rootUser[0].identity
+  //         })
+  //         tree.push({
+  //           ...resultMember
+  //         });
+  //       }
+  //
+  //       if (item.end === itemMember.identity && tree.length) {
+  //
+  //         let resultMember = members.filter(obj => {
+  //           return obj.identity == item.start
+  //         })
+  //
+  //         let resultMarriedMember = members.filter(obj => {
+  //           return obj.end == item.end
+  //         })
+  //
+  //         // console.log('itemMember', itemMember);
+  //         // console.log('resultMember', resultMember);
+  //
+  //         //Find index of specific object using findIndex method.
+  //         let treeIndex = tree.findIndex((obj => obj.identity == resultMember.identity));
+  //         if (!tree[treeIndex].descendant) {
+  //           tree[treeIndex].descendant = [];
+  //         }
+  //         if (!tree[treeIndex].married) {
+  //           tree[treeIndex].married = [];
+  //         }
+  //         if (resultMarriedMember) {
+  //           tree[treeIndex].married.push(resultMarriedMember);
+  //         }
+  //
+  //         tree[treeIndex].descendant.push(resultMember);
+  //
+  //         // itemMember.push({
+  //         //   descendant: [],
+  //         //   married: []
+  //         // });
+  //       }
+  //     }
+  // } //--------------11-----------------------
+
+   const partial = (descendantRels = [], condition) => {
+    const result = [];
+    for (let i = 0; i < descendantRels.length; i++) {
+      if(condition(descendantRels[i])){
+        result.push(descendantRels[i]);
+      }
+    }
+    return result;
+ }
+  const findNodes = (parentKey, items, members) => {
+    let subItems = partial(items, n => {
+     return n.end == parentKey});
+    const result = [];
+    for (let i = 0; i < subItems.length; i++) {
+      let subItem = subItems[i];
+      let resultItem = members.filter(obj => {
+        return obj.identity == subItem.start
+      });
+      let married = findNodes(subItem.start , marriedRel, members);
+      if(married.length){
+        // @ts-ignore
+        resultItem.push({
+          married : married,
+          ...resultItem
+        })
+      }
+
+      let descendants = findNodes(subItem.start , items, members);
+      if(descendants.length){
+        // @ts-ignore
+        resultItem.push({
+          descendant : descendants,
+          ...resultItem
+        })
+      }
+      result.push(resultItem);
+    }
+    return result;
+  }
+  let treeResult = findNodes('ROOT', descendantRels, members);
+
+  return treeResult;
+};
+
 export const Return = (array: any, ...args: any[]) => {
   return [...array, ...args.filter((a) => a)];
 };
+
 export const mapCypherResultToEntity = (input: any, expand: any = {}) => {
   return !!input
     ? { id: input.identity, ...input.properties, ...expand }

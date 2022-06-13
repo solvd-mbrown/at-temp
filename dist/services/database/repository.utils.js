@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mapCypherResultToEntity = exports.Return = exports.processArrayProperty = exports.processEntityIds = exports.processEmptyNestedArray = exports.addUpdateDateToProperties = exports.addUuidToProperties = exports.addCreateDateToProperties = exports.RepositoryQuery = void 0;
+exports.mapCypherResultToEntity = exports.Return = exports.buildTreeFromRelations = exports.getRootUser = exports.removeDuplicates = exports.getMarriedRel = exports.getDescendantRel = exports.buildTree = exports.processArrayProperty = exports.processEntityIds = exports.processEmptyNestedArray = exports.addUpdateDateToProperties = exports.addUuidToProperties = exports.addCreateDateToProperties = exports.RepositoryQuery = void 0;
 const cypher_query_builder_1 = require("cypher-query-builder");
 const uuid_1 = require("uuid");
 const convert = (propertyName, propertyValue) => {
@@ -1266,6 +1266,110 @@ const processArrayProperty = (array) => {
     }
 };
 exports.processArrayProperty = processArrayProperty;
+const buildTree = (data) => {
+    let descendant = this.getDescendantRel(data.rList);
+    let married = this.getMarriedRel(data.rList);
+    let rootUser = this.getRootUser(data.nList, descendant, married);
+    let tree = this.buildTreeFromRelations(rootUser, data.nList, descendant, married);
+    return tree;
+};
+exports.buildTree = buildTree;
+const getDescendantRel = (data) => {
+    let result = [];
+    for (let rel of data) {
+        for (let item of rel) {
+            if (item.label === 'USER_DESCENDANT_USER') {
+                result.push(item);
+            }
+        }
+    }
+    let res = this.removeDuplicates(result, "identity");
+    return res;
+};
+exports.getDescendantRel = getDescendantRel;
+const getMarriedRel = (data) => {
+    let result = [];
+    for (let rel of data) {
+        for (let item of rel) {
+            if (item.label === "USER_MARRIED_USER") {
+                result.push(item);
+            }
+        }
+    }
+    let res = this.removeDuplicates(result, "identity");
+    return res;
+};
+exports.getMarriedRel = getMarriedRel;
+const removeDuplicates = (originalArray, prop) => {
+    var newArray = [];
+    var lookupObject = {};
+    for (var i in originalArray) {
+        lookupObject[originalArray[i][prop]] = originalArray[i];
+    }
+    for (i in lookupObject) {
+        newArray.push(lookupObject[i]);
+    }
+    return newArray;
+};
+exports.removeDuplicates = removeDuplicates;
+const getRootUser = (members, descendantRels, marriedRel) => {
+    const resultWithoutDescendantRels = members.filter(e => !descendantRels.find(a => e.identity == a.start));
+    const resultWithoutMarriedRel = resultWithoutDescendantRels.filter(e => !marriedRel.find(a => e.identity == a.start));
+    const rootUser = resultWithoutMarriedRel.filter(object => {
+        return object.labels[0] !== 'Tree';
+    });
+    return rootUser;
+};
+exports.getRootUser = getRootUser;
+const buildTreeFromRelations = (rootUser, members, descendantRels, marriedRel) => {
+    descendantRels = descendantRels.filter(object => {
+        return object.end !== object.start;
+    });
+    descendantRels.push({
+        identity: 'ROOT',
+        start: rootUser[0].identity,
+        end: 'ROOT',
+        label: 'USER_DESCENDANT_USER',
+        properties: {}
+    });
+    members = members.filter(object => {
+        return object.labels[0] !== 'Tree';
+    });
+    const partial = (descendantRels = [], condition) => {
+        const result = [];
+        for (let i = 0; i < descendantRels.length; i++) {
+            if (condition(descendantRels[i])) {
+                result.push(descendantRels[i]);
+            }
+        }
+        return result;
+    };
+    const findNodes = (parentKey, items, members) => {
+        let subItems = partial(items, n => {
+            return n.end == parentKey;
+        });
+        const result = [];
+        for (let i = 0; i < subItems.length; i++) {
+            let subItem = subItems[i];
+            let resultItem = members.filter(obj => {
+                return obj.identity == subItem.start;
+            });
+            let married = findNodes(subItem.start, marriedRel, members);
+            if (married.length) {
+                resultItem.push(Object.assign({ married: married }, resultItem));
+            }
+            let descendants = findNodes(subItem.start, items, members);
+            if (descendants.length) {
+                resultItem.push(Object.assign({ descendant: descendants }, resultItem));
+            }
+            result.push(resultItem);
+        }
+        return result;
+    };
+    let treeResult = findNodes('ROOT', descendantRels, members);
+    return treeResult;
+};
+exports.buildTreeFromRelations = buildTreeFromRelations;
 const Return = (array, ...args) => {
     return [...array, ...args.filter((a) => a)];
 };

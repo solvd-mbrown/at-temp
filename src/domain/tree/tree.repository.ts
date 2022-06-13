@@ -42,12 +42,11 @@ export class TreeRepository {
 
     if (result) {
       const data = result.data;
-      console.log('data', data);
       return {
         id: data.Tree.identity,
         ...data.Tree.properties,
         treeMembers: data.nList,
-        relations: data.r
+        // relations: data.rList,
       };
     }
   }
@@ -59,12 +58,11 @@ export class TreeRepository {
 
     if (result) {
       const data = result.data;
-      console.log('data', data);
+      const tree = cypher.buildTree(data);
       return {
         id: data.Tree.identity,
         ...data.Tree.properties,
-        treeMembers: data.nList,
-        relations: data.rList
+       tree: tree[0]
       };
     }
   }

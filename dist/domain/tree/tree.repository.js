@@ -44,8 +44,7 @@ let TreeRepository = class TreeRepository {
             .commitWithReturnEntity();
         if (result) {
             const data = result.data;
-            console.log('data', data);
-            return Object.assign(Object.assign({ id: data.Tree.identity }, data.Tree.properties), { treeMembers: data.nList, relations: data.r });
+            return Object.assign(Object.assign({ id: data.Tree.identity }, data.Tree.properties), { treeMembers: data.nList });
         }
     }
     async getTree(id) {
@@ -54,8 +53,8 @@ let TreeRepository = class TreeRepository {
             .commitWithReturnEntity();
         if (result) {
             const data = result.data;
-            console.log('data', data);
-            return Object.assign(Object.assign({ id: data.Tree.identity }, data.Tree.properties), { treeMembers: data.nList, relations: data.rList });
+            const tree = cypher.buildTree(data);
+            return Object.assign(Object.assign({ id: data.Tree.identity }, data.Tree.properties), { tree: tree[0] });
         }
     }
     async joinToTreeDescendant(id, treeProperties) {
