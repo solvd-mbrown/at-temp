@@ -15,6 +15,7 @@ export declare class RepositoryQuery {
     attachExternalEntityByParentList(childEntity: string, parentEntity: string): RepositoryQuery;
     attachInternalEntitiesByParent(childEntity: string, parentEntity: string, attachArchived?: boolean): RepositoryQuery;
     attachInternalEntityParentListByChildLabel(childEntity: string, parentEntity: string, attachArchived?: boolean): RepositoryQuery;
+    beginWithUserById(id: number): RepositoryQuery;
     attachInternalEntityByParent(childEntity: string, parentEntity: string, attachArchived?: boolean): RepositoryQuery;
     attachInternalEntitiesByParentList(childEntity: string, parentEntity: string, deps?: string[], alias?: string): RepositoryQuery;
     callStart(): this;

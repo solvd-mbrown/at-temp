@@ -36,6 +36,6 @@ export class FileController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.fileService.remove(+id);
+    return this.fileService.removeFileFromS3(id);
   }
 }

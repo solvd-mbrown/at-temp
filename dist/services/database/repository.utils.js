@@ -239,6 +239,18 @@ class RepositoryQuery {
         this.returns.push(`${childEntity}`);
         return this;
     }
+    beginWithUserById(id) {
+        this.dependencies.add('User');
+        this.query = this.connection
+            .match([
+            (0, cypher_query_builder_1.node)('User', 'User', {
+                id: id,
+            }),
+        ])
+            .with([...this.dependencies.values()].join(','));
+        this.returns.push('User');
+        return this;
+    }
     attachInternalEntityByParent(childEntity, parentEntity, attachArchived = false) {
         this.dependencies.add(`${childEntity}`);
         this.query.raw(` 
