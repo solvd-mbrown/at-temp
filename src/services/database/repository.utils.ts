@@ -168,6 +168,20 @@ export class RepositoryQuery {
     return this;
   }
 
+  public beginWithUserById(id: number): RepositoryQuery {
+    this.dependencies.add('User');
+    this.query = this.connection
+    .match([
+      node('User', 'User', {
+        id: id,
+      }),
+    ])
+    .with([...this.dependencies.values()].join(','));
+
+    this.returns.push('User');
+    return this;
+  }
+  
   public attachInternalEntityByParent(
     childEntity: string,
     parentEntity: string,

@@ -16,6 +16,8 @@ import configuration from 'src/services/config/env.config';
 import { DatabaseConfig } from './services/database/database.service';
 import { UserRepository } from './domain/user/user.repository';
 import { TreeRepository } from './domain/tree/tree.repository';
+import { FileService } from './domain/file/file.service';
+import { FileController } from './domain/file/file.controller';
 
 @Module({
   imports: [
@@ -40,13 +42,14 @@ import { TreeRepository } from './domain/tree/tree.repository';
         createDatabaseConfiguration(configService),
     }),
   ],
-  controllers: [AppController, UserController, TreeController],
+  controllers: [AppController, UserController, TreeController, FileController],
   providers: [
     AppService,
     UserService,
     UserRepository,
     TreeService,
-    TreeRepository,  
+    TreeRepository,
+    FileService,
   ],
 })
 export class AppModule {}
