@@ -18,12 +18,14 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    const result = await this.userRepository.getUserEntity(id);
+    return result;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const result = await this.userRepository.updateUserEntity(id, updateUserDto);
+    return result;
   }
 
   async remove(id: number) {

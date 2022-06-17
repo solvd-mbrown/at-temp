@@ -90,6 +90,15 @@ export class RepositoryQuery {
     return this;
   }
 
+  public fetchUserByUserId(
+    userId: number,
+  ): RepositoryQuery {
+    this.query.raw(
+      `MATCH (User:User) WHERE ID(User) = ${userId}`);
+    this.returns.push(`User`);
+    return this;
+  }
+
   public attachExternalEntityByParent(
     childEntity: string,
     parentEntity: string,
@@ -1607,7 +1616,7 @@ export class RepositoryQuery {
       this.query
         .setValues(properties)
         .setVariables(addUpdateDateToProperties(childEntity))
-        .with([...this.dependencies.values()].join(','));
+        // .with([...this.dependencies.values()].join(','));
     }
     this.returns.push(childEntity);
     return this;

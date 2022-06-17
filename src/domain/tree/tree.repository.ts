@@ -35,7 +35,7 @@ export class TreeRepository {
     }
   }
 
-  async getTreeMember(id: any): Promise<Tree[]> {
+  async getTreeMembers(id: any): Promise<Tree[]> {
     const result = await this.query()
     .fetchAllByEntityId(id, 'Tree')
     .commitWithReturnEntity();

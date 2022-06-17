@@ -23,7 +23,11 @@ export class TreeService {
   async findOne(id: number) {
     const result = await this.treeRepository.getTree(id);
     return result;
-    return `This action returns a #${id} tree`;
+  }
+  
+  async getTreeMembers(id: number) {
+    const result = await this.treeRepository.getTreeMembers(id);
+    return result;
   }
 
   update(id: number, updateTreeDto: UpdateTreeDto) {
