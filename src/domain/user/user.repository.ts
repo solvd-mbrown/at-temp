@@ -4,6 +4,7 @@ import * as cypher from 'src/services/database/repository.utils';
 import { ConfigService } from '@nestjs/config';
 import { DATABASE_CONNECTION } from 'src/services/database/database.constants';
 import { User } from './entities/user.entity';
+import { UtilsRepository } from 'src/utils/utils.repository';
 
 
 @Injectable({ scope: Scope.REQUEST })
@@ -44,6 +45,7 @@ export class UserRepository {
       };
     }
   }
+
   async getUserEntity(id: number): Promise<any> {
     const result = await this.query()
     .fetchUserByUserId(id)
@@ -74,7 +76,7 @@ export class UserRepository {
         'User.middleName': params?.middleName,
         'User.lastName': params?.lastName,
         'User.IntroductionText':params?.IntroductionText,
-        'User.IntroductionImageLinks':params?.IntroductionImageLinks ? UserRepository.getStringVersion(params?.IntroductionImageLinks) : null,
+        'User.IntroductionImageLinks':params?.IntroductionImageLinks ? UtilsRepository.getStringVersion(params?.IntroductionImageLinks) : null,
         'User.birthdate': params?.birthdate,
         'User.dateOfDeath': params?.dateOfDeath,
         'User.deceased': params?.deceased,
@@ -84,11 +86,11 @@ export class UserRepository {
         'User.email': params?.email,
         'User.phone': params?.phone,
         'User.address': params?.address,
-        'User.spouse': params?.spouse ? UserRepository.getStringVersion(params?.spouse) : null,
-        'User.kids': params?.kids ? UserRepository.getStringVersion(params?.kids) : null,
-        'User.socialNetworks': params?.socialNetworks ? UserRepository.getStringVersion(params?.socialNetworks) : null,
-        'User.work': params?.work ? UserRepository.getStringVersion(params?.work) : null,
-        'User.education': params?.education ? UserRepository.getStringVersion(params?.education) : null,
+        'User.spouse': params?.spouse ? UtilsRepository.getStringVersion(params?.spouse) : null,
+        'User.kids': params?.kids ? UtilsRepository.getStringVersion(params?.kids) : null,
+        'User.socialNetworks': params?.socialNetworks ? UtilsRepository.getStringVersion(params?.socialNetworks) : null,
+        'User.work': params?.work ? UtilsRepository.getStringVersion(params?.work) : null,
+        'User.education': params?.education ? UtilsRepository.getStringVersion(params?.education) : null,
       }).reduce((valuesAcc, [key, value]) => {
         return value !== undefined && value !== null
           ? {
@@ -108,10 +110,5 @@ export class UserRepository {
       };
     }
   }
-
-  static getStringVersion(param): string {
-    return typeof param === 'string' ? param : JSON.stringify(param);
-  }
-
 
 }

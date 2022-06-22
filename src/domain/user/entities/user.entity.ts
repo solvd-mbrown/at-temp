@@ -3,7 +3,7 @@ type Nullable<T> = T | null;
 export class User {
   __typename?: 'User';
   id: number;
-  TreeName?: Nullable<string>;
+  treeName?: Nullable<string>;
   email: string;
   firstName?: Nullable<string>;
   middleName?: Nullable<string>

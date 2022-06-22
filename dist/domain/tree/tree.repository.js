@@ -38,7 +38,7 @@ let TreeRepository = class TreeRepository {
             return Object.assign({ id: data.Tree.identity }, data.Tree.properties);
         }
     }
-    async getTreeMember(id) {
+    async getTreeMembers(id) {
         const result = await this.query()
             .fetchAllByEntityId(id, 'Tree')
             .commitWithReturnEntity();

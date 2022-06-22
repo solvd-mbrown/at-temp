@@ -22,6 +22,9 @@ const user_repository_1 = require("./domain/user/user.repository");
 const tree_repository_1 = require("./domain/tree/tree.repository");
 const file_service_1 = require("./domain/file/file.service");
 const file_controller_1 = require("./domain/file/file.controller");
+const post_controller_1 = require("./domain/post/post.controller");
+const post_service_1 = require("./domain/post/post.service");
+const post_repository_1 = require("./domain/post/post.repository");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -45,7 +48,13 @@ AppModule = __decorate([
                 useFactory: (configService) => (0, database_module_1.createDatabaseConfiguration)(configService),
             }),
         ],
-        controllers: [app_controller_1.AppController, user_controller_1.UserController, tree_controller_1.TreeController, file_controller_1.FileController],
+        controllers: [
+            app_controller_1.AppController,
+            user_controller_1.UserController,
+            tree_controller_1.TreeController,
+            file_controller_1.FileController,
+            post_controller_1.PostController,
+        ],
         providers: [
             app_service_1.AppService,
             user_service_1.UserService,
@@ -53,6 +62,8 @@ AppModule = __decorate([
             tree_service_1.TreeService,
             tree_repository_1.TreeRepository,
             file_service_1.FileService,
+            post_service_1.PostService,
+            post_repository_1.PostRepository,
         ],
     })
 ], AppModule);

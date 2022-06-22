@@ -79,6 +79,17 @@ export class RepositoryQuery {
     return this;
   }
 
+  public fetchAllByEntityUUUID(
+    entityUUID: string,
+    entity: string,
+  ): RepositoryQuery {
+    this.query.raw(
+      `MATCH (${entity}:${entity}) WHERE ${entity}.treeUUID = '${entityUUID}'`,
+    );
+    this.returns.push(`${entity}`);
+    return this;
+  }
+
   public fetchDescendantTreeByUserId(
     userId: number,
   ): RepositoryQuery {
@@ -953,7 +964,7 @@ export class RepositoryQuery {
     where?: boolean,
     findArchived = false,
   ) {
-    const arr = ['Note', 'Workspace', 'WorkspaceList', 'Tag', 'TagList'];
+    const arr = ['Post', 'Comment', 'CommentList', 'PostList'];
 
     const whereStmt = where ? 'WHERE' : 'AND';
 
@@ -988,13 +999,8 @@ export class RepositoryQuery {
     where?: boolean,
   ) {
     const arr = [
-      'Note',
-      'NoteList',
-      'Outcome',
-      'OutcomeList',
-      'Action',
-      'ActionList',
-      'OutcomeActionList',
+      'Post',
+      'PostList',
     ];
     let query = `${childEntity}.isArchived = false`;
     if (where) {

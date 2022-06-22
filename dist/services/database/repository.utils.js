@@ -192,10 +192,20 @@ class RepositoryQuery {
         this.returns.push(`${entity}`, 'rList', 'nList');
         return this;
     }
+    fetchAllByEntityUUUID(entityUUID, entity) {
+        this.query.raw(`MATCH (${entity}:${entity}) WHERE ${entity}.treeUUID = '${entityUUID}'`);
+        this.returns.push(`${entity}`);
+        return this;
+    }
     fetchDescendantTreeByUserId(userId) {
         this.query.raw(`MATCH (User:User) WHERE ID(User) = ${userId}
        MATCH (User)-[rList:USER_DESCENDANT_USER*..10]-(nList)`);
         this.returns.push(`User`, 'rList', 'nList');
+        return this;
+    }
+    fetchUserByUserId(userId) {
+        this.query.raw(`MATCH (User:User) WHERE ID(User) = ${userId}`);
+        this.returns.push(`User`);
         return this;
     }
     attachExternalEntityByParent(childEntity, parentEntity, attachArchived = false) {
@@ -714,7 +724,7 @@ class RepositoryQuery {
         return this;
     }
     findWhereConditions(childEntity, parentEntity, where, findArchived = false) {
-        const arr = ['Note', 'Workspace', 'WorkspaceList', 'Tag', 'TagList'];
+        const arr = ['Post', 'Comment', 'CommentList', 'PostList'];
         const whereStmt = where ? 'WHERE' : 'AND';
         if (arr.includes(childEntity)) {
             return `${whereStmt} (NOT(${childEntity}.isDeleted) = true
@@ -736,13 +746,8 @@ class RepositoryQuery {
     }
     findWhereArchivedConditions(childEntity, parentEntity, where) {
         const arr = [
-            'Note',
-            'NoteList',
-            'Outcome',
-            'OutcomeList',
-            'Action',
-            'ActionList',
-            'OutcomeActionList',
+            'Post',
+            'PostList',
         ];
         let query = `${childEntity}.isArchived = false`;
         if (where) {
@@ -1020,8 +1025,7 @@ class RepositoryQuery {
         if (Object.keys(properties).length) {
             this.query
                 .setValues(properties)
-                .setVariables(addUpdateDateToProperties(childEntity))
-                .with([...this.dependencies.values()].join(','));
+                .setVariables(addUpdateDateToProperties(childEntity));
         }
         this.returns.push(childEntity);
         return this;

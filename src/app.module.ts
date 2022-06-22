@@ -18,6 +18,9 @@ import { UserRepository } from './domain/user/user.repository';
 import { TreeRepository } from './domain/tree/tree.repository';
 import { FileService } from './domain/file/file.service';
 import { FileController } from './domain/file/file.controller';
+import { PostController } from './domain/post/post.controller';
+import { PostService } from './domain/post/post.service';
+import { PostRepository } from './domain/post/post.repository';
 
 @Module({
   imports: [
@@ -42,7 +45,13 @@ import { FileController } from './domain/file/file.controller';
         createDatabaseConfiguration(configService),
     }),
   ],
-  controllers: [AppController, UserController, TreeController, FileController],
+  controllers: [
+    AppController,
+    UserController,
+    TreeController,
+    FileController,
+    PostController,
+  ],
   providers: [
     AppService,
     UserService,
@@ -50,6 +59,8 @@ import { FileController } from './domain/file/file.controller';
     TreeService,
     TreeRepository,
     FileService,
+    PostService,
+    PostRepository,
   ],
 })
 export class AppModule {}
