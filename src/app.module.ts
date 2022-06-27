@@ -21,6 +21,9 @@ import { FileController } from './domain/file/file.controller';
 import { PostController } from './domain/post/post.controller';
 import { PostService } from './domain/post/post.service';
 import { PostRepository } from './domain/post/post.repository';
+import { CommentController } from './domain/comment/comment.controller';
+import { CommentRepository } from './domain/comment/comment.repository';
+import { CommentService } from './domain/comment/comment.service';
 
 @Module({
   imports: [
@@ -51,6 +54,7 @@ import { PostRepository } from './domain/post/post.repository';
     TreeController,
     FileController,
     PostController,
+    CommentController,
   ],
   providers: [
     AppService,
@@ -61,6 +65,8 @@ import { PostRepository } from './domain/post/post.repository';
     FileService,
     PostService,
     PostRepository,
+    CommentService,
+    CommentRepository,
   ],
 })
 export class AppModule {}

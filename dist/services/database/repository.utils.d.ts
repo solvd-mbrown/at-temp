@@ -55,7 +55,7 @@ export declare class RepositoryQuery {
     findEntitiesByChildId(childEntity: string, parentEntity: string, childId: number, willReturn?: boolean): RepositoryQuery;
     findEntityById(entity: string, id: number): RepositoryQuery;
     findEntityByIdWithoutName(id: number): RepositoryQuery;
-    findEntityByIds(entity: string, ids: number[]): RepositoryQuery;
+    findEntityByIds(entity: string, ids: string[]): RepositoryQuery;
     findEntityByParent(childEntity: string, parentEntity: string, id?: number, willReturn?: boolean): RepositoryQuery;
     findEntitiesByParentByProperty(childEntity: string, parentEntity: string, propertyName: string, propertyValue: any): RepositoryQuery;
     findEntitiesByParent(childEntity: string, parentEntity: string, fetchArchived?: boolean): RepositoryQuery;

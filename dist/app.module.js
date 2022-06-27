@@ -25,6 +25,9 @@ const file_controller_1 = require("./domain/file/file.controller");
 const post_controller_1 = require("./domain/post/post.controller");
 const post_service_1 = require("./domain/post/post.service");
 const post_repository_1 = require("./domain/post/post.repository");
+const comment_controller_1 = require("./domain/comment/comment.controller");
+const comment_repository_1 = require("./domain/comment/comment.repository");
+const comment_service_1 = require("./domain/comment/comment.service");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -54,6 +57,7 @@ AppModule = __decorate([
             tree_controller_1.TreeController,
             file_controller_1.FileController,
             post_controller_1.PostController,
+            comment_controller_1.CommentController,
         ],
         providers: [
             app_service_1.AppService,
@@ -64,6 +68,8 @@ AppModule = __decorate([
             file_service_1.FileService,
             post_service_1.PostService,
             post_repository_1.PostRepository,
+            comment_service_1.CommentService,
+            comment_repository_1.CommentRepository,
         ],
     })
 ], AppModule);

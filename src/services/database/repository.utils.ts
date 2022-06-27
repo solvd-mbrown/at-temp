@@ -806,7 +806,7 @@ export class RepositoryQuery {
     return this;
   }
 
-  public findEntityByIds(entity: string, ids: number[]): RepositoryQuery {
+  public findEntityByIds(entity: string, ids: string[]): RepositoryQuery {
     this.query.raw(`MATCH (${entity}:${entity})
     WHERE ID(${entity}) IN [${ids}]  
     WITH *             

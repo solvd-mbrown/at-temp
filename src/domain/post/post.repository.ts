@@ -91,7 +91,8 @@ export class PostRepository {
       Object.entries({
         'Post.postType': params?.postType,
         'Post.postBody': params?.postBody,
-        'Post.comments': params?.comments ? UtilsRepository.getStringVersion(params?.comments) : null,
+        'Post.comments': params?.comments,
+        // 'Post.comments': params?.comments ? UtilsRepository.getStringVersion(params?.comments) : null,
       }).reduce((valuesAcc, [key, value]) => {
         return value !== undefined && value !== null
           ? {
