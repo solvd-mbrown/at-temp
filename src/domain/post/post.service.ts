@@ -24,6 +24,11 @@ export class PostService {
     return result;
   }
 
+  async findAllByUserId(id: string) {
+    const result = await this.postRepository.findAllByUserId(id);
+    return result;
+  }
+
   async update(id: number, updatePostDto: UpdatePostDto) {
     const result = await this.postRepository.updatePostEntity(id, updatePostDto);
     return result;

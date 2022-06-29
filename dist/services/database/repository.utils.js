@@ -197,6 +197,11 @@ class RepositoryQuery {
         this.returns.push(`${entity}`);
         return this;
     }
+    findAllPostsByUserId(userId, entity) {
+        this.query.raw(`MATCH (${entity}:${entity}) WHERE ${entity}.publishedById = '${userId}'`);
+        this.returns.push(`${entity}`);
+        return this;
+    }
     fetchDescendantTreeByUserId(userId) {
         this.query.raw(`MATCH (User:User) WHERE ID(User) = ${userId}
        MATCH (User)-[rList:USER_DESCENDANT_USER*..10]-(nList)`);
@@ -1382,8 +1387,6 @@ const buildTreeFromRelations = (rootUser, members, descendantRels, marriedRel) =
             let marRel = marriedRel.filter(obj => {
                 return obj.end == subItem.start;
             });
-            console.log('marRel', marRel[0]);
-            console.log('subItem.start', subItem.start);
             let married = null;
             if (marRel.length) {
                 married = members.filter(obj => {
@@ -1391,7 +1394,6 @@ const buildTreeFromRelations = (rootUser, members, descendantRels, marriedRel) =
                     return obj.identity == member.start;
                 });
             }
-            console.log('married', married);
             if (descendants.length) {
                 resultItem.push(Object.assign({ descendant: descendants[0], married: married ? married : [] }, resultItem));
             }

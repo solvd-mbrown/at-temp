@@ -22,6 +22,11 @@ export class PostController {
     return this.postService.findOne(+id);
   }
 
+  @Get('user/:id')
+  findAllByUserId(@Param('id') id: string) {
+    return this.postService.findAllByUserId(id);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postService.update(+id, updatePostDto);

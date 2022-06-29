@@ -48,6 +48,21 @@ export class PostRepository {
     }
   }
 
+  async findAllByUserId(id: string): Promise<any> {
+    const result = await this.query()
+    .findAllPostsByUserId(id, 'Post')
+    .commitWithReturnEntities();
+    if (result) {
+      return result.map(({ data }) => {
+        const result = data;
+        return {
+          id: result.Post.identity,
+          ...result.Post.properties,
+        };
+      });
+    }
+  }
+
 
   async addNewPost(PostData: any): Promise<Post[]> {
     const result = await this.query()

@@ -90,6 +90,17 @@ export class RepositoryQuery {
     return this;
   }
 
+  public findAllPostsByUserId(
+    userId: string,
+    entity: string,
+  ): RepositoryQuery {
+    this.query.raw(
+      `MATCH (${entity}:${entity}) WHERE ${entity}.publishedById = '${userId}'`,
+    );
+    this.returns.push(`${entity}`);
+    return this;
+  }
+
   public fetchDescendantTreeByUserId(
     userId: number,
   ): RepositoryQuery {
