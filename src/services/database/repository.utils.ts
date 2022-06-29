@@ -2097,20 +2097,25 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
       let resultItem = members.filter(obj => {
         return obj.identity == subItem.start
       });
-      let married = findNodes(subItem.start , marriedRel, members);
-      if(married.length){
-        // @ts-ignore
-        resultItem.push({
-          married : married,
-          ...resultItem
-        })
-      }
 
       let descendants = findNodes(subItem.start , items, members);
+      let marRel = marriedRel.filter(obj => {
+        return obj.end == subItem.start
+      });
+
+      let married = null;
+      if (marRel.length) {
+        married = members.filter(obj => {
+          let member = marRel[0]
+          return obj.identity == member.start
+        });
+      }
+
       if(descendants.length){
         // @ts-ignore
         resultItem.push({
-          descendant : descendants,
+          descendant : descendants[0],
+          married : married ? married : [],
           ...resultItem
         })
       }

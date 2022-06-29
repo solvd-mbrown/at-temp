@@ -5,14 +5,13 @@ export class UpdateUserDto {
   firstName?: string;
   middleName?: string;
   lastName?: string;
-  IntroductionText?: string;
-  IntroductionImageLinks?: [];
+  introduction?: [];
   birthdate?: string;
   dateOfDeath?: string;
   deceased?: boolean;
   gender?: string;
   hometown?: string;
-  HomeCountry ?: string;
+  homeCountry ?: string;
   email?: string;
   phone?: string;
   address?: string;
