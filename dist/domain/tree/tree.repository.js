@@ -37,6 +37,7 @@ let TreeRepository = class TreeRepository {
             const data = result.data;
             return Object.assign({ id: data.Tree.identity }, data.Tree.properties);
         }
+        throw new common_1.BadRequestException(database_constants_1.CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
     }
     async getTreeMembers(id) {
         const result = await this.query()
@@ -46,6 +47,7 @@ let TreeRepository = class TreeRepository {
             const data = result.data;
             return Object.assign(Object.assign({ id: data.Tree.identity }, data.Tree.properties), { treeMembers: data.nList });
         }
+        throw new common_1.BadRequestException(database_constants_1.CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
     }
     async getTree(id) {
         const result = await this.query()
@@ -56,6 +58,7 @@ let TreeRepository = class TreeRepository {
             const tree = cypher.buildTree(data);
             return Object.assign(Object.assign({ id: data.Tree.identity }, data.Tree.properties), { tree: tree[0] });
         }
+        throw new common_1.BadRequestException(database_constants_1.CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
     }
     async joinToTreeDescendant(id, treeProperties) {
         const result = await this.query()
@@ -67,6 +70,7 @@ let TreeRepository = class TreeRepository {
                 "response": "done"
             };
         }
+        throw new common_1.BadRequestException(database_constants_1.CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
     }
     async joinToTreeMarried(id, treeProperties) {
         const result = await this.query()
@@ -78,6 +82,7 @@ let TreeRepository = class TreeRepository {
                 "response": "done"
             };
         }
+        throw new common_1.BadRequestException(database_constants_1.CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
     }
 };
 TreeRepository = __decorate([

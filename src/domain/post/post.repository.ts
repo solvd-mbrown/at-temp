@@ -67,10 +67,11 @@ export class PostRepository {
   }
 
 
-  async addNewPost(PostData: any): Promise<Post[]> {
+  async addNewPost(postData: any): Promise<Post[]> {
+    postData.postBody = UtilsRepository.getStringVersion(postData?.postBody);
     const result = await this.query()
     .createEntity<{ [key in keyof Partial<Post>]: any }>('Post',
-      PostData
+      postData
     )
     .commitWithReturnEntity();
 
@@ -110,7 +111,7 @@ export class PostRepository {
       'Post',
       Object.entries({
         'Post.postType': params?.postType,
-        'Post.postBody': params?.postBody,
+        'Post.postBody': params?.postBody ? UtilsRepository.getStringVersion(params?.postBody) : null,
         'Post.comments': params?.comments,
         // 'Post.comments': params?.comments ? UtilsRepository.getStringVersion(params?.comments) : null,
       }).reduce((valuesAcc, [key, value]) => {
