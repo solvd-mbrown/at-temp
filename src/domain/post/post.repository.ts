@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable, Scope } from '@nestjs/common';
 import { Connection } from 'cypher-query-builder';
 import * as cypher from 'src/services/database/repository.utils';
 import { ConfigService } from '@nestjs/config';
-import { DATABASE_CONNECTION } from 'src/services/database/database.constants';
+import {CUSTOM_ERROR_MESSAGE, DATABASE_CONNECTION } from 'src/services/database/database.constants';
 import { Post } from './entities/post.entity';
 import { UtilsRepository } from 'src/utils/utils.repository';
 
@@ -30,6 +30,7 @@ export class PostRepository {
         ...data.Post.properties,
       };
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
   async getAllPostsByTreeUUID(uuid: string): Promise<any> {
@@ -46,6 +47,7 @@ export class PostRepository {
         };
       });
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
   async findAllByUserId(id: string): Promise<any> {
@@ -61,6 +63,7 @@ export class PostRepository {
         };
       });
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
 
@@ -79,6 +82,7 @@ export class PostRepository {
         ...data.Post.properties,
       };
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
   async deletePost(id: number): Promise<any> {
@@ -91,6 +95,7 @@ export class PostRepository {
         "response": "done"
       };
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
   async updatePostEntity(
@@ -126,6 +131,7 @@ export class PostRepository {
         ...data.Post.properties,
       };
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
 

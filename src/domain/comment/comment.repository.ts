@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable, Scope } from '@nestjs/common';
 import { Connection } from 'cypher-query-builder';
 import * as cypher from 'src/services/database/repository.utils';
 import { ConfigService } from '@nestjs/config';
-import { DATABASE_CONNECTION } from 'src/services/database/database.constants';
+import {CUSTOM_ERROR_MESSAGE, DATABASE_CONNECTION } from 'src/services/database/database.constants';
 import { Comment } from './entities/comment.entity';
 import { UtilsRepository } from 'src/utils/utils.repository';
 import {ENTITY_TYPE_COMMENT, ENTITY_TYPE_POST } from './comment.constants';
@@ -61,6 +61,7 @@ export class CommentRepository {
         ...data.Comment.properties,
       };
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
   async getCommentEntity(id: number): Promise<any> {
@@ -74,6 +75,7 @@ export class CommentRepository {
         ...data.Comment.properties,
       };
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
   async getAllCommentsByIds(id: number, type: string): Promise<any> {
@@ -100,6 +102,7 @@ export class CommentRepository {
         };
       });
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
   async deleteComment(id: number): Promise<any> {
@@ -112,6 +115,7 @@ export class CommentRepository {
         "response": "done"
       };
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
   async updateCommentEntity(
@@ -145,6 +149,7 @@ export class CommentRepository {
         ...data.Comment.properties,
       };
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
 
