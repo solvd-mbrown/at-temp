@@ -29,6 +29,7 @@
     "@nestjs/platform-express": "^8.0.0",
     "aws-sdk": "^2.1154.0",
     "cypher-query-builder": "^6.0.4",
+    "firebase-admin": "^11.0.0",
     "neo4j-driver": "^4.4.5",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
