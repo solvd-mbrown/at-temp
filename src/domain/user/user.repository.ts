@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable, Scope } from '@nestjs/common';
 import { Connection } from 'cypher-query-builder';
 import * as cypher from 'src/services/database/repository.utils';
 import { ConfigService } from '@nestjs/config';
-import { DATABASE_CONNECTION } from 'src/services/database/database.constants';
+import { CUSTOM_ERROR_MESSAGE, DATABASE_CONNECTION } from 'src/services/database/database.constants';
 import { User } from './entities/user.entity';
 import { UtilsRepository } from 'src/utils/utils.repository';
 
@@ -32,6 +32,7 @@ export class UserRepository {
         ...data.User.properties,
       };
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
   async deleteUser(id: number): Promise<any> {
@@ -44,6 +45,7 @@ export class UserRepository {
         "response": "done"
       };
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
   async getUserEntity(id: number): Promise<any> {
@@ -57,6 +59,7 @@ export class UserRepository {
         ...data.User.properties,
       };
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
   async updateUserEntity(
@@ -108,6 +111,7 @@ export class UserRepository {
         ...data.User.properties,
       };
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
 }

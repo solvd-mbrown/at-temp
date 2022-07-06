@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable, Scope } from '@nestjs/common';
 import { Connection } from 'cypher-query-builder';
 import * as cypher from 'src/services/database/repository.utils';
 import { ConfigService } from '@nestjs/config';
-import { DATABASE_CONNECTION } from 'src/services/database/database.constants';
+import {CUSTOM_ERROR_MESSAGE, DATABASE_CONNECTION } from 'src/services/database/database.constants';
 import { Tree } from './entities/tree.entity';
 
 @Injectable({ scope: Scope.REQUEST })
@@ -33,6 +33,7 @@ export class TreeRepository {
         ...data.Tree.properties,
       };
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
   async getTreeMembers(id: any): Promise<Tree[]> {
@@ -49,6 +50,7 @@ export class TreeRepository {
         // relations: data.rList,
       };
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
   async getTree(id: any): Promise<Tree[]> {
@@ -65,6 +67,7 @@ export class TreeRepository {
        tree: tree[0]
       };
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
   
   async joinToTreeDescendant(id, treeProperties: any): Promise<any> {
@@ -77,6 +80,7 @@ export class TreeRepository {
          "response": "done"
         };
       }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
  }
 
   async joinToTreeMarried(id, treeProperties: any): Promise<any> {
@@ -89,6 +93,7 @@ export class TreeRepository {
         "response": "done"
       };
     }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
 }

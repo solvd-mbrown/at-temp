@@ -17,16 +17,20 @@ export class FileService {
 
   async upload(file) {
     const newUuid = uuidv4();
-    const result = await this.uploadS3(file.buffer, newUuid);
+    const partuuid = newUuid.slice(0,8);
+    const result = await this.uploadS3(file, partuuid);
     return result;
   }
 
   async uploadS3(file, uuid) {
     const s3 = this.getS3();
+    const timestamp = Date.now();
+    const fileName = `${uuid}${timestamp}${file.originalname}`
     const params = {
       Bucket: S3_BUCKET,
-      Key: String(uuid),
-      Body: file,
+      Key: fileName,
+      ContentType: file.mimetype,
+      Body: file.buffer,
     };
     return new Promise((resolve, reject) => {
       s3.upload(params, (err, data) => {
