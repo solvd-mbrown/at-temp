@@ -1394,9 +1394,12 @@ const buildTreeFromRelations = (rootUser, members, descendantRels, marriedRel) =
                     return obj.identity == member.start;
                 });
             }
-            console.log('descendants', descendants);
-            resultItem.push(Object.assign({ descendant: descendants.length ? descendants.flat() : [], married: married ? married : [] }, resultItem));
             console.log('resultItem', resultItem);
+            resultItem.push({
+                user: resultItem[0],
+                descendant: descendants.length ? descendants.flat() : [],
+                married: married ? married : [],
+            });
             if (resultItem.length > 1) {
                 resultItem = resultItem.filter(obj => {
                     return obj.hasOwnProperty('descendant');

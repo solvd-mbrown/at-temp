@@ -2101,7 +2101,9 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
  }
   const findNodes = (parentKey, items, members) => {
     let subItems = partial(items, n => {
-     return n.end == parentKey});
+     return n.end == parentKey
+    });
+
     const result = [];
     for (let i = 0; i < subItems.length; i++) {
       let subItem = subItems[i];
@@ -2123,9 +2125,9 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
       }
 
       resultItem.push({
+        user : resultItem[0],
         descendant : descendants.length ? descendants.flat() : [],
         married : married ? married : [],
-        ...resultItem
       })
 
       if (resultItem.length > 1) {
