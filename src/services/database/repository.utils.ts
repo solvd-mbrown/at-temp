@@ -2123,12 +2123,23 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
       }
 
       if(descendants.length){
-        // @ts-ignore
         resultItem.push({
           descendant : descendants[0],
           married : married ? married : [],
           ...resultItem
         })
+      }else{
+        resultItem.push({
+          descendant : [],
+          married : married ? married : [],
+          ...resultItem
+        })
+      }
+
+      if (resultItem.length > 1) {
+      resultItem = resultItem.filter(obj => {
+          return obj.hasOwnProperty('descendant')
+        });
       }
       result.push(resultItem);
     }

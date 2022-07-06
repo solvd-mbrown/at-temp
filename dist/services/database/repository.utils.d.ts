@@ -11,6 +11,7 @@ export declare class RepositoryQuery {
     attachExternalEntitiesByParent(childEntity: string, parentEntity: string, attachArchived?: boolean): RepositoryQuery;
     fetchAllByEntityId(entityId: number, entity: string): RepositoryQuery;
     fetchAllByEntityUUUID(entityUUID: string, entity: string): RepositoryQuery;
+    findAllPostsByUserId(userId: string, entity: string): RepositoryQuery;
     fetchDescendantTreeByUserId(userId: number): RepositoryQuery;
     fetchUserByUserId(userId: number): RepositoryQuery;
     attachExternalEntityByParent(childEntity: string, parentEntity: string, attachArchived?: boolean): RepositoryQuery;
