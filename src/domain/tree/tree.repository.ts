@@ -4,6 +4,7 @@ import * as cypher from 'src/services/database/repository.utils';
 import { ConfigService } from '@nestjs/config';
 import {CUSTOM_ERROR_MESSAGE, DATABASE_CONNECTION } from 'src/services/database/database.constants';
 import { Tree } from './entities/tree.entity';
+import { UtilsRepository } from 'src/utils/utils.repository';
 
 @Injectable({ scope: Scope.REQUEST })
 export class TreeRepository {
@@ -22,8 +23,26 @@ export class TreeRepository {
       true
     )
     .commitWithReturnEntity();
+
     await this.query()
     .createMemberRelation(treeData.userId, result.data.Tree.identity)
+    .commitWithReturnEntity();
+
+    await this.query()
+    .fetchUserByUserId(treeData.userId)
+    .updateEntity(
+      'User',
+      Object.entries({
+        'User.myTreeId': UtilsRepository.getStringVersion(result.data.Tree.identity),
+      }).reduce((valuesAcc, [key, value]) => {
+        return value !== undefined && value !== null
+          ? {
+            ...valuesAcc,
+            [key]: value,
+          }
+          : valuesAcc;
+      }, {}),
+    )
     .commitWithReturnEntity();
 
     if (result) {
@@ -47,7 +66,6 @@ export class TreeRepository {
         id: data.Tree.identity,
         ...data.Tree.properties,
         treeMembers: data.nList,
-        // relations: data.rList,
       };
     }
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
@@ -74,7 +92,25 @@ export class TreeRepository {
       const result = await this.query()
       .createMemberAndDescendantRelations(treeProperties.userId, treeProperties.toUserId, id)
       .commitWithReturnEntity();
-      if(result) {
+
+      await this.query()
+      .fetchUserByUserId(treeProperties.userId)
+      .updateEntity(
+        'User',
+        Object.entries({
+          'User.myTreeId': UtilsRepository.getStringVersion(id),
+        }).reduce((valuesAcc, [key, value]) => {
+          return value !== undefined && value !== null
+            ? {
+              ...valuesAcc,
+              [key]: value,
+            }
+            : valuesAcc;
+        }, {}),
+      )
+    .commitWithReturnEntity();
+
+    if(result) {
         const output = result.data;
         return {
          "response": "done"
@@ -86,6 +122,49 @@ export class TreeRepository {
   async joinToTreeMarried(id, treeProperties: any): Promise<any> {
     const result = await this.query()
     .createMemberAndMarriedRelations(treeProperties.userId, treeProperties.toUserId, id)
+    .commitWithReturnEntity();
+
+    const spouse = await this.query()
+    .fetchUserByUserId(treeProperties.toUserId)
+    .commitWithReturnEntity();
+
+    const spouseToUser = await this.query()
+    .fetchUserByUserId(treeProperties.toUserId)
+    .commitWithReturnEntity();
+
+    await this.query()
+    .fetchUserByUserId(treeProperties.userId)
+    .updateEntity(
+      'User',
+      Object.entries({
+        'User.spouseTreeId': UtilsRepository.getStringVersion(id),
+        'User.spouse': UtilsRepository.getStringVersion([spouse.data.User]),
+      }).reduce((valuesAcc, [key, value]) => {
+        return value !== undefined && value !== null
+          ? {
+            ...valuesAcc,
+            [key]: value,
+          }
+          : valuesAcc;
+      }, {}),
+    )
+    .commitWithReturnEntity();
+
+    await this.query()
+    .fetchUserByUserId(treeProperties.toUserId)
+    .updateEntity(
+      'User',
+      Object.entries({
+        'User.spouse': UtilsRepository.getStringVersion([spouseToUser.data.User]),
+      }).reduce((valuesAcc, [key, value]) => {
+        return value !== undefined && value !== null
+          ? {
+            ...valuesAcc,
+            [key]: value,
+          }
+          : valuesAcc;
+      }, {}),
+    )
     .commitWithReturnEntity();
     if(result) {
       const output = result.data;

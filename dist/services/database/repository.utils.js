@@ -1394,7 +1394,6 @@ const buildTreeFromRelations = (rootUser, members, descendantRels, marriedRel) =
                     return obj.identity == member.start;
                 });
             }
-            console.log('resultItem', resultItem);
             resultItem.push({
                 user: resultItem[0],
                 descendant: descendants.length ? descendants.flat() : [],
