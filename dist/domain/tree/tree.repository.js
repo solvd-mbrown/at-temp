@@ -18,6 +18,7 @@ const cypher_query_builder_1 = require("cypher-query-builder");
 const cypher = require("../../services/database/repository.utils");
 const config_1 = require("@nestjs/config");
 const database_constants_1 = require("../../services/database/database.constants");
+const utils_repository_1 = require("../../utils/utils.repository");
 let TreeRepository = class TreeRepository {
     constructor(connection, configService) {
         this.connection = connection;
@@ -32,6 +33,15 @@ let TreeRepository = class TreeRepository {
             .commitWithReturnEntity();
         await this.query()
             .createMemberRelation(treeData.userId, result.data.Tree.identity)
+            .commitWithReturnEntity();
+        await this.query()
+            .fetchUserByUserId(treeData.userId)
+            .updateEntity('User', Object.entries({
+            'User.myTreeId': utils_repository_1.UtilsRepository.getStringVersion(result.data.Tree.identity),
+        }).reduce((valuesAcc, [key, value]) => {
+            return value !== undefined && value !== null
+                ? Object.assign(Object.assign({}, valuesAcc), { [key]: value }) : valuesAcc;
+        }, {}))
             .commitWithReturnEntity();
         if (result) {
             const data = result.data;
@@ -64,6 +74,15 @@ let TreeRepository = class TreeRepository {
         const result = await this.query()
             .createMemberAndDescendantRelations(treeProperties.userId, treeProperties.toUserId, id)
             .commitWithReturnEntity();
+        await this.query()
+            .fetchUserByUserId(treeProperties.userId)
+            .updateEntity('User', Object.entries({
+            'User.myTreeId': utils_repository_1.UtilsRepository.getStringVersion(id),
+        }).reduce((valuesAcc, [key, value]) => {
+            return value !== undefined && value !== null
+                ? Object.assign(Object.assign({}, valuesAcc), { [key]: value }) : valuesAcc;
+        }, {}))
+            .commitWithReturnEntity();
         if (result) {
             const output = result.data;
             return {
@@ -75,6 +94,15 @@ let TreeRepository = class TreeRepository {
     async joinToTreeMarried(id, treeProperties) {
         const result = await this.query()
             .createMemberAndMarriedRelations(treeProperties.userId, treeProperties.toUserId, id)
+            .commitWithReturnEntity();
+        await this.query()
+            .fetchUserByUserId(treeProperties.userId)
+            .updateEntity('User', Object.entries({
+            'User.spouseTreeId': utils_repository_1.UtilsRepository.getStringVersion(id),
+        }).reduce((valuesAcc, [key, value]) => {
+            return value !== undefined && value !== null
+                ? Object.assign(Object.assign({}, valuesAcc), { [key]: value }) : valuesAcc;
+        }, {}))
             .commitWithReturnEntity();
         if (result) {
             const output = result.data;

@@ -17,10 +17,10 @@ export class UpdateUserDto {
   address?: string;
   spouseTreeId?: string;
   myTreeId?: string;
-  spouse?: [];
-  kids?: [];
-  parents?: [];
-  siblings?: [];
+  // spouse?: [];
+  // kids?: [];
+  // parents?: [];
+  // siblings?: [];
   socialNetworks?: [];
   work?: [];
   education?: [];

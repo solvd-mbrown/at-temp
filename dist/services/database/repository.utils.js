@@ -43,6 +43,28 @@ class RepositoryQuery {
     `);
             return this;
         };
+        this.resolveUsersParentsByRelation = () => {
+            this.query.raw(`
+      OPTIONAL MATCH (User)-[:USER_DESCENDANT_USER]->(UserP)
+      OPTIONAL MATCH (UserP)<-[:USER_MARRIED_USER]-(UserM)
+    `);
+            this.returns.push('UserP', 'UserM');
+            return this;
+        };
+        this.resolveUsersSpouseByRelation = () => {
+            this.query.raw(`
+      OPTIONAL MATCH (User)-[:USER_MARRIED_USER]-(UserS)
+    `);
+            this.returns.push('UserS');
+            return this;
+        };
+        this.resolveUsersChildrenByRelation = () => {
+            this.query.raw(`
+      OPTIONAL MATCH (User)<-[:USER_DESCENDANT_USER]-(UserKList)
+    `);
+            this.returns.push('UserKList');
+            return this;
+        };
         this.resolveInternalRelations = (childEntity, parentEntity, ids, findArchived = false, customWith = `*`) => {
             if ((ids === null || ids === void 0 ? void 0 : ids.length) > 0) {
                 this.dependencies.add(`${childEntity}List`);

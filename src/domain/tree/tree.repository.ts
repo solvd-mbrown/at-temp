@@ -124,21 +124,12 @@ export class TreeRepository {
     .createMemberAndMarriedRelations(treeProperties.userId, treeProperties.toUserId, id)
     .commitWithReturnEntity();
 
-    const spouse = await this.query()
-    .fetchUserByUserId(treeProperties.toUserId)
-    .commitWithReturnEntity();
-
-    const spouseToUser = await this.query()
-    .fetchUserByUserId(treeProperties.toUserId)
-    .commitWithReturnEntity();
-
     await this.query()
     .fetchUserByUserId(treeProperties.userId)
     .updateEntity(
       'User',
       Object.entries({
         'User.spouseTreeId': UtilsRepository.getStringVersion(id),
-        'User.spouse': UtilsRepository.getStringVersion([spouse.data.User]),
       }).reduce((valuesAcc, [key, value]) => {
         return value !== undefined && value !== null
           ? {
@@ -150,22 +141,6 @@ export class TreeRepository {
     )
     .commitWithReturnEntity();
 
-    await this.query()
-    .fetchUserByUserId(treeProperties.toUserId)
-    .updateEntity(
-      'User',
-      Object.entries({
-        'User.spouse': UtilsRepository.getStringVersion([spouseToUser.data.User]),
-      }).reduce((valuesAcc, [key, value]) => {
-        return value !== undefined && value !== null
-          ? {
-            ...valuesAcc,
-            [key]: value,
-          }
-          : valuesAcc;
-      }, {}),
-    )
-    .commitWithReturnEntity();
     if(result) {
       const output = result.data;
       return {
