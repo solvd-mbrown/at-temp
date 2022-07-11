@@ -75,20 +75,21 @@ export class UserRepository {
     }
 
     let siblings = [];
-    if (parent && parent[0].data.UserP) {
-      const siblingsArr = await this.query()
-      .fetchUserByUserId(parent[0].data.UserP.identity)
-      .resolveUsersChildrenByRelation()
-      .commitWithReturnEntities();
-
-      if(siblingsArr && siblingsArr[0].data.UserKList) {
-        let famalyLine = siblingsArr[0].data.UserKList;
-        famalyLine = famalyLine.filter(object => {
-          return object.identity != id;
-        });
-        siblings.push(famalyLine);
-      }
-    }
+    // if (parent && parent[0].data.UserP) {
+    //   const siblingsArr = await this.query()
+    //   .fetchUserByUserId(parent[0].data.UserP.identity)
+    //   .resolveUsersChildrenByRelation()
+    //   .commitWithReturnEntities();
+    //
+    //   if(siblingsArr && siblingsArr[0].data.UserKList) {
+    //     let famalyLine = siblingsArr[0].data.UserKList;
+    //     console.log('famalyLine',famalyLine);
+    //     famalyLine = famalyLine.filter(object => {
+    //       return object.identity != id;
+    //     });
+    //     siblings.push(famalyLine);
+    //   }
+    // }
 
     const childrens = await this.query()
       .fetchUserByUserId(id)
@@ -97,6 +98,7 @@ export class UserRepository {
 
     let kids = [];
     if(childrens && childrens[0].data.UserKList) {
+      console.log('childrens', childrens);
       kids = childrens[0].data.UserKList;
     }
 
@@ -105,25 +107,29 @@ export class UserRepository {
       .fetchUserByUserId(spouses[0].data.UserS.identity)
       .resolveUsersChildrenByRelation()
       .commitWithReturnEntities();
+
+
       if(spouseChildrens && spouseChildrens[0].data.UserKList) {
+        console.log('spouseChildrens', spouseChildrens);
         kids = spouseChildrens[0].data.UserKList;
       }
     }
 
     if (result) {
 
-      if (!parents.length) {
-        parents = null;
-      }
-       if (!siblings.length) {
-         siblings = null;
-      }
-       if (!spouse.length) {
-         spouse = null;
-      }
-       if (!kids.length) {
-         kids = null;
-      }
+      // if (!parents.length) {
+      //   parents = null;
+      // }
+      //  if (!siblings.length) {
+      //    siblings = null;
+      // }
+      //  if (!spouse.length) {
+      //    spouse = null;
+      // }
+      //  if (!kids.length) {
+      //    kids = null;
+      // }
+console.log('siblings', siblings);
 
       const data = result.data;
       data.User.properties.parents = parents.length ? parents : null;
