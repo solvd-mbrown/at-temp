@@ -112,11 +112,24 @@ export class UserRepository {
 
     if (result) {
 
+      if (!parents.length) {
+        parents = null;
+      }
+       if (!siblings.length) {
+         siblings = null;
+      }
+       if (!spouse.length) {
+         spouse = null;
+      }
+       if (!kids.length) {
+         kids = null;
+      }
+
       const data = result.data;
-      data.User.properties.parents = parents ? parents : null;
-      data.User.properties.siblings = siblings ? siblings : null;
-      data.User.properties.spouse = spouse ? spouse : null;
-      data.User.properties.kids = kids ? kids : null;
+      data.User.properties.parents = parents.length ? parents : null;
+      data.User.properties.siblings = siblings.length ? siblings : null;
+      data.User.properties.spouse = spouse.length ? spouse : null;
+      data.User.properties.kids = kids.length ? kids : null;
       return {
         id: data.User.identity,
         ...data.User.properties,
