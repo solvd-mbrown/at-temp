@@ -83,6 +83,9 @@ export declare class RepositoryQuery {
     removeDependencies(deps: string[]): RepositoryQuery;
     removeRelationFromEntityToParent: (childEntity: string, parentEntity: string) => RepositoryQuery;
     resolveEntityByInternalRelation: (childEntity: string, parentEntity: string) => RepositoryQuery;
+    resolveUsersParentsByRelation: () => RepositoryQuery;
+    resolveUsersSpouseByRelation: () => RepositoryQuery;
+    resolveUsersChildrenByRelation: () => RepositoryQuery;
     resolveInternalRelations: (childEntity: string, parentEntity: string, ids: number[], findArchived?: boolean, customWith?: string) => RepositoryQuery;
     resolveExternalRelations: (childEntity: string, parentEntity: string, ids: number[]) => RepositoryQuery;
     resolveExternalRelation: (childEntity: string, parentEntity: string, id?: number, attachArchived?: boolean) => RepositoryQuery;

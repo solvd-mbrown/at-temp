@@ -73,7 +73,7 @@ export class RepositoryQuery {
   ): RepositoryQuery {
     this.query.raw(
       `MATCH (${entity}:${entity}) WHERE ID(${entity}) = ${entityId}
-       MATCH (${entity})-[rList*..10]-(nList)`,
+       MATCH (${entity})-[rList*..2]-(nList)`,
     );
     this.returns.push(`${entity}`, 'rList', 'nList');
     return this;
@@ -1170,6 +1170,35 @@ export class RepositoryQuery {
     return this;
   };
 
+  public resolveUsersParentsByRelation = (
+  ): RepositoryQuery => {
+    this.query.raw(`
+      OPTIONAL MATCH (User)-[:USER_DESCENDANT_USER]->(UserP)
+      OPTIONAL MATCH (UserP)<-[:USER_MARRIED_USER]-(UserM)
+    `);
+    this.returns.push('UserP', 'UserM');
+    return this;
+  };
+
+  public resolveUsersSpouseByRelation = (
+  ): RepositoryQuery => {
+    this.query.raw(`
+      OPTIONAL MATCH (User)-[:USER_MARRIED_USER]-(UserS)
+    `);
+    this.returns.push('UserS');
+    return this;
+  };
+
+  public resolveUsersChildrenByRelation = (
+  ): RepositoryQuery => {
+    this.query.raw(`
+      OPTIONAL MATCH (User)<-[:USER_DESCENDANT_USER]-(UserKList)
+    `);
+    this.returns.push('UserKList');
+    return this;
+  };
+
+
   public resolveInternalRelations = (
     childEntity: string,
     parentEntity: string,
@@ -2044,51 +2073,6 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
   members = members.filter(object => {
     return object.labels[0] !== 'Tree';
   });
-  //   for (let item of descendantRels) {
-  //     for (let itemMember of members) {
-  //       if (!tree.length) {
-  //         let resultMember = members.filter(obj => {
-  //           return obj.identity == rootUser[0].identity
-  //         })
-  //         tree.push({
-  //           ...resultMember
-  //         });
-  //       }
-  //
-  //       if (item.end === itemMember.identity && tree.length) {
-  //
-  //         let resultMember = members.filter(obj => {
-  //           return obj.identity == item.start
-  //         })
-  //
-  //         let resultMarriedMember = members.filter(obj => {
-  //           return obj.end == item.end
-  //         })
-  //
-  //         // console.log('itemMember', itemMember);
-  //         // console.log('resultMember', resultMember);
-  //
-  //         //Find index of specific object using findIndex method.
-  //         let treeIndex = tree.findIndex((obj => obj.identity == resultMember.identity));
-  //         if (!tree[treeIndex].descendant) {
-  //           tree[treeIndex].descendant = [];
-  //         }
-  //         if (!tree[treeIndex].married) {
-  //           tree[treeIndex].married = [];
-  //         }
-  //         if (resultMarriedMember) {
-  //           tree[treeIndex].married.push(resultMarriedMember);
-  //         }
-  //
-  //         tree[treeIndex].descendant.push(resultMember);
-  //
-  //         // itemMember.push({
-  //         //   descendant: [],
-  //         //   married: []
-  //         // });
-  //       }
-  //     }
-  // } //--------------11-----------------------
 
    const partial = (descendantRels = [], condition) => {
     const result = [];
@@ -2101,7 +2085,9 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
  }
   const findNodes = (parentKey, items, members) => {
     let subItems = partial(items, n => {
-     return n.end == parentKey});
+     return n.end == parentKey
+    });
+
     const result = [];
     for (let i = 0; i < subItems.length; i++) {
       let subItem = subItems[i];
@@ -2122,13 +2108,16 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
         });
       }
 
-      if(descendants.length){
-        // @ts-ignore
-        resultItem.push({
-          descendant : descendants[0],
-          married : married ? married : [],
-          ...resultItem
-        })
+      resultItem.push({
+        user : resultItem[0],
+        descendant : descendants.length ? descendants.flat() : [],
+        married : married ? married : [],
+      })
+
+      if (resultItem.length > 1) {
+      resultItem = resultItem.filter(obj => {
+          return obj.hasOwnProperty('descendant')
+        });
       }
       result.push(resultItem);
     }
