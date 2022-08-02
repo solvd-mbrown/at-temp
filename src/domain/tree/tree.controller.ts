@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { TreeService } from './tree.service';
 import { CreateTreeDto } from './dto/create-tree.dto';
 import { UpdateTreeDto } from './dto/update-tree.dto';
 import { JoinToTreeDto } from './dto/join-to-tree.dto';
+import { FirebaseAuthGuard } from 'src/services/auth/firebase/firebase-auth.guard';
 
 @Controller('tree')
+@UseGuards(FirebaseAuthGuard)
 export class TreeController {
   constructor(private readonly treeService: TreeService) {}
 

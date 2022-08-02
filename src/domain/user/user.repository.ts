@@ -184,4 +184,20 @@ export class UserRepository {
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
+
+  /*
+   * Get User Entity from email
+   */
+  public async getUserFromEmail(email: string): Promise<User> {
+    const result = await this.query()
+    .findUserByEmail(email)
+    .commitWithReturnEntity();
+
+    if (result) {
+      const data = result.data;
+      return cypher.mapCypherResultToEntity(data.User);
+    }
+  }
+
+
 }
