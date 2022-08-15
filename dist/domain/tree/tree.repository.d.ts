@@ -11,4 +11,5 @@ export declare class TreeRepository {
     getTree(id: any): Promise<Tree[]>;
     joinToTreeDescendant(id: any, treeProperties: any): Promise<any>;
     joinToTreeMarried(id: any, treeProperties: any): Promise<any>;
+    joinToTreeMarriedSubTree(id: any, treeProperties: any): Promise<any>;
 }

@@ -112,6 +112,27 @@ let TreeRepository = class TreeRepository {
         }
         throw new common_1.BadRequestException(database_constants_1.CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
     }
+    async joinToTreeMarriedSubTree(id, treeProperties) {
+        const result = await this.query()
+            .createMemberAndMarriedSubTreeRelations(treeProperties.userId, treeProperties.toUserId, id)
+            .commitWithReturnEntity();
+        await this.query()
+            .fetchUserByUserId(treeProperties.userId)
+            .updateEntity('User', Object.entries({
+            'User.spouseTreeId': utils_repository_1.UtilsRepository.getStringVersion(id),
+        }).reduce((valuesAcc, [key, value]) => {
+            return value !== undefined && value !== null
+                ? Object.assign(Object.assign({}, valuesAcc), { [key]: value }) : valuesAcc;
+        }, {}))
+            .commitWithReturnEntity();
+        if (result) {
+            const output = result.data;
+            return {
+                "response": "done"
+            };
+        }
+        throw new common_1.BadRequestException(database_constants_1.CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
+    }
 };
 TreeRepository = __decorate([
     (0, common_1.Injectable)({ scope: common_1.Scope.REQUEST }),

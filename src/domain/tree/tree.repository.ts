@@ -150,4 +150,35 @@ export class TreeRepository {
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
+  async joinToTreeMarriedSubTree(id, treeProperties: any): Promise<any> {
+    const result = await this.query()
+    .createMemberAndMarriedSubTreeRelations(treeProperties.userId, treeProperties.toUserId, id)
+    .commitWithReturnEntity();
+
+    await this.query()
+    .fetchUserByUserId(treeProperties.userId)
+    .updateEntity(
+      'User',
+      Object.entries({
+        'User.spouseTreeId': UtilsRepository.getStringVersion(id),
+      }).reduce((valuesAcc, [key, value]) => {
+        return value !== undefined && value !== null
+          ? {
+            ...valuesAcc,
+            [key]: value,
+          }
+          : valuesAcc;
+      }, {}),
+    )
+    .commitWithReturnEntity();
+
+    if(result) {
+      const output = result.data;
+      return {
+        "response": "done"
+      };
+    }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
+  }
+
 }

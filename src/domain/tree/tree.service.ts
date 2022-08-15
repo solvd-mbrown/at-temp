@@ -38,8 +38,12 @@ export class TreeService {
     let result = null;
     if (joinToTreeProperty.relation == 'MARRIED') {
       result = await this.treeRepository.joinToTreeMarried(id, joinToTreeProperty);
-    } else{
+    }
+    if (joinToTreeProperty.relation == 'DESCENDANT'){
       result = await this.treeRepository.joinToTreeDescendant(id, joinToTreeProperty);
+    }
+    if (joinToTreeProperty.relation == 'MARRIEDSUBTREE'){
+      result = await this.treeRepository.joinToTreeMarriedSubTree(id, joinToTreeProperty);
     }
     return result;
   }
