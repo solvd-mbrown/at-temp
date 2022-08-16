@@ -2195,7 +2195,7 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
       let parentsSubTree = null
       if(married && (+married[0].identity == +EnterPointToSubTree)) {
         if (subTree) {
-          parentsSubTree = subTree;
+          parentsSubTree = subTree[0];
         }
       }
 
