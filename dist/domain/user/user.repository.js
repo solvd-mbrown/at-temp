@@ -96,7 +96,7 @@ let UserRepository = class UserRepository {
         if (childrens && childrens.length && childrens[0].data.UserKList) {
             kids = childrens[0].data.UserKList;
         }
-        if (parent && parent.length && parent[0].data.UserS) {
+        if (!childrens[0].data.UserKList.length && spouses && spouses[0].data.UserS) {
             const spouseChildrens = await this.query()
                 .fetchUserByUserId(spouses[0].data.UserS.identity)
                 .resolveUsersChildrenByRelation()

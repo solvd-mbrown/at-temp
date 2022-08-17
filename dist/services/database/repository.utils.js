@@ -1493,7 +1493,7 @@ const buildTreeFromRelations = (rootUser, members, descendantRels, marriedRel, s
             let parentsSubTree = null;
             if (married && (+married[0].identity == +EnterPointToSubTree)) {
                 if (subTree) {
-                    parentsSubTree = subTree;
+                    parentsSubTree = subTree[0];
                 }
             }
             if (parentsSubTree && parentsSubTree.length) {
