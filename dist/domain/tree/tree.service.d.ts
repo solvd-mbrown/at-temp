@@ -7,6 +7,7 @@ export declare class TreeService {
     findAll(): string;
     findOne(id: number): Promise<import("./entities/tree.entity").Tree[]>;
     getTreeMembers(id: number): Promise<import("./entities/tree.entity").Tree[]>;
+    getPartTreeByUserId(treeId: number, userId: string): Promise<import("./entities/tree.entity").Tree[]>;
     update(id: number, updateTreeDto: UpdateTreeDto): string;
     join(id: number, joinToTreeProperty: any): Promise<any>;
     remove(id: number): string;

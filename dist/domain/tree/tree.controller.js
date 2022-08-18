@@ -34,6 +34,9 @@ let TreeController = class TreeController {
     getTreeMembers(id) {
         return this.treeService.getTreeMembers(+id);
     }
+    getPartTreeByUserId(treeId, userId) {
+        return this.treeService.getPartTreeByUserId(+treeId, userId);
+    }
     update(id, updateTreeDto) {
         return this.treeService.update(+id, updateTreeDto);
     }
@@ -71,6 +74,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], TreeController.prototype, "getTreeMembers", null);
+__decorate([
+    (0, common_1.Get)('partTree/:treeId/:userId'),
+    __param(0, (0, common_1.Param)('treeId')),
+    __param(1, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", void 0)
+], TreeController.prototype, "getPartTreeByUserId", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),

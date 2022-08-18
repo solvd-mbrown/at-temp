@@ -2016,7 +2016,6 @@ export const buildTree = (data: any) => {
   let marriedRel = this.getMarriedRel(data.rList);
   // @ts-ignore
   let subTreeRel = this.getMarriedSubTreeRel(data.rList);
-  console.log('subTreeRel', subTreeRel);
   let tree = null;
   if(subTreeRel.length){
     // @ts-ignore
@@ -2025,7 +2024,6 @@ export const buildTree = (data: any) => {
     let EnterPointToSubTree = this.getEnterPointToSubTree(subTreeRel);
     // @ts-ignore
     let subTree = this.buildTreeFromRelations(subTreeRootUser, data.nList, subTreeRel, marriedRel);
-    console.log('subTree', subTree);
     // @ts-ignore
     let rootUser = this.getRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
     // @ts-ignore
@@ -2034,6 +2032,35 @@ export const buildTree = (data: any) => {
   } else {
     // @ts-ignore
     let rootUser = this.getRootUser(data.nList, descendantRel, marriedRel);
+    // @ts-ignore
+    let tree = this.buildTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel);
+    return tree;
+  }
+};
+
+export const buildPartTree = (data: any, userId: string) => {
+  // @ts-ignore
+  let descendantRel = this.getDescendantRel(data.rList);
+  // @ts-ignore
+  let marriedRel = this.getMarriedRel(data.rList);
+  // @ts-ignore
+  let subTreeRel = this.getMarriedSubTreeRel(data.rList);
+  let tree = null;
+  if(subTreeRel.length){
+    // @ts-ignore
+    let subTreeRootUser = this.getSubTreeRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
+    // @ts-ignore
+    let EnterPointToSubTree = this.getEnterPointToSubTree(subTreeRel);
+    // @ts-ignore
+    let subTree = this.buildTreeFromRelations(subTreeRootUser, data.nList, subTreeRel, marriedRel);
+    // @ts-ignore
+    let rootUser = this.getRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
+    // @ts-ignore
+    let tree = this.buildTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel, subTree, EnterPointToSubTree);
+    return tree;
+  } else {
+    // @ts-ignore
+    let rootUser =  [{ identity: userId }];
     // @ts-ignore
     let tree = this.buildTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel);
     return tree;

@@ -125,6 +125,7 @@ export declare const processEmptyNestedArray: (arr: any) => any;
 export declare const processEntityIds: (array: any) => string;
 export declare const processArrayProperty: (array: any) => any;
 export declare const buildTree: (data: any) => any;
+export declare const buildPartTree: (data: any, userId: string) => any;
 export declare const getDescendantRel: (data: any) => any;
 export declare const getMarriedRel: (data: any) => any;
 export declare const getMarriedSubTreeRel: (data: any) => any;

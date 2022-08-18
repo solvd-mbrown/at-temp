@@ -87,6 +87,32 @@ export class TreeRepository {
     }
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
+
+  async getPartTreeByUserId(treeId: number, userId: string): Promise<Tree[]> {
+    const spouses = await this.query()
+    .fetchUserByUserId(+userId)
+    .resolveUsersSpouseByRelation()
+    .commitWithReturnEntities();
+    let spouseId = null;
+    if(spouses && spouses.length && spouses[0].data.UserS) {
+      spouseId = spouses[0].data.UserS.identity;
+    }
+
+    const result = await this.query()
+    .fetchAllByEntityId(treeId, 'Tree')
+    .commitWithReturnEntity();
+
+    if (result) {
+      const data = result.data;
+      const tree = cypher.buildPartTree(data, spouseId);
+      return {
+        id: data.Tree.identity,
+        ...data.Tree.properties,
+       tree: tree[0]
+      };
+    }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
+  }
   
   async joinToTreeDescendant(id, treeProperties: any): Promise<any> {
       const result = await this.query()

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mapCypherResultToEntity = exports.Return = exports.buildTreeFromRelations = exports.getEnterPointToSubTree = exports.getRootUser = exports.getSubTreeRootUser = exports.removeDuplicates = exports.getMarriedSubTreeRel = exports.getMarriedRel = exports.getDescendantRel = exports.buildTree = exports.processArrayProperty = exports.processEntityIds = exports.processEmptyNestedArray = exports.addUpdateDateToProperties = exports.addUuidToProperties = exports.addCreateDateToProperties = exports.RepositoryQuery = void 0;
+exports.mapCypherResultToEntity = exports.Return = exports.buildTreeFromRelations = exports.getEnterPointToSubTree = exports.getRootUser = exports.getSubTreeRootUser = exports.removeDuplicates = exports.getMarriedSubTreeRel = exports.getMarriedRel = exports.getDescendantRel = exports.buildPartTree = exports.buildTree = exports.processArrayProperty = exports.processEntityIds = exports.processEmptyNestedArray = exports.addUpdateDateToProperties = exports.addUuidToProperties = exports.addCreateDateToProperties = exports.RepositoryQuery = void 0;
 const cypher_query_builder_1 = require("cypher-query-builder");
 const uuid_1 = require("uuid");
 const convert = (propertyName, propertyValue) => {
@@ -1332,13 +1332,11 @@ const buildTree = (data) => {
     let descendantRel = this.getDescendantRel(data.rList);
     let marriedRel = this.getMarriedRel(data.rList);
     let subTreeRel = this.getMarriedSubTreeRel(data.rList);
-    console.log('subTreeRel', subTreeRel);
     let tree = null;
     if (subTreeRel.length) {
         let subTreeRootUser = this.getSubTreeRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
         let EnterPointToSubTree = this.getEnterPointToSubTree(subTreeRel);
         let subTree = this.buildTreeFromRelations(subTreeRootUser, data.nList, subTreeRel, marriedRel);
-        console.log('subTree', subTree);
         let rootUser = this.getRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
         let tree = this.buildTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel, subTree, EnterPointToSubTree);
         return tree;
@@ -1350,6 +1348,26 @@ const buildTree = (data) => {
     }
 };
 exports.buildTree = buildTree;
+const buildPartTree = (data, userId) => {
+    let descendantRel = this.getDescendantRel(data.rList);
+    let marriedRel = this.getMarriedRel(data.rList);
+    let subTreeRel = this.getMarriedSubTreeRel(data.rList);
+    let tree = null;
+    if (subTreeRel.length) {
+        let subTreeRootUser = this.getSubTreeRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
+        let EnterPointToSubTree = this.getEnterPointToSubTree(subTreeRel);
+        let subTree = this.buildTreeFromRelations(subTreeRootUser, data.nList, subTreeRel, marriedRel);
+        let rootUser = this.getRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
+        let tree = this.buildTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel, subTree, EnterPointToSubTree);
+        return tree;
+    }
+    else {
+        let rootUser = [{ identity: userId }];
+        let tree = this.buildTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel);
+        return tree;
+    }
+};
+exports.buildPartTree = buildPartTree;
 const getDescendantRel = (data) => {
     let result = [];
     for (let rel of data) {

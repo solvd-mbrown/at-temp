@@ -9,6 +9,7 @@ export declare class TreeRepository {
     addNewTree(treeData: any): Promise<Tree[]>;
     getTreeMembers(id: any): Promise<Tree[]>;
     getTree(id: any): Promise<Tree[]>;
+    getPartTreeByUserId(treeId: number, userId: string): Promise<Tree[]>;
     joinToTreeDescendant(id: any, treeProperties: any): Promise<any>;
     joinToTreeMarried(id: any, treeProperties: any): Promise<any>;
     joinToTreeMarriedSubTree(id: any, treeProperties: any): Promise<any>;
