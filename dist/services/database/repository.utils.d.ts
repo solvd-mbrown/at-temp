@@ -125,7 +125,10 @@ export declare const processEmptyNestedArray: (arr: any) => any;
 export declare const processEntityIds: (array: any) => string;
 export declare const processArrayProperty: (array: any) => any;
 export declare const buildTree: (data: any) => any;
+export declare const buildRootPartTree: (data: any, userId: string) => any;
 export declare const buildPartTree: (data: any, userId: string) => any;
+export declare const buildPartTreeWithoutSubTreeRel: (data: any, userId: string) => any;
+export declare const buildSubTree: (data: any, userId: string) => any;
 export declare const getDescendantRel: (data: any) => any;
 export declare const getMarriedRel: (data: any) => any;
 export declare const getMarriedSubTreeRel: (data: any) => any;
@@ -134,5 +137,6 @@ export declare const getSubTreeRootUser: (members: any, descendantRels: any, mar
 export declare const getRootUser: (members: any, descendantRels: any, marriedRel: any, subTreeRel?: any) => any;
 export declare const getEnterPointToSubTree: (subTreeRel: any) => any;
 export declare const buildTreeFromRelations: (rootUser: any, members: any, descendantRels: any, marriedRel: any, subTree?: any, EnterPointToSubTree?: any) => any[];
+export declare const buildRootPartTreeFromRelations: (rootUser: any, members: any, descendantRels: any, marriedRel: any, stopPoint: any) => any[];
 export declare const Return: (array: any, ...args: any[]) => any[];
 export declare const mapCypherResultToEntity: (input: any, expand?: any) => any;

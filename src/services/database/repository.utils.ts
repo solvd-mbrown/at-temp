@@ -2160,6 +2160,7 @@ export const getMarriedSubTreeRel = (data: any) => {
       }
     }
   }
+
   // @ts-ignore
   let res = this.removeDuplicates(result, "identity");
   return res;

@@ -89,6 +89,27 @@ let TreeRepository = class TreeRepository {
         }
         throw new common_1.BadRequestException(database_constants_1.CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
     }
+    async getTreeInPartsUserId(treeId, userId) {
+        const parent = await this.query()
+            .fetchUserByUserId(+userId)
+            .resolveUsersParentsByRelation()
+            .commitWithReturnEntities();
+        let parentId = null;
+        if (parent && parent.length && parent[0].data.UserP) {
+            parentId = parent[0].data.UserP.identity;
+        }
+        const result = await this.query()
+            .fetchAllByEntityId(treeId, 'Tree')
+            .commitWithReturnEntity();
+        if (result) {
+            const data = result.data;
+            const partTree = await cypher.buildPartTreeWithoutSubTreeRel(data, parentId);
+            const rootPart = await cypher.buildRootPartTree(data, parentId);
+            const subTree = await cypher.buildSubTree(data, userId);
+            return Object.assign(Object.assign({ id: data.Tree.identity }, data.Tree.properties), { rootPartTree: rootPart ? rootPart[0] : null, subTree: subTree ? subTree[0] : null, bottomPartTree: partTree[0] });
+        }
+        throw new common_1.BadRequestException(database_constants_1.CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
+    }
     async joinToTreeDescendant(id, treeProperties) {
         const result = await this.query()
             .createMemberAndDescendantRelations(treeProperties.userId, treeProperties.toUserId, id)

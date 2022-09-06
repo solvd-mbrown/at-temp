@@ -35,6 +35,10 @@ let TreeService = class TreeService {
         const result = await this.treeRepository.getPartTreeByUserId(treeId, userId);
         return result;
     }
+    async getTreeInPartsUserId(treeId, userId) {
+        const result = await this.treeRepository.getTreeInPartsUserId(treeId, userId);
+        return result;
+    }
     update(id, updateTreeDto) {
         return `This action updates a #${id} tree`;
     }

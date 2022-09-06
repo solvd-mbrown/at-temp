@@ -10,6 +10,7 @@ export declare class TreeController {
     findOne(id: string): Promise<import("./entities/tree.entity").Tree[]>;
     getTreeMembers(id: string): Promise<import("./entities/tree.entity").Tree[]>;
     getPartTreeByUserId(treeId: string, userId: string): Promise<import("./entities/tree.entity").Tree[]>;
+    getTreeInPartsUserId(treeId: string, userId: string): Promise<import("./entities/tree.entity").Tree[]>;
     update(id: string, updateTreeDto: UpdateTreeDto): string;
     join(id: string, joinToTreeDto: JoinToTreeDto): Promise<any>;
     remove(id: string): string;
