@@ -2094,7 +2094,7 @@ export const buildPartTreeWithoutSubTreeRel = (data: any, userId: string) => {
   // @ts-ignore
   let rootUser =  [{ identity: userId }];
   // @ts-ignore
-  let tree = this.buildTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel);
+  tree = this.buildTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel);
   return tree;
 };
 
