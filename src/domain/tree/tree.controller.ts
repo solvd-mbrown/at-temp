@@ -36,6 +36,14 @@ export class TreeController {
     return this.treeService.getPartTreeByUserId(+treeId, userId);
   }
 
+  @Get('treeInParts/:treeId/:userId')
+  getTreeInPartsUserId(
+    @Param('treeId') treeId: string,
+    @Param('userId') userId: string,
+  ) {
+    return this.treeService.getTreeInPartsUserId(+treeId, userId);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTreeDto: UpdateTreeDto) {
     return this.treeService.update(+id, updateTreeDto);

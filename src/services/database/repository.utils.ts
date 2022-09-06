@@ -2038,6 +2038,23 @@ export const buildTree = (data: any) => {
   }
 };
 
+export const buildRootPartTree = (data: any, userId: string) => {
+  // @ts-ignore
+  let descendantRel = this.getDescendantRel(data.rList);
+  // @ts-ignore
+  let marriedRel = this.getMarriedRel(data.rList);
+  // @ts-ignore
+  let subTreeRel = this.getMarriedSubTreeRel(data.rList);
+  // @ts-ignore
+  let stopPoint = userId;
+  let tree = null;
+  // @ts-ignore
+  let rootUser = this.getRootUser(data.nList, descendantRel, marriedRel);
+  // @ts-ignore
+  tree = this.buildRootPartTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel, stopPoint);
+  return tree;
+};
+
 export const buildPartTree = (data: any, userId: string) => {
   // @ts-ignore
   let descendantRel = this.getDescendantRel(data.rList);
@@ -2045,7 +2062,7 @@ export const buildPartTree = (data: any, userId: string) => {
   let marriedRel = this.getMarriedRel(data.rList);
   // @ts-ignore
   let subTreeRel = this.getMarriedSubTreeRel(data.rList);
-  let tree = null;
+  // let tree = null;
   if(subTreeRel.length){
     // @ts-ignore
     let subTreeRootUser = this.getSubTreeRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
@@ -2063,6 +2080,45 @@ export const buildPartTree = (data: any, userId: string) => {
     let rootUser =  [{ identity: userId }];
     // @ts-ignore
     let tree = this.buildTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel);
+    return tree;
+  }
+};
+
+export const buildPartTreeWithoutSubTreeRel = (data: any, userId: string) => {
+  // @ts-ignore
+  let descendantRel = this.getDescendantRel(data.rList);
+  // @ts-ignore
+  let marriedRel = this.getMarriedRel(data.rList);
+  // @ts-ignore
+  let tree = null;
+  // @ts-ignore
+  let rootUser =  [{ identity: userId }];
+  // @ts-ignore
+  let tree = this.buildTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel);
+  return tree;
+};
+
+export const buildSubTree = (data: any, userId: string) => {
+  // @ts-ignore
+  let marriedRel = this.getMarriedRel(data.rList);
+  // @ts-ignore
+  let descendantRel = this.getDescendantRel(data.rList);
+  // @ts-ignore
+  let subTreeRel = this.getMarriedSubTreeRel(data.rList);
+  let tree = null;
+  if(subTreeRel.length){
+    // @ts-ignore
+    let subTreeRootUser = this.getSubTreeRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
+    // @ts-ignore
+    let EnterPointToSubTree = this.getEnterPointToSubTree(subTreeRel);
+    // @ts-ignore
+    let subTree = this.buildTreeFromRelations(subTreeRootUser, data.nList, subTreeRel, marriedRel);
+    // @ts-ignore
+    let rootUser = this.getRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
+    // @ts-ignore
+    tree = this.buildTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel, subTree, EnterPointToSubTree);
+    return tree;
+  } else {
     return tree;
   }
 };
@@ -2234,6 +2290,85 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
           parentsSubTree: parentsSubTree,
         })
       } else {
+        resultItem.push({
+          user : resultItem[0],
+          descendant : descendants.length ? descendants.flat() : [],
+          married : married ? married : [],
+        })
+      }
+
+      if (resultItem.length > 1) {
+      resultItem = resultItem.filter(obj => {
+          return obj.hasOwnProperty('descendant')
+        });
+      }
+      result.push(resultItem);
+    }
+    return result;
+  }
+  let treeResult = findNodes('ROOT', descendantRels, members);
+
+  return treeResult;
+};
+export const buildRootPartTreeFromRelations = (rootUser, members, descendantRels, marriedRel, stopPoint) => {
+
+  descendantRels = descendantRels.filter(object => {
+    return object.end !== object.start;
+  });
+
+  descendantRels.push({
+    identity: 'ROOT',
+    start: rootUser[0].identity,
+    end: 'ROOT',
+    label: 'ROOT',
+    properties: {}
+  });
+
+  let isBuild = true;
+
+  members = members.filter(object => {
+    return object.labels[0] !== 'Tree';
+  });
+
+   const partial = (descendantRels = [], condition) => {
+    const result = [];
+    for (let i = 0; i < descendantRels.length; i++) {
+      if(condition(descendantRels[i])){
+        result.push(descendantRels[i]);
+      }
+    }
+    return result;
+ }
+  const findNodes = (parentKey, items, members) => {
+    let subItems = partial(items, n => {
+     return n.end == parentKey
+    });
+
+    const result = [];
+    for (let i = 0; i < subItems.length; i++) {
+      let subItem = subItems[i];
+      let resultItem = members.filter(obj => {
+        return obj.identity == subItem.start
+      });
+
+      if (subItem.start == stopPoint) {
+        isBuild = false;
+      }
+
+      let descendants = findNodes(subItem.start, items, members);
+      let marRel = marriedRel.filter(obj => {
+        return obj.end == subItem.start
+      });
+
+      let married = null;
+      if (marRel.length) {
+        married = members.filter(obj => {
+          let member = marRel[0]
+          return obj.identity == member.start
+        });
+      }
+
+      if (isBuild) {
         resultItem.push({
           user : resultItem[0],
           descendant : descendants.length ? descendants.flat() : [],

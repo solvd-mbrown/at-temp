@@ -34,6 +34,10 @@ export class TreeService {
     const result = await this.treeRepository.getPartTreeByUserId(treeId, userId);
     return result;
   }
+  async getTreeInPartsUserId(treeId: number, userId: string) {
+    const result = await this.treeRepository.getTreeInPartsUserId(treeId, userId);
+    return result;
+  }
 
   update(id: number, updateTreeDto: UpdateTreeDto) {
     return `This action updates a #${id} tree`;
