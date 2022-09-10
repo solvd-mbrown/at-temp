@@ -2104,7 +2104,7 @@ export const buildSubTree = (data: any) => {
   // @ts-ignore
   let descendantRel = this.getDescendantRel(data.rList);
   // @ts-ignore
-  let subTreeRel = this.getMarcriedSubTreeRel(data.rList);
+  let subTreeRel = this.getMarriedSubTreeRel(data.rList);
   let tree = null;
   if(subTreeRel.length){
     // @ts-ignore
