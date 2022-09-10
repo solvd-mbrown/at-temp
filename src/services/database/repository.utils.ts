@@ -2098,13 +2098,13 @@ export const buildPartTreeWithoutSubTreeRel = (data: any, userId: string) => {
   return tree;
 };
 
-export const buildSubTree = (data: any, userId: string) => {
+export const buildSubTree = (data: any) => {
   // @ts-ignore
   let marriedRel = this.getMarriedRel(data.rList);
   // @ts-ignore
   let descendantRel = this.getDescendantRel(data.rList);
   // @ts-ignore
-  let subTreeRel = this.getMarriedSubTreeRel(data.rList);
+  let subTreeRel = this.getMarcriedSubTreeRel(data.rList);
   let tree = null;
   if(subTreeRel.length){
     // @ts-ignore
@@ -2112,11 +2112,7 @@ export const buildSubTree = (data: any, userId: string) => {
     // @ts-ignore
     let EnterPointToSubTree = this.getEnterPointToSubTree(subTreeRel);
     // @ts-ignore
-    let subTree = this.buildTreeFromRelations(subTreeRootUser, data.nList, subTreeRel, marriedRel);
-    // @ts-ignore
-    let rootUser = this.getRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
-    // @ts-ignore
-    tree = this.buildTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel, subTree, EnterPointToSubTree);
+    tree = this.buildTreeFromRelations(subTreeRootUser, data.nList, subTreeRel, marriedRel);
     return tree;
   } else {
     return tree;

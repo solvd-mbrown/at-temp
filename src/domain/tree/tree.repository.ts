@@ -133,7 +133,7 @@ export class TreeRepository {
       const data = result.data;
       const partTree = await cypher.buildPartTreeWithoutSubTreeRel(data, parentId);
       const rootPart = await cypher.buildRootPartTree(data, parentId);
-      const subTree = await cypher.buildSubTree(data, userId);
+      const subTree = await cypher.buildSubTree(data);
       return {
         id: data.Tree.identity,
         ...data.Tree.properties,
