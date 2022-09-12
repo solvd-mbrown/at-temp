@@ -129,6 +129,10 @@ export class TreeRepository {
     .fetchAllByEntityId(treeId, 'Tree')
     .commitWithReturnEntity();
 
+    if (parentId === null) {
+      parentId = userId;
+    }
+
     if (result) {
       const data = result.data;
       const partTree = await cypher.buildPartTreeWithoutSubTreeRel(data, parentId);
@@ -139,7 +143,7 @@ export class TreeRepository {
         ...data.Tree.properties,
        rootPartTree: rootPart ? rootPart[0] : null,
        subTree: subTree ? subTree[0] : null,
-       bottomPartTree: partTree[0]
+       bottomPartTree: partTree ? partTree[0] : null,
       };
     }
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);

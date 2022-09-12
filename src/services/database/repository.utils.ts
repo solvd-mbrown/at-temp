@@ -2049,7 +2049,7 @@ export const buildRootPartTree = (data: any, userId: string) => {
   let stopPoint = userId;
   let tree = null;
   // @ts-ignore
-  let rootUser = this.getRootUser(data.nList, descendantRel, marriedRel);
+  let rootUser = this.getRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
   // @ts-ignore
   tree = this.buildRootPartTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel, stopPoint);
   return tree;
@@ -2321,8 +2321,6 @@ export const buildRootPartTreeFromRelations = (rootUser, members, descendantRels
     properties: {}
   });
 
-  let isBuild = true;
-
   members = members.filter(object => {
     return object.labels[0] !== 'Tree';
   });
@@ -2348,14 +2346,15 @@ export const buildRootPartTreeFromRelations = (rootUser, members, descendantRels
         return obj.identity == subItem.start
       });
 
-      if (subItem.start == stopPoint) {
-        isBuild = false;
-      }
-
       let descendants = findNodes(subItem.start, items, members);
       let marRel = marriedRel.filter(obj => {
         return obj.end == subItem.start
       });
+
+      let isBuild = true;
+      if (resultItem[0].identity == stopPoint) {
+        isBuild = false;
+      }
 
       let married = null;
       if (marRel.length) {
