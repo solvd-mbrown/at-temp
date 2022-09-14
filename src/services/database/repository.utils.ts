@@ -2247,6 +2247,8 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
     }
     return result;
  }
+
+  let levelCount = 0;
   const findNodes = (parentKey, items, members) => {
     let subItems = partial(items, n => {
      return n.end == parentKey
@@ -2280,6 +2282,7 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
       }
 
       if(parentsSubTree && parentsSubTree.length){
+        levelCount ++;
         resultItem.push({
           user : resultItem[0],
           descendant : descendants.length ? descendants.flat() : [],
@@ -2287,6 +2290,7 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
           parentsSubTree: parentsSubTree,
         })
       } else {
+        levelCount ++;
         resultItem.push({
           user : resultItem[0],
           descendant : descendants.length ? descendants.flat() : [],
@@ -2304,7 +2308,7 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
     return result;
   }
   let treeResult = findNodes('ROOT', descendantRels, members);
-
+  treeResult[0][0].levelCount = levelCount;
   return treeResult;
 };
 export const buildRootPartTreeFromRelations = (rootUser, members, descendantRels, marriedRel, stopPoint) => {
@@ -2334,6 +2338,8 @@ export const buildRootPartTreeFromRelations = (rootUser, members, descendantRels
     }
     return result;
  }
+
+  let levelCount = 0;
   const findNodes = (parentKey, items, members) => {
     let subItems = partial(items, n => {
      return n.end == parentKey
@@ -2365,6 +2371,7 @@ export const buildRootPartTreeFromRelations = (rootUser, members, descendantRels
       }
 
       if (isBuild) {
+        levelCount ++;
         resultItem.push({
           user : resultItem[0],
           descendant : descendants.length ? descendants.flat() : [],
@@ -2382,7 +2389,7 @@ export const buildRootPartTreeFromRelations = (rootUser, members, descendantRels
     return result;
   }
   let treeResult = findNodes('ROOT', descendantRels, members);
-
+  treeResult[0][0].levelCount = levelCount;
   return treeResult;
 };
 
