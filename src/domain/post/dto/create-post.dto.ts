@@ -1,6 +1,6 @@
 export class CreatePostDto {
   treeUUID: string;
-  publishedBy: string;
+  publishedById: number;
   postType: string;
   postBody: string;
 }

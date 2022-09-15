@@ -90,6 +90,20 @@ export class RepositoryQuery {
     return this;
   }
 
+  public fetchAllByEntityUUUIDWithUsers(
+    entityUUID: string,
+    entity: string,
+  ): RepositoryQuery {
+    this.query.raw(
+      `MATCH (${entity}:${entity}) WHERE ${entity}.treeUUID = '${entityUUID}'
+      WITH *  
+      OPTIONAL MATCH (User:User) WHERE ID(User) = ${entity}.publishedById
+     `,
+    );
+    this.returns.push(`COLLECT(distinct {${entity}:${entity}, User:User}) as ${entity}s`);
+    return this;
+  }
+
   public findAllPostsByUserId(
     userId: string,
     entity: string,
@@ -526,6 +540,16 @@ export class RepositoryQuery {
       .join(',')}} as data`;
   }
 
+  private createResultInRow(queryReturns: string[]): string {
+      return `{${queryReturns
+        // .map((queryReturn) => {
+        //   return queryReturn.includes('List')
+        //     ? `${queryReturn}:collect(distinct ${queryReturn})`
+        //     : `${queryReturn}`;
+        // })
+        .join(',')}} as data`;
+    }
+
   public async commit() {
     if (
       process.env.NODE_ENV === 'local'
@@ -541,6 +565,19 @@ export class RepositoryQuery {
 
   public async commitWithReturnEntities() {
     this.query.return(this.createResult(this.returns));
+    if (
+      process.env.NODE_ENV === 'local'
+      // || process.env.NODE_ENV === 'test'
+    ) {
+      console.log(
+        this.query.interpolate(),
+        '\n ------------END OF QUERY-----------',
+      );
+    }
+    return await this.query.run();
+  }
+  public async commitWithReturnEntitiesRow() {
+    this.query.return(this.returns);
     if (
       process.env.NODE_ENV === 'local'
       // || process.env.NODE_ENV === 'test'
@@ -825,6 +862,17 @@ export class RepositoryQuery {
     return this;
   }
 
+   public findEntityByIdWithUsers(entity: string, id: number): RepositoryQuery {
+      this.query.raw(`MATCH (${entity}:${entity})
+      WHERE ID(${entity}) = ${id}  
+      WITH *               
+        OPTIONAL MATCH (User:User) WHERE ID(User) = ${entity}.publishedById
+     `,
+      );
+     this.returns.push(`COLLECT(distinct {${entity}:${entity}, User:User}) as ${entity}s`);
+     return this;
+    }
+
   public findEntityByIdWithoutName(id: number): RepositoryQuery {
     this.query.raw(`MATCH (n)
     WHERE ID(n) = ${id}  
@@ -983,6 +1031,19 @@ export class RepositoryQuery {
           `,
     );
     this.returns.push(childEntity);
+    return this;
+  }
+
+  public findEntityByIdWithUserOptionalMatch(
+    parentEntity: string,
+    id: number
+  ): RepositoryQuery {
+      this.query.raw(`MATCH (${parentEntity})
+    WHERE ID(${parentEntity}) = ${id}  
+    WITH *  
+    OPTIONAL MATCH (User:User) WHERE ID(User) = ${parentEntity}.publishedById             
+    `);
+    this.returns.push(parentEntity, 'User');
     return this;
   }
 

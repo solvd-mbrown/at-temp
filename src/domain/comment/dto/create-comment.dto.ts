@@ -1,7 +1,7 @@
 export class CreateCommentDto {
   commentForEntityType: string;
-  commentForEntityId: string;
-  publishedById: string;
+  commentForEntityId: number;
+  publishedById: number;
   commentType: string;
   commentBody: string;
 }

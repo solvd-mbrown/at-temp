@@ -21,12 +21,13 @@ export class PostRepository {
 
   async getPostEntity(id: number): Promise<any> {
     const result = await this.query()
-    .findEntityById('Post', id)
+    .findEntityByIdWithUserOptionalMatch('Post', id)
     .commitWithReturnEntity();
     if (result) {
       const data = result.data;
       return {
         id: data.Post.identity,
+        publishedByUser: data.User,
         ...data.Post.properties,
       };
     }
@@ -36,16 +37,10 @@ export class PostRepository {
   async getAllPostsByTreeUUID(uuid: string): Promise<any> {
     const treeUUID = UtilsRepository.getStringVersion(uuid);
     const result = await this.query()
-    .fetchAllByEntityUUUID(treeUUID, 'Post')
-    .commitWithReturnEntities();
+    .fetchAllByEntityUUUIDWithUsers(treeUUID, 'Post')
+    .commitWithReturnEntitiesRow();
     if (result) {
-      return result.map(({ data }) => {
-        const result = data;
-        return {
-          id: result.Post.identity,
-          ...result.Post.properties,
-        };
-      });
+      return result[0].Posts;
     }
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
@@ -66,9 +61,20 @@ export class PostRepository {
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
-
   async addNewPost(postData: any): Promise<Post[]> {
     postData.postBody = UtilsRepository.getStringVersion(postData?.postBody);
+    //
+    // const publisheByUser = await this.query()
+    // .fetchUserByUserId(postData.publishedById)
+    // .commitWithReturnEntity();
+    //
+    // console.log('publisheByUser', publisheByUser.data['User'].properties);
+    //
+    // postData.userPictureLink = publisheByUser.data['User'].properties.userPictureLink || null;
+    // postData.firstName = publisheByUser.data['User'].properties.firstName || null;
+    // postData.userPictureLink = publisheByUser.data['User'].properties.userPictureLink || null;
+    // postData.lastName = publisheByUser.data['User'].properties.lastName || null;
+
     const result = await this.query()
     .createEntity<{ [key in keyof Partial<Post>]: any }>('Post',
       postData
