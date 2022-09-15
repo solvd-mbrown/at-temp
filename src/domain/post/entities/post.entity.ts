@@ -4,7 +4,7 @@ export class Post {
   __typename?: 'Post';
   id: number;
   treeUUID: string;
-  publishedBy: string;
+  publishedById: number;
   postType?: Nullable<string>;
   postBody?: Nullable<string>;
   comments?: Nullable<string>;

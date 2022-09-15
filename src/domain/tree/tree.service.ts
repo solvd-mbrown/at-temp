@@ -30,7 +30,7 @@ export class TreeService {
     return result;
   }
 
-  async getPartTreeByUserId(treeId: number, userId: string) {
+  async getPartTreeByUserId(treeId: number, userId: number) {
     const result = await this.treeRepository.getPartTreeByUserId(treeId, userId);
     return result;
   }

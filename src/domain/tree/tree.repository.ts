@@ -88,9 +88,9 @@ export class TreeRepository {
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
-  async getPartTreeByUserId(treeId: number, userId: string): Promise<Tree[]> {
+  async getPartTreeByUserId(treeId: number, userId: number): Promise<Tree[]> {
     const spouses = await this.query()
-    .fetchUserByUserId(+userId)
+    .fetchUserByUserId(userId)
     .resolveUsersSpouseByRelation()
     .commitWithReturnEntities();
     let spouseId = null;

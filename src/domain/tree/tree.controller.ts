@@ -33,7 +33,7 @@ export class TreeController {
     @Param('treeId') treeId: string,
     @Param('userId') userId: string,
   ) {
-    return this.treeService.getPartTreeByUserId(+treeId, userId);
+    return this.treeService.getPartTreeByUserId(+treeId, +userId);
   }
 
   @Get('treeInParts/:treeId/:userId')

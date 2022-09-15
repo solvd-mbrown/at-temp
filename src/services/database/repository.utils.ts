@@ -2124,25 +2124,25 @@ export const buildPartTree = (data: any, userId: string) => {
   // @ts-ignore
   let subTreeRel = this.getMarriedSubTreeRel(data.rList);
   // let tree = null;
-  if(subTreeRel.length){
-    // @ts-ignore
-    let subTreeRootUser = this.getSubTreeRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
-    // @ts-ignore
-    let EnterPointToSubTree = this.getEnterPointToSubTree(subTreeRel);
-    // @ts-ignore
-    let subTree = this.buildTreeFromRelations(subTreeRootUser, data.nList, subTreeRel, marriedRel);
-    // @ts-ignore
-    let rootUser = this.getRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
-    // @ts-ignore
-    let tree = this.buildTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel, subTree, EnterPointToSubTree);
-    return tree;
-  } else {
+  // if(subTreeRel.length){
+  //   // @ts-ignore
+  //   let subTreeRootUser = this.getSubTreeRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
+  //   // @ts-ignore
+  //   let EnterPointToSubTree = this.getEnterPointToSubTree(subTreeRel);
+  //   // @ts-ignore
+  //   let subTree = this.buildTreeFromRelations(subTreeRootUser, data.nList, subTreeRel, marriedRel);
+  //   // @ts-ignore
+  //   let rootUser = this.getRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
+  //   // @ts-ignore
+  //   let tree = this.buildTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel, subTree, EnterPointToSubTree);
+  //   return tree;
+  // } else {
     // @ts-ignore
     let rootUser =  [{ identity: userId }];
     // @ts-ignore
     let tree = this.buildTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel);
     return tree;
-  }
+  // }
 };
 
 export const buildPartTreeWithoutSubTreeRel = (data: any, userId: string) => {
