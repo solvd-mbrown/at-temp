@@ -45,9 +45,9 @@ export class PostRepository {
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
-  async findAllByUserId(id: string): Promise<any> {
+  async findAllByUserId(id: number): Promise<any> {
     const result = await this.query()
-    .findAllPostsByUserId(id, 'Post')
+    .findAllPostsByUserId(+id, 'Post')
     .commitWithReturnEntities();
     if (result) {
       return result.map(({ data }) => {

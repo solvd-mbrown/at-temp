@@ -25,7 +25,7 @@ export class PostService {
   }
 
   async findAllByUserId(id: string) {
-    const result = await this.postRepository.findAllByUserId(id);
+    const result = await this.postRepository.findAllByUserId(+id);
     return result;
   }
 

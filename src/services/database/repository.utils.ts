@@ -105,11 +105,11 @@ export class RepositoryQuery {
   }
 
   public findAllPostsByUserId(
-    userId: string,
+    userId: number,
     entity: string,
   ): RepositoryQuery {
     this.query.raw(
-      `MATCH (${entity}:${entity}) WHERE ${entity}.publishedById = '${userId}'`,
+      `MATCH (${entity}:${entity}) WHERE ${entity}.publishedById = ${userId}`,
     );
     this.returns.push(`${entity}`);
     return this;
