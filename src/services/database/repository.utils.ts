@@ -2370,6 +2370,7 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
   }
   let treeResult = findNodes('ROOT', descendantRels, members);
   treeResult[0][0].levelCount = levelCount;
+  treeResult[0][0].EnterPointToSubTree = EnterPointToSubTree;
   return treeResult;
 };
 export const buildRootPartTreeFromRelations = (rootUser, members, descendantRels, marriedRel, stopPoint) => {
