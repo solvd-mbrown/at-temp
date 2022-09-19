@@ -2369,7 +2369,7 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
     return result;
   }
   let treeResult = findNodes('ROOT', descendantRels, members);
-  treeResult[0][0].levelCount = levelCount;
+  // treeResult[0][0].levelCount = levelCount;
   treeResult[0][0].enterPointToSubTree = EnterPointToSubTree;
   return treeResult;
 };
