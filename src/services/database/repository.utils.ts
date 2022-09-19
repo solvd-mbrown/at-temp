@@ -2173,7 +2173,7 @@ export const buildSubTree = (data: any) => {
     // @ts-ignore
     let EnterPointToSubTree = this.getEnterPointToSubTree(subTreeRel);
     // @ts-ignore
-    tree = this.buildTreeFromRelations(subTreeRootUser, data.nList, subTreeRel, marriedRel);
+    tree = this.buildTreeFromRelations(subTreeRootUser, data.nList, subTreeRel, marriedRel, EnterPointToSubTree);
     return tree;
   } else {
     return tree;
@@ -2340,6 +2340,7 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
       if(married && (+married[0].identity == +EnterPointToSubTree)) {
         if (subTree) {
           parentsSubTree = subTree[0];
+          enterPointToSubTree = +EnterPointToSubTree;
         }
       }
 
@@ -2370,7 +2371,7 @@ export const buildTreeFromRelations = (rootUser, members, descendantRels, marrie
     return result;
   }
   let treeResult = findNodes('ROOT', descendantRels, members);
-  enterPointToSubTree = EnterPointToSubTree;
+
   treeResult[0][0].levelCount = levelCount;
   treeResult[0][0].enterPointToSubTree = enterPointToSubTree;
   return treeResult;
