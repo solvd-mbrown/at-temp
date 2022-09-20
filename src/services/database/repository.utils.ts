@@ -2407,6 +2407,7 @@ export const buildRootPartTreeFromRelations = (rootUser, members, descendantRels
  }
 
   let levelCount = 0;
+  let currentLevelCount = 0;
   const findNodes = (parentKey, items, members) => {
     let subItems = partial(items, n => {
      return n.end == parentKey
@@ -2427,6 +2428,7 @@ export const buildRootPartTreeFromRelations = (rootUser, members, descendantRels
       let isBuild = true;
       if (resultItem[0].identity == stopPoint) {
         isBuild = false;
+        currentLevelCount = levelCount;
       }
 
       let married = null;
@@ -2456,7 +2458,7 @@ export const buildRootPartTreeFromRelations = (rootUser, members, descendantRels
     return result;
   }
   let treeResult = findNodes('ROOT', descendantRels, members);
-  treeResult[0][0].levelCount = levelCount;
+  treeResult[0][0].levelCount = currentLevelCount;
   if (stopPoint) {
     treeResult[0][0].enterPointToRootPartTree = stopPoint;
   }
