@@ -2457,6 +2457,9 @@ export const buildRootPartTreeFromRelations = (rootUser, members, descendantRels
   }
   let treeResult = findNodes('ROOT', descendantRels, members);
   treeResult[0][0].levelCount = levelCount;
+  if (stopPoint) {
+    treeResult[0][0].enterPointToRootPartTree = stopPoint;
+  }
   return treeResult;
 };
 
