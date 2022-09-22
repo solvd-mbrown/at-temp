@@ -23,6 +23,7 @@ export class CommentRepository {
 
 
   async addNewComment(commentData: any): Promise<Comment[]> {
+    commentData.commentBody = UtilsRepository.getStringVersion(commentData?.commentBody);
     const result = await this.query()
     .createEntity<{ [key in keyof Partial<Comment>]: any }>('Comment',
       commentData
