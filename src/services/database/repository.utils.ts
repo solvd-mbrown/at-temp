@@ -855,8 +855,7 @@ export class RepositoryQuery {
 
   public findEntityById(entity: string, id: number): RepositoryQuery {
     this.query.raw(`MATCH (${entity}:${entity})
-    WHERE ID(${entity}) = ${id}  
-    WITH *               
+    WHERE ID(${entity}) = ${id}                
     `);
     this.returns.push(entity);
     return this;

@@ -87,13 +87,13 @@ export class CommentRepository {
     let result = null;
     if(type === ENTITY_TYPE_COMMENT) {
       result = await this.query()
-      .findEntityByIdWithUsers('Comment', entityResult.Comment.properties.comments)
-      .commitWithReturnEntitiesRow();
+      .findEntityByIds('Comment', entityResult.data.Comment.properties.comments)
+      .commitWithReturnEntities();
     }
     if(type === ENTITY_TYPE_POST) {
       result = await this.query()
-      .findEntityByIdWithUsers('Comment', entityResult.Post.properties.comments)
-      .commitWithReturnEntitiesRow();
+      .findEntityByIds('Comment', entityResult.data.Post.properties.comments)
+      .commitWithReturnEntities();
     }
     if (result) {
       return result.map(({ data }) => {
