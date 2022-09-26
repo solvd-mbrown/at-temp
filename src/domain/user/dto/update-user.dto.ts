@@ -16,7 +16,8 @@ export class UpdateUserDto {
   phone?: string;
   address?: string;
   spouseTreeId?: string;
-  myTreeId?: string;
+  myTreeIdByParent1?: string;
+  myTreeIdByParent2?: string;
   // spouse?: [];
   // kids?: [];
   // parents?: [];

@@ -21,7 +21,12 @@ export class TreeController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.treeService.findOne(+id);
-  } 
+  }
+
+  @Get('all/:id')
+  findOneByUUID(@Param('id') id: string) {
+    return this.treeService.findOneByUUID(id);
+  }
   
   @Get('members/:id')
   getTreeMembers(@Param('id') id: string) {

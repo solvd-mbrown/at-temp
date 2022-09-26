@@ -63,18 +63,6 @@ export class PostRepository {
 
   async addNewPost(postData: any): Promise<Post[]> {
     postData.postBody = UtilsRepository.getStringVersion(postData?.postBody);
-    //
-    // const publisheByUser = await this.query()
-    // .fetchUserByUserId(postData.publishedById)
-    // .commitWithReturnEntity();
-    //
-    // console.log('publisheByUser', publisheByUser.data['User'].properties);
-    //
-    // postData.userPictureLink = publisheByUser.data['User'].properties.userPictureLink || null;
-    // postData.firstName = publisheByUser.data['User'].properties.firstName || null;
-    // postData.userPictureLink = publisheByUser.data['User'].properties.userPictureLink || null;
-    // postData.lastName = publisheByUser.data['User'].properties.lastName || null;
-
     const result = await this.query()
     .createEntity<{ [key in keyof Partial<Post>]: any }>('Post',
       postData

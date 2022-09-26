@@ -135,6 +135,18 @@ export class RepositoryQuery {
     return this;
   }
 
+  public fetchUserInTree(
+    userId: number,
+    treeId: number,
+  ): RepositoryQuery {
+    this.query.raw(
+      `MATCH (User:User) WHERE ID(User) = ${userId}
+             MATCH (Tree:Tree) WHERE ID(Tree) = ${treeId}
+      `);
+    this.returns.push(`User`);
+    return this;
+  }
+
   public attachExternalEntityByParent(
     childEntity: string,
     parentEntity: string,
