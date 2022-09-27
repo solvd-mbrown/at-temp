@@ -63,6 +63,7 @@ export class PostRepository {
 
   async addNewPost(postData: any): Promise<Post[]> {
     postData.postBody = UtilsRepository.getStringVersion(postData?.postBody);
+    postData.publishedById = +postData.publishedById;
     const result = await this.query()
     .createEntity<{ [key in keyof Partial<Post>]: any }>('Post',
       postData

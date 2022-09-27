@@ -24,6 +24,7 @@ export class CommentRepository {
 
   async addNewComment(commentData: any): Promise<Comment[]> {
     commentData.commentBody = UtilsRepository.getStringVersion(commentData?.commentBody);
+    commentData.publishedById = +commentData.publishedById;
     const result = await this.query()
     .createEntity<{ [key in keyof Partial<Comment>]: any }>('Comment',
       commentData
@@ -87,22 +88,16 @@ export class CommentRepository {
     let result = null;
     if(type === ENTITY_TYPE_COMMENT) {
       result = await this.query()
-      .findEntityByIds('Comment', entityResult.data.Comment.properties.comments)
-      .commitWithReturnEntities();
+      .findEntityByIdsWithUsers('Comment', entityResult.data.Comment.properties.comments)
+      .commitWithReturnEntitiesRow();
     }
     if(type === ENTITY_TYPE_POST) {
       result = await this.query()
-      .findEntityByIds('Comment', entityResult.data.Post.properties.comments)
-      .commitWithReturnEntities();
+      .findEntityByIdsWithUsers('Comment', entityResult.data.Post.properties.comments)
+      .commitWithReturnEntitiesRow();
     }
     if (result) {
-      return result.map(({ data }) => {
-        const result = data;
-        return {
-          id: result.Comment.identity,
-          ...result.Comment.properties,
-        };
-      });
+      return result[0].Comments;
     }
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }

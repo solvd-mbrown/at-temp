@@ -902,6 +902,16 @@ export class RepositoryQuery {
     return this;
   }
 
+  public findEntityByIdsWithUsers(entity: string, ids: string[]): RepositoryQuery {
+    this.query.raw(`MATCH (${entity}:${entity})
+    WHERE ID(${entity}) IN [${ids}]  
+    WITH *  
+    OPTIONAL MATCH (User:User) WHERE ID(User) = ${entity}.publishedById           
+    `);
+    this.returns.push(`COLLECT(distinct {${entity}:${entity}, User:User}) as ${entity}s`);
+    return this;
+  }
+
   public findEntityByParent(
     childEntity: string,
     parentEntity: string,
