@@ -345,6 +345,64 @@ export class TreeRepository {
     .createMemberAndMarriedRelations(treeProperties.userId, treeProperties.toUserId, id)
     .commitWithReturnEntity();
 
+    const childrenCurrentParent = await this.query()
+    .fetchUserByUserId(+treeProperties.toUserId)
+    .resolveUsersChildrenByRelation()
+    .commitWithReturnEntities();
+
+    const childrenMarriedParent = await this.query()
+    .fetchUserByUserId(+treeProperties.userId)
+    .resolveUsersChildrenByRelation()
+    .commitWithReturnEntities();
+
+    const marriedUser = await this.query()
+    .fetchUserByUserId(+treeProperties.userId)
+    .commitWithReturnEntity();
+
+    let kidsCurrent;
+    let kidsMarried;
+
+    if(childrenCurrentParent.length && !childrenMarriedParent.length) {
+      kidsCurrent = childrenCurrentParent[0].data.UserKList;
+      if(kidsCurrent.length == 1) {
+        await this.joinUserToTreeDescendant(+kidsCurrent[0].identity, +treeProperties.userId, +marriedUser.data.User.properties.myTreeIdByParent1);
+      }
+
+      if(kidsCurrent.length > 1) {
+        for (let item of kidsCurrent) {
+          await this.joinUserToTreeDescendant(+item.identity, +treeProperties.userId, +marriedUser.data.User.properties.myTreeIdByParent1);
+        }
+      }
+    }
+
+    if(childrenMarriedParent.length && !childrenCurrentParent.length) {
+      kidsMarried = childrenMarriedParent[0].data.UserKList;
+
+      if (kidsMarried.length == 1) {
+        await this.joinUserToTreeDescendant(+kidsMarried[0].identity, treeProperties.toUserId, +id);
+
+        if (kidsMarried.length > 1) {
+          for (let item of kidsCurrent) {
+            await this.joinUserToTreeDescendant(+item.identity, treeProperties.toUserId, +id);
+          }
+        }
+      }
+    }
+
+    if(childrenMarriedParent.length && childrenCurrentParent.length) {
+      kidsMarried = childrenMarriedParent[0].data.UserKList;
+      kidsCurrent = childrenCurrentParent[0].data.UserKList;
+      const diffKidsForP = kidsMarried.filter(e => !kidsCurrent.find(a => e.identity == a.identity));
+      const diffKidsForM = kidsCurrent.filter(e => !kidsMarried.find(a => e.identity == a.identity));
+      for (let item of diffKidsForP) {
+        await this.joinUserToTreeDescendant(+item.identity, +treeProperties.toUserId, +id);
+      }
+      console.log('marriedUser', marriedUser);
+      for (let item of diffKidsForM) {
+        await this.joinUserToTreeDescendant(+item.identity, +treeProperties.userId, +marriedUser.data.User.properties.myTreeIdByParent1);
+      }
+    }
+
     await this.query()
     .fetchUserByUserId(treeProperties.userId)
     .updateEntity(
@@ -402,4 +460,26 @@ export class TreeRepository {
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
+  async joinUserToTreeDescendant(userId, toUserId, treeId): Promise<any> {
+    await this.query()
+    .createMemberAndDescendantRelations(userId, toUserId, treeId)
+    .commitWithReturnEntity();
+
+    await this.query()
+    .fetchUserByUserId(userId)
+    .updateEntity(
+      'User',
+      Object.entries({
+        'User.myTreeIdByParent2': UtilsRepository.getStringVersion(treeId),
+      }).reduce((valuesAcc, [key, value]) => {
+        return value !== undefined && value !== null
+          ? {
+            ...valuesAcc,
+            [key]: value,
+          }
+          : valuesAcc;
+      }, {}),
+    )
+    .commitWithReturnEntity();
+  }
 }
