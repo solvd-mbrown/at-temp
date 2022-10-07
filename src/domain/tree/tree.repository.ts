@@ -187,52 +187,18 @@ export class TreeRepository {
               name: spouses[0].data.UserS.properties.firstName,
               userId: +spouseId,
          });
-
           // add current spouse in new tree
          await this.query()
          .createMemberAndMarriedRelations(treeProperties.toUserId, spouseId, spouseTree["id"])
          .commitWithReturnEntity();
-
-        await this.query()
-         .fetchUserByUserId(spouseId)
-         .updateEntity(
-            'User',
-            Object.entries({
-              'User.spouseTreeId': UtilsRepository.getStringVersion(id),
-            }).reduce((valuesAcc, [key, value]) => {
-              return value !== undefined && value !== null
-                ? {
-                  ...valuesAcc,
-                  [key]: value,
-                }
-                : valuesAcc;
-            }, {}),
-         )
-         .commitWithReturnEntity();
+         await this.updateUserParamSpouseTreeId(spouseId, id);
+         await this.updateUserParamSpouseTreeId(treeProperties.toUserId, spouseTree["id"]);
 
          //add kind into new tree for spouse
-          await this.query()
-          .createMemberAndDescendantRelations(treeProperties.userId, spouseId, spouseTree["id"])
-          .commitWithReturnEntity();
+          await this.joinUserToTreeDescendantParent2(+treeProperties.userId, +spouseId, +spouseTree["id"]);
 
-          await this.query()
-          .fetchUserByUserId(spouseId)
-          .updateEntity(
-            'User',
-            Object.entries({
-              'User.myTreeIdByParent2': UtilsRepository.getStringVersion(spouseTree["id"]),
-            }).reduce((valuesAcc, [key, value]) => {
-              return value !== undefined && value !== null
-                ? {
-                  ...valuesAcc,
-                  [key]: value,
-                }
-                : valuesAcc;
-            }, {}),
-          )
-          .commitWithReturnEntity();
-          }
-        else{
+          } else{
+
             let spouseInMarriedTree;
             let userInMarriedTree;
             spouseInMarriedTree = await this.query()
@@ -243,70 +209,22 @@ export class TreeRepository {
               await this.query()
               .createMemberAndMarriedRelations(treeProperties.toUserId, spouseId, spouses[0].data.UserS.properties.myTreeIdByParent1)
               .commitWithReturnEntity();
-
-              await this.query()
-              .fetchUserByUserId(spouseId)
-              .updateEntity(
-                'User',
-                Object.entries({
-                  'User.spouseTreeId': UtilsRepository.getStringVersion(id),
-                }).reduce((valuesAcc, [key, value]) => {
-                  return value !== undefined && value !== null
-                    ? {
-                      ...valuesAcc,
-                      [key]: value,
-                    }
-                    : valuesAcc;
-                }, {}),
-              )
-              .commitWithReturnEntity();
-              spouseInMarriedTree = null;
+              await this.updateUserParamSpouseTreeId(spouseId, id);
            }
 
-          userInMarriedTree = await this.query()
-          .fetchUserInTree(treeProperties.userId, spouses[0].data.UserS.properties.myTreeIdByParent1)
-          .commitWithReturnEntity();
-          if(!userInMarriedTree) {
-            await this.query()
-            .createMemberAndDescendantRelations(treeProperties.userId, spouseId, spouses[0].data.UserS.properties.myTreeIdByParent1)
-            .commitWithReturnEntity();
-
-            await this.query()
-            .fetchUserByUserId(spouseId)
-            .updateEntity(
-              'User',
-              Object.entries({
-                'User.myTreeIdByParent2': UtilsRepository.getStringVersion(spouses[0].data.UserS.properties.myTreeIdByParent1),
-              }).reduce((valuesAcc, [key, value]) => {
-                return value !== undefined && value !== null
-                  ? {
-                    ...valuesAcc,
-                    [key]: value,
-                  }
-                  : valuesAcc;
-              }, {}),
-            )
-            .commitWithReturnEntity();
-          }
-
-          if(userInMarriedTree) {
-            await this.query()
-            .fetchUserByUserId(spouseId)
-            .updateEntity(
-              'User',
-              Object.entries({
-                'User.myTreeIdByParent2': UtilsRepository.getStringVersion(spouses[0].data.UserS.properties.myTreeIdByParent1),
-              }).reduce((valuesAcc, [key, value]) => {
-                return value !== undefined && value !== null
-                  ? {
-                    ...valuesAcc,
-                    [key]: value,
-                  }
-                  : valuesAcc;
-              }, {}),
-            )
-            .commitWithReturnEntity();
-          }
+          await this.joinUserToTreeDescendantParent2(+treeProperties.userId, +spouseId, +spouses[0].data.UserS.properties.myTreeIdByParent1);
+   //
+   //        userInMarriedTree = await this.query()
+   //        .fetchUserInTree(treeProperties.userId, spouses[0].data.UserS.properties.myTreeIdByParent1)
+   //        .commitWithReturnEntity();
+   // console.log('userInMarriedTree', userInMarriedTree);
+   //        if(!userInMarriedTree) {
+   //          await this.joinUserToTreeDescendantParent2(+treeProperties.userId, +spouseId, +spouses[0].data.UserS.properties.myTreeIdByParent1);
+   //        }
+   //
+   //        if(userInMarriedTree) {
+   //          await this.updateUserParamMyTreeIdByParent2(+treeProperties.userId, +spouses[0].data.UserS.properties.myTreeIdByParent1);
+   //        }
         }
       }
 
@@ -365,12 +283,12 @@ export class TreeRepository {
     if(childrenCurrentParent.length && !childrenMarriedParent.length) {
       kidsCurrent = childrenCurrentParent[0].data.UserKList;
       if(kidsCurrent.length == 1) {
-        await this.joinUserToTreeDescendant(+kidsCurrent[0].identity, +treeProperties.userId, +marriedUser.data.User.properties.myTreeIdByParent1);
+        await this.joinUserToTreeDescendantParent2(+kidsCurrent[0].identity, +treeProperties.userId, +marriedUser.data.User.properties.myTreeIdByParent1);
       }
 
       if(kidsCurrent.length > 1) {
         for (let item of kidsCurrent) {
-          await this.joinUserToTreeDescendant(+item.identity, +treeProperties.userId, +marriedUser.data.User.properties.myTreeIdByParent1);
+          await this.joinUserToTreeDescendantParent2(+item.identity, +treeProperties.userId, +marriedUser.data.User.properties.myTreeIdByParent1);
         }
       }
     }
@@ -379,11 +297,11 @@ export class TreeRepository {
       kidsMarried = childrenMarriedParent[0].data.UserKList;
 
       if (kidsMarried.length == 1) {
-        await this.joinUserToTreeDescendant(+kidsMarried[0].identity, treeProperties.toUserId, +id);
+        await this.joinUserToTreeDescendantParent2(+kidsMarried[0].identity, treeProperties.toUserId, +id);
 
         if (kidsMarried.length > 1) {
           for (let item of kidsCurrent) {
-            await this.joinUserToTreeDescendant(+item.identity, treeProperties.toUserId, +id);
+            await this.joinUserToTreeDescendantParent2(+item.identity, treeProperties.toUserId, +id);
           }
         }
       }
@@ -395,11 +313,10 @@ export class TreeRepository {
       const diffKidsForP = kidsMarried.filter(e => !kidsCurrent.find(a => e.identity == a.identity));
       const diffKidsForM = kidsCurrent.filter(e => !kidsMarried.find(a => e.identity == a.identity));
       for (let item of diffKidsForP) {
-        await this.joinUserToTreeDescendant(+item.identity, +treeProperties.toUserId, +id);
+        await this.joinUserToTreeDescendantParent2(+item.identity, +treeProperties.toUserId, +id);
       }
-      console.log('marriedUser', marriedUser);
       for (let item of diffKidsForM) {
-        await this.joinUserToTreeDescendant(+item.identity, +treeProperties.userId, +marriedUser.data.User.properties.myTreeIdByParent1);
+        await this.joinUserToTreeDescendantParent2(+item.identity, +treeProperties.userId, +marriedUser.data.User.properties.myTreeIdByParent1);
       }
     }
 
@@ -460,10 +377,91 @@ export class TreeRepository {
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
-  async joinUserToTreeDescendant(userId, toUserId, treeId): Promise<any> {
+  async joinUserToTreeDescendantParent2(userId, toUserId, treeId): Promise<any> {
     await this.query()
     .createMemberAndDescendantRelations(userId, toUserId, treeId)
     .commitWithReturnEntity();
+
+    await this.query()
+    .fetchUserByUserId(userId)
+    .updateEntity(
+      'User',
+      Object.entries({
+        'User.myTreeIdByParent2': UtilsRepository.getStringVersion(treeId),
+      }).reduce((valuesAcc, [key, value]) => {
+        return value !== undefined && value !== null
+          ? {
+            ...valuesAcc,
+            [key]: value,
+          }
+          : valuesAcc;
+      }, {}),
+    )
+    .commitWithReturnEntity();
+  }
+
+  async joinUserToTreeDescendantParent1(userId, toUserId, treeId): Promise<any> {
+    await this.query()
+    .createMemberAndDescendantRelations(userId, toUserId, treeId)
+    .commitWithReturnEntity();
+
+    await this.query()
+    .fetchUserByUserId(userId)
+    .updateEntity(
+      'User',
+      Object.entries({
+        'User.myTreeIdByParent1': UtilsRepository.getStringVersion(treeId),
+      }).reduce((valuesAcc, [key, value]) => {
+        return value !== undefined && value !== null
+          ? {
+            ...valuesAcc,
+            [key]: value,
+          }
+          : valuesAcc;
+      }, {}),
+    )
+    .commitWithReturnEntity();
+  }
+
+  async updateUserParamSpouseTreeId(userId, treeId): Promise<any> {
+
+    await this.query()
+    .fetchUserByUserId(userId)
+    .updateEntity(
+      'User',
+      Object.entries({
+        'User.spouseTreeId': UtilsRepository.getStringVersion(treeId),
+      }).reduce((valuesAcc, [key, value]) => {
+        return value !== undefined && value !== null
+          ? {
+            ...valuesAcc,
+            [key]: value,
+          }
+          : valuesAcc;
+      }, {}),
+    )
+    .commitWithReturnEntity();
+  }
+  async updateUserParamMyTreeIdByParent1(userId, treeId): Promise<any> {
+
+    await this.query()
+    .fetchUserByUserId(userId)
+    .updateEntity(
+      'User',
+      Object.entries({
+        'User.myTreeIdByParent1': UtilsRepository.getStringVersion(treeId),
+      }).reduce((valuesAcc, [key, value]) => {
+        return value !== undefined && value !== null
+          ? {
+            ...valuesAcc,
+            [key]: value,
+          }
+          : valuesAcc;
+      }, {}),
+    )
+    .commitWithReturnEntity();
+  }
+  async updateUserParamMyTreeIdByParent2(userId, treeId): Promise<any> {
 
     await this.query()
     .fetchUserByUserId(userId)
