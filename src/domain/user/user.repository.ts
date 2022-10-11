@@ -58,7 +58,7 @@ export class UserRepository {
       .resolveUsersParentsByRelation()
       .commitWithReturnEntities();
     let parents = [];
-    if(parent && parent[0].data.UserP) {
+    if(parent && parent.length && parent[0].data.UserP) {
       parents.push(parent[0].data.UserP)
       if(parent[0].data.UserM) {
         parents.push(parent[0].data.UserM)
@@ -70,24 +70,24 @@ export class UserRepository {
       .resolveUsersSpouseByRelation()
       .commitWithReturnEntities();
     let spouse = [];
-    if(spouses && spouses[0].data.UserS) {
+    if(spouses && spouses.length && spouses[0].data.UserS) {
       spouse.push(spouses[0].data.UserS);
     }
 
     let siblings = [];
-    if (parent && parent[0].data.UserP) {
+    if (parent && parent.length && parent[0].data.UserP) {
       const siblingsArr = await this.query()
       .fetchUserByUserId(parent[0].data.UserP.identity)
       .resolveUsersChildrenByRelation()
       .commitWithReturnEntities();
 
-      if(siblingsArr && siblingsArr[0].data.UserKList) {
+      if(siblingsArr && siblingsArr.length && siblingsArr[0].data.UserKList) {
         let famalyLine = siblingsArr[0].data.UserKList;
         if (famalyLine.length > 1) {
           famalyLine = famalyLine.filter(object => {
             return object.identity != id;
           });
-          siblings.push(famalyLine);
+          siblings = famalyLine;
         }
       }
     }
@@ -98,17 +98,17 @@ export class UserRepository {
       .commitWithReturnEntities();
 
     let kids = [];
-    if(childrens && childrens[0].data.UserKList) {
+    if(childrens && childrens.length && childrens[0].data.UserKList) {
       kids = childrens[0].data.UserKList;
     }
 
-    if (parent && parent[0].data.UserS) {
+    if (!childrens[0].data.UserKList.length && spouses && spouses[0].data.UserS) {
       const spouseChildrens = await this.query()
       .fetchUserByUserId(spouses[0].data.UserS.identity)
       .resolveUsersChildrenByRelation()
       .commitWithReturnEntities();
 
-      if(spouseChildrens && spouseChildrens[0].data.UserKList) {
+      if(spouseChildrens && spouseChildrens.length && spouseChildrens[0].data.UserKList) {
         kids = spouseChildrens[0].data.UserKList;
       }
     }
@@ -155,7 +155,8 @@ export class UserRepository {
         'User.phone': params?.phone,
         'User.address': params?.address,
         'User.spouseTreeId': params?.spouseTreeId,
-        'User.myTreeId': params?.myTreeId,
+        'User.myTreeIdByParent1': params?.myTreeIdByParent1,
+        'User.myTreeIdByParent2': params?.myTreeIdByParent2,
         'User.spouse': params?.spouse ? UtilsRepository.getStringVersion(params?.spouse) : null,
         'User.kids': params?.kids ? UtilsRepository.getStringVersion(params?.kids) : null,
         'User.parents': params?.parents ? UtilsRepository.getStringVersion(params?.parents) : null,

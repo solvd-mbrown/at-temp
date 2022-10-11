@@ -23,11 +23,32 @@ export class TreeController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.treeService.findOne(+id);
-  } 
+  }
+
+  @Get('all/:id')
+  findOneByUUID(@Param('id') id: string) {
+    return this.treeService.findOneByUUID(id);
+  }
   
   @Get('members/:id')
   getTreeMembers(@Param('id') id: string) {
     return this.treeService.getTreeMembers(+id);
+  }
+
+  @Get('partTree/:treeId/:userId')
+  getPartTreeByUserId(
+    @Param('treeId') treeId: string,
+    @Param('userId') userId: string,
+  ) {
+    return this.treeService.getPartTreeByUserId(+treeId, +userId);
+  }
+
+  @Get('treeInParts/:treeId/:userId')
+  getTreeInPartsUserId(
+    @Param('treeId') treeId: string,
+    @Param('userId') userId: string,
+  ) {
+    return this.treeService.getTreeInPartsUserId(+treeId, userId);
   }
 
   @Patch(':id')

@@ -24,9 +24,23 @@ export class TreeService {
     const result = await this.treeRepository.getTree(id);
     return result;
   }
-  
+
+  async findOneByUUID(id: string) {
+    const result = await this.treeRepository.getTreeByUUID(id);
+    return result;
+  }
+
   async getTreeMembers(id: number) {
     const result = await this.treeRepository.getTreeMembers(id);
+    return result;
+  }
+
+  async getPartTreeByUserId(treeId: number, userId: number) {
+    const result = await this.treeRepository.getPartTreeByUserId(treeId, userId);
+    return result;
+  }
+  async getTreeInPartsUserId(treeId: number, userId: string) {
+    const result = await this.treeRepository.getTreeInPartsUserId(treeId, userId);
     return result;
   }
 
@@ -38,8 +52,12 @@ export class TreeService {
     let result = null;
     if (joinToTreeProperty.relation == 'MARRIED') {
       result = await this.treeRepository.joinToTreeMarried(id, joinToTreeProperty);
-    } else{
+    }
+    if (joinToTreeProperty.relation == 'DESCENDANT'){
       result = await this.treeRepository.joinToTreeDescendant(id, joinToTreeProperty);
+    }
+    if (joinToTreeProperty.relation == 'MARRIEDSUBTREE'){
+      result = await this.treeRepository.joinToTreeMarriedSubTree(id, joinToTreeProperty);
     }
     return result;
   }
