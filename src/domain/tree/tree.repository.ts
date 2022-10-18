@@ -310,8 +310,10 @@ export class TreeRepository {
     if(childrenMarriedParent.length && childrenCurrentParent.length) {
       kidsMarried = childrenMarriedParent[0].data.UserKList;
       kidsCurrent = childrenCurrentParent[0].data.UserKList;
-      const diffKidsForP = kidsMarried.filter(e => !kidsCurrent.find(a => e.identity == a.identity));
-      const diffKidsForM = kidsCurrent.filter(e => !kidsMarried.find(a => e.identity == a.identity));
+      const diffKidsForP = kidsMarried.filter(e => !kidsCurrent.find(a => e.firstName == a.firstName));
+      const diffKidsForM = kidsCurrent.filter(e => !kidsMarried.find(a => e.firstName == a.firstName));
+      // const diffKidsForP = kidsMarried.filter(e => !kidsCurrent.find(a => e.identity == a.identity));
+      // const diffKidsForM = kidsCurrent.filter(e => !kidsMarried.find(a => e.identity == a.identity));
       for (let item of diffKidsForP) {
         await this.joinUserToTreeDescendantParent2(+item.identity, +treeProperties.toUserId, +id);
       }

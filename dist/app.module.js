@@ -28,8 +28,7 @@ const post_repository_1 = require("./domain/post/post.repository");
 const comment_controller_1 = require("./domain/comment/comment.controller");
 const comment_repository_1 = require("./domain/comment/comment.repository");
 const comment_service_1 = require("./domain/comment/comment.service");
-const firebase = require("firebase-admin");
-const auth_module_1 = require("./services/auth/auth.module");
+const firebase_auth_strategy_1 = require("./services/auth/firebase/firebase-auth.strategy");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -52,19 +51,6 @@ AppModule = __decorate([
                 inject: [config_1.ConfigService],
                 useFactory: (configService) => (0, database_module_1.createDatabaseConfiguration)(configService),
             }),
-            auth_module_1.FirebaseAdminModule.forRootAsync({
-                imports: [config_1.ConfigModule],
-                inject: [config_1.ConfigService],
-                useFactory: async (configService) => {
-                    return {
-                        credential: firebase.credential.cert({
-                            projectId: configService.get('FIREBASE_PROJECT_ID'),
-                            clientEmail: configService.get('FIREBASE_CLIENT_EMAIL'),
-                            privateKey: configService.get('FIREBASE_PRIVATE_KEY'),
-                        }),
-                    };
-                },
-            }),
         ],
         controllers: [
             app_controller_1.AppController,
@@ -76,6 +62,7 @@ AppModule = __decorate([
         ],
         providers: [
             app_service_1.AppService,
+            firebase_auth_strategy_1.FirebaseAuthStrategy,
             user_service_1.UserService,
             user_repository_1.UserRepository,
             tree_service_1.TreeService,
