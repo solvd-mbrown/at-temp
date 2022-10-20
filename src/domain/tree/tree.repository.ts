@@ -349,26 +349,25 @@ export class TreeRepository {
   }
 
   async joinToTreeMarriedSubTree(id, treeProperties: any): Promise<any> {
-    const result = await this.query()
+
+    const targetUser = await this.query()
+    .fetchUserByUserId(treeProperties.userId)
+    .commitWithReturnEntities();
+
+    if(!targetUser[0].data.User.properties.myTreeIdByParent1){
+      const targetUserTree = await this.addNewTree(
+        {
+          name: targetUser[0].data.User.properties.firstName,
+          userId: +treeProperties.userId,
+        });
+      await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUserTree["id"]);
+    }else{
+      await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUser[0].data.User.properties.myTreeIdByParent1);
+    }
+
+      const result = await this.query()
     .createMemberAndMarriedSubTreeRelations(treeProperties.userId, treeProperties.toUserId, id)
     .commitWithReturnEntity();
-
-    // await this.query()
-    // .fetchUserByUserId(treeProperties.userId)
-    // .updateEntity(
-    //   'User',
-    //   Object.entries({
-    //     'User.spouseTreeId': UtilsRepository.getStringVersion(id),
-    //   }).reduce((valuesAcc, [key, value]) => {
-    //     return value !== undefined && value !== null
-    //       ? {
-    //         ...valuesAcc,
-    //         [key]: value,
-    //       }
-    //       : valuesAcc;
-    //   }, {}),
-    // )
-    // .commitWithReturnEntity();
 
     if(result) {
       const output = result.data;

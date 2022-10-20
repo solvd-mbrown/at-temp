@@ -24,7 +24,7 @@ export class UserController {
     return this.userService.findOne(+id);
   }
 
-  @Get(':token')
+  @Get('initUser/:token')
   initUser(@Param('token') jwt: string) {
     return this.userService.initUser(jwt);
   }
