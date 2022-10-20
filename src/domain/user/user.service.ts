@@ -1,7 +1,6 @@
 import { Injectable, Scope } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './user.repository';
-// import { FirebaseAuthenticationService } from "../../services/auth/auth.service";
 import { FirebaseAuthStrategy } from "../../services/auth/firebase/firebase-auth.strategy";
 
 @Injectable()

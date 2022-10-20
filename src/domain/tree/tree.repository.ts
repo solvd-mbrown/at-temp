@@ -78,7 +78,7 @@ export class TreeRepository {
 
     if (result) {
       const data = result.data;
-      const tree = cypher.buildTree(data);
+      const tree = cypher.buildTree(data, id);
       return {
         id: data.Tree.identity,
         ...data.Tree.properties,
@@ -95,7 +95,7 @@ export class TreeRepository {
 
     if (result) {
       const data = result.data;
-      const tree = cypher.buildTree(data);
+      const tree = cypher.buildTree(data, data.Tree.identity);
       return {
         id: data.Tree.identity,
         ...data.Tree.properties,
@@ -108,7 +108,7 @@ export class TreeRepository {
   async getPartTreeByUserId(treeId: number, userId: number): Promise<Tree[]> {
     const spouses = await this.query()
     .fetchUserByUserId(userId)
-    .resolveUsersSpouseByRelation()
+    .resolveUsersSpouseByRelationByTreeId(treeId.toString())
     .commitWithReturnEntities();
     let spouseId = null;
     if(spouses && spouses.length && spouses[0].data.UserS) {
@@ -121,7 +121,7 @@ export class TreeRepository {
 
     if (result) {
       const data = result.data;
-      const tree = cypher.buildPartTree(data, spouseId);
+      const tree = cypher.buildPartTree(data, spouseId, treeId.toString());
       return {
         id: data.Tree.identity,
         ...data.Tree.properties,
@@ -152,9 +152,9 @@ export class TreeRepository {
 
     if (result) {
       const data = result.data;
-      const partTree = await cypher.buildPartTreeWithoutSubTreeRel(data, parentId);
-      const rootPart = await cypher.buildRootPartTree(data, parentId);
-      const subTree = await cypher.buildSubTree(data);
+      const partTree = await cypher.buildPartTreeWithoutSubTreeRel(data, parentId, treeId.toString());
+      const rootPart = await cypher.buildRootPartTree(data, parentId, treeId.toString());
+      const subTree = await cypher.buildSubTree(data, treeId.toString());
       return {
         id: data.Tree.identity,
         ...data.Tree.properties,
@@ -170,7 +170,7 @@ export class TreeRepository {
 
       const spouses = await this.query()
       .fetchUserByUserId(treeProperties.toUserId)
-      .resolveUsersSpouseByRelation()
+      .resolveUsersSpouseByRelationByTreeId(id)
       .commitWithReturnEntities();
       let spouseId = null;
       if(spouses && spouses.length && spouses[0].data.UserS) {

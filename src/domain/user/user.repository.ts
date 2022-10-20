@@ -67,7 +67,7 @@ export class UserRepository {
 
     const spouses = await this.query()
       .fetchUserByUserId(id)
-      .resolveUsersSpouseByRelation()
+      .resolveUsersSpouseByRelationByTreeId(result.data.User.properties.myTreeIdByParent1)
       .commitWithReturnEntities();
     let spouse = [];
     if(spouses && spouses.length && spouses[0].data.UserS) {
