@@ -178,7 +178,6 @@ export class TreeRepository {
       }
 
       if(spouseId) {
-        // if(!spouses[0].data.UserS.properties.myTreeIdByParent1 || !spouses[0].data.UserS.properties.myTreeIdByParent2){
         if(!spouses[0].data.UserS.properties.myTreeIdByParent1){
 
           // crate new tree for spouse
