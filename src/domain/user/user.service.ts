@@ -1,14 +1,15 @@
 import { Injectable, Scope } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './user.repository';
+import { FirebaseAuthStrategy } from "../../services/auth/firebase/firebase-auth.strategy";
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
+    private readonly firebaseService: FirebaseAuthStrategy,
   ) {}
-  
+
   async create(usersProperties): Promise<any> {
     const result = await this.userRepository.addNewUser(usersProperties);
     return result;
@@ -32,4 +33,13 @@ export class UserService {
     const result = await this.userRepository.deleteUser(id);
     return result;
   }
+
+  public async initUser(jwt :string) {
+    const jwtParsed = await this.firebaseService.validate(jwt);
+    const result = await this.userRepository.getUserFromEmail(
+      jwtParsed.email,
+    );
+    return result;
+  }
+
 }

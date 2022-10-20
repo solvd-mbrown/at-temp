@@ -24,6 +24,9 @@ import { PostRepository } from './domain/post/post.repository';
 import { CommentController } from './domain/comment/comment.controller';
 import { CommentRepository } from './domain/comment/comment.repository';
 import { CommentService } from './domain/comment/comment.service';
+import * as firebase from 'firebase-admin';
+import { FirebaseAdminModule } from './services/auth/auth.module';
+import { FirebaseAuthStrategy } from './services/auth/firebase/firebase-auth.strategy';
 
 @Module({
   imports: [
@@ -47,6 +50,19 @@ import { CommentService } from './domain/comment/comment.service';
       useFactory: (configService: ConfigService): DatabaseConfig =>
         createDatabaseConfiguration(configService),
     }),
+  //   FirebaseAdminModule.forRootAsync({
+  //     imports: [ConfigModule],
+  //     inject: [ConfigService],
+  //     useFactory: async (configService: ConfigService) => {
+  //       return {
+  //         credential: firebase.credential.cert({
+  //           projectId: configService.get('FIREBASE_PROJECT_ID'),
+  //           clientEmail: configService.get('FIREBASE_CLIENT_EMAIL'),
+  //           privateKey: configService.get('FIREBASE_PRIVATE_KEY'),
+  //         }),
+  //       };
+  //     },
+  //   }),
   ],
   controllers: [
     AppController,
@@ -58,6 +74,7 @@ import { CommentService } from './domain/comment/comment.service';
   ],
   providers: [
     AppService,
+    FirebaseAuthStrategy,
     UserService,
     UserRepository,
     TreeService,

@@ -67,7 +67,7 @@ export class UserRepository {
 
     const spouses = await this.query()
       .fetchUserByUserId(id)
-      .resolveUsersSpouseByRelation()
+      .resolveUsersSpouseByRelationByTreeId(result.data.User.properties.myTreeIdByParent1)
       .commitWithReturnEntities();
     let spouse = [];
     if(spouses && spouses.length && spouses[0].data.UserS) {
@@ -184,5 +184,21 @@ export class UserRepository {
     }
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
+
+
+  /*
+   * Get User Entity from email
+   */
+  public async getUserFromEmail(email: string): Promise<User> {
+    const result = await this.query()
+    .findUserByEmail(email)
+    .commitWithReturnEntity();
+
+    if (result) {
+      const data = result.data;
+      return cypher.mapCypherResultToEntity(data.User);
+    }
+  }
+
 
 }

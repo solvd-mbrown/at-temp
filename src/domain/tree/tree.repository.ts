@@ -78,7 +78,7 @@ export class TreeRepository {
 
     if (result) {
       const data = result.data;
-      const tree = cypher.buildTree(data);
+      const tree = cypher.buildTree(data, id);
       return {
         id: data.Tree.identity,
         ...data.Tree.properties,
@@ -95,7 +95,7 @@ export class TreeRepository {
 
     if (result) {
       const data = result.data;
-      const tree = cypher.buildTree(data);
+      const tree = cypher.buildTree(data, data.Tree.identity);
       return {
         id: data.Tree.identity,
         ...data.Tree.properties,
@@ -108,7 +108,7 @@ export class TreeRepository {
   async getPartTreeByUserId(treeId: number, userId: number): Promise<Tree[]> {
     const spouses = await this.query()
     .fetchUserByUserId(userId)
-    .resolveUsersSpouseByRelation()
+    .resolveUsersSpouseByRelationByTreeId(treeId.toString())
     .commitWithReturnEntities();
     let spouseId = null;
     if(spouses && spouses.length && spouses[0].data.UserS) {
@@ -121,7 +121,7 @@ export class TreeRepository {
 
     if (result) {
       const data = result.data;
-      const tree = cypher.buildPartTree(data, spouseId);
+      const tree = cypher.buildPartTree(data, spouseId, treeId.toString());
       return {
         id: data.Tree.identity,
         ...data.Tree.properties,
@@ -152,9 +152,9 @@ export class TreeRepository {
 
     if (result) {
       const data = result.data;
-      const partTree = await cypher.buildPartTreeWithoutSubTreeRel(data, parentId);
-      const rootPart = await cypher.buildRootPartTree(data, parentId);
-      const subTree = await cypher.buildSubTree(data);
+      const partTree = await cypher.buildPartTreeWithoutSubTreeRel(data, parentId, treeId.toString());
+      const rootPart = await cypher.buildRootPartTree(data, parentId, treeId.toString());
+      const subTree = await cypher.buildSubTree(data, treeId.toString());
       return {
         id: data.Tree.identity,
         ...data.Tree.properties,
@@ -170,7 +170,7 @@ export class TreeRepository {
 
       const spouses = await this.query()
       .fetchUserByUserId(treeProperties.toUserId)
-      .resolveUsersSpouseByRelation()
+      .resolveUsersSpouseByRelationByTreeId(id)
       .commitWithReturnEntities();
       let spouseId = null;
       if(spouses && spouses.length && spouses[0].data.UserS) {
@@ -310,8 +310,10 @@ export class TreeRepository {
     if(childrenMarriedParent.length && childrenCurrentParent.length) {
       kidsMarried = childrenMarriedParent[0].data.UserKList;
       kidsCurrent = childrenCurrentParent[0].data.UserKList;
-      const diffKidsForP = kidsMarried.filter(e => !kidsCurrent.find(a => e.identity == a.identity));
-      const diffKidsForM = kidsCurrent.filter(e => !kidsMarried.find(a => e.identity == a.identity));
+      const diffKidsForP = kidsMarried.filter(e => !kidsCurrent.find(a => e.firstName == a.firstName));
+      const diffKidsForM = kidsCurrent.filter(e => !kidsMarried.find(a => e.firstName == a.firstName));
+      // const diffKidsForP = kidsMarried.filter(e => !kidsCurrent.find(a => e.identity == a.identity));
+      // const diffKidsForM = kidsCurrent.filter(e => !kidsMarried.find(a => e.identity == a.identity));
       for (let item of diffKidsForP) {
         await this.joinUserToTreeDescendantParent2(+item.identity, +treeProperties.toUserId, +id);
       }
@@ -347,26 +349,25 @@ export class TreeRepository {
   }
 
   async joinToTreeMarriedSubTree(id, treeProperties: any): Promise<any> {
-    const result = await this.query()
+
+    const targetUser = await this.query()
+    .fetchUserByUserId(treeProperties.userId)
+    .commitWithReturnEntities();
+
+    if(!targetUser[0].data.User.properties.myTreeIdByParent1){
+      const targetUserTree = await this.addNewTree(
+        {
+          name: targetUser[0].data.User.properties.firstName,
+          userId: +treeProperties.userId,
+        });
+      await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUserTree["id"]);
+    }else{
+      await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUser[0].data.User.properties.myTreeIdByParent1);
+    }
+
+      const result = await this.query()
     .createMemberAndMarriedSubTreeRelations(treeProperties.userId, treeProperties.toUserId, id)
     .commitWithReturnEntity();
-
-    // await this.query()
-    // .fetchUserByUserId(treeProperties.userId)
-    // .updateEntity(
-    //   'User',
-    //   Object.entries({
-    //     'User.spouseTreeId': UtilsRepository.getStringVersion(id),
-    //   }).reduce((valuesAcc, [key, value]) => {
-    //     return value !== undefined && value !== null
-    //       ? {
-    //         ...valuesAcc,
-    //         [key]: value,
-    //       }
-    //       : valuesAcc;
-    //   }, {}),
-    // )
-    // .commitWithReturnEntity();
 
     if(result) {
       const output = result.data;
