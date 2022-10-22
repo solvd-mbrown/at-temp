@@ -55,7 +55,7 @@ export class UserRepository {
 
     const parent = await this.query()
       .fetchUserByUserId(id)
-      .resolveUsersParentsByRelation()
+      .resolveUsersParentsByRelation(result.data.User.properties.myTreeIdByParent1)
       .commitWithReturnEntities();
     let parents = [];
     if(parent && parent.length && parent[0].data.UserP) {

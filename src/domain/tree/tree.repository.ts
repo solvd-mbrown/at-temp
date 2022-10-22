@@ -134,7 +134,7 @@ export class TreeRepository {
   async getTreeInPartsUserId(treeId: number, userId: string): Promise<Tree[]> {
     const parent = await this.query()
     .fetchUserByUserId(+userId)
-    .resolveUsersParentsByRelation()
+    .resolveUsersParentsByRelation(treeId.toString())
     .commitWithReturnEntities();
 
     let parentId = null;

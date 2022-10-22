@@ -1289,10 +1289,11 @@ export class RepositoryQuery {
   };
 
   public resolveUsersParentsByRelation = (
+    treeId: string,
   ): RepositoryQuery => {
     this.query.raw(`
-      OPTIONAL MATCH (User)-[:USER_DESCENDANT_USER]->(UserP)
-      OPTIONAL MATCH (UserP)<-[:USER_MARRIED_USER]-(UserM)
+      OPTIONAL MATCH (User)-[:USER_DESCENDANT_USER_TREE_${treeId}]->(UserP)
+      OPTIONAL MATCH (UserP)<-[:USER_MARRIED_USER_TREE_${treeId}]-(UserM)
     `);
     this.returns.push('UserP', 'UserM');
     return this;
