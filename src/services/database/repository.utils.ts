@@ -474,7 +474,7 @@ export class RepositoryQuery {
     MATCH (User2:User) WHERE ID(User2) = ${toUserId}
     MATCH (Tree:Tree) WHERE ID(Tree) = ${treeId}
 
-    MERGE (User2)<-[UserUserRelations:USER_DESCENDANT_USER]-(User1)
+    MERGE (User2)<-[UserUserRelations:USER_DESCENDANT_USER_TREE_${treeId}]-(User1)
     MERGE (User1)-[TreeUserRelations:TREE_MEMBER_USER]->(Tree)
     `);
     
@@ -509,7 +509,7 @@ export class RepositoryQuery {
     MATCH (User2:User) WHERE ID(User2) = ${toUserId}
     MATCH (Tree:Tree) WHERE ID(Tree) = ${treeId}
 
-    MERGE (User2)<-[UserUserRelations:USER_MARRIED_SUB_TREE_USER]-(User1)
+    MERGE (User2)<-[UserUserRelations:USER_MARRIED_SUB_TREE_USER_TREE_${treeId}]-(User1)
     MERGE (User1)-[TreeUserRelations:TREE_MEMBER_USER]->(Tree)
     `);
 
@@ -2122,11 +2122,11 @@ export const processArrayProperty = (array: any) => {
 
 export const buildTree = (data: any, treeId: string) => {
   // @ts-ignore
-  let descendantRel = this.getDescendantRel(data.rList);
+  let descendantRel = this.getDescendantRelByTreeId(data.rList, treeId);
   // @ts-ignore
   let marriedRel = this.getMarriedRelByTreeId(data.rList, treeId);
   // @ts-ignore
-  let subTreeRel = this.getMarriedSubTreeRel(data.rList);
+  let subTreeRel = this.getMarriedSubTreeRelByTreeId(data.rList, treeId);
   let tree = null;
   if(subTreeRel.length){
     // @ts-ignore
@@ -2151,11 +2151,11 @@ export const buildTree = (data: any, treeId: string) => {
 
 export const buildRootPartTree = (data: any, userId: string, treeId: string) => {
   // @ts-ignore
-  let descendantRel = this.getDescendantRel(data.rList);
+  let descendantRel = this.getDescendantRelByTreeId(data.rList, treeId);
   // @ts-ignore
   let marriedRel = this.getMarriedRelByTreeId(data.rList, treeId);
   // @ts-ignore
-  let subTreeRel = this.getMarriedSubTreeRel(data.rList);
+  let subTreeRel = this.getMarriedSubTreeRelByTreeId(data.rList, treeId);
   // @ts-ignore
   let stopPoint = userId;
   let tree = null;
@@ -2168,11 +2168,11 @@ export const buildRootPartTree = (data: any, userId: string, treeId: string) => 
 
 export const buildPartTree = (data: any, userId: string, treeId: string) => {
   // @ts-ignore
-  let descendantRel = this.getDescendantRel(data.rList);
+  let descendantRel = this.getDescendantRelByTreeId(data.rList, treeId);
   // @ts-ignore
   let marriedRel = this.getMarriedRelByTreeId(data.rList, treeId);
   // @ts-ignore
-  let subTreeRel = this.getMarriedSubTreeRel(data.rList);
+  let subTreeRel = this.getMarriedSubTreeRelByTreeId(data.rList, treeId);
   // let tree = null;
   // if(subTreeRel.length){
   //   // @ts-ignore
@@ -2197,7 +2197,7 @@ export const buildPartTree = (data: any, userId: string, treeId: string) => {
 
 export const buildPartTreeWithoutSubTreeRel = (data: any, userId: string, treeId: string) => {
   // @ts-ignore
-  let descendantRel = this.getDescendantRel(data.rList);
+  let descendantRel = this.getDescendantRelByTreeId(data.rList, treeId);
   // @ts-ignore
   let marriedRel = this.getMarriedRelByTreeId(data.rList, treeId);
   // @ts-ignore
@@ -2213,9 +2213,9 @@ export const buildSubTree = (data: any, treeId: string) => {
   // @ts-ignore
   let marriedRel = this.getMarriedRelByTreeId(data.rList, treeId);
   // @ts-ignore
-  let descendantRel = this.getDescendantRel(data.rList);
+  let descendantRel = this.getDescendantRelByTreeId(data.rList, treeId);
   // @ts-ignore
-  let subTreeRel = this.getMarriedSubTreeRel(data.rList);
+  let subTreeRel = this.getMarriedSubTreeRelByTreeId(data.rList, treeId);
   let tree = null;
   if(subTreeRel.length){
     // @ts-ignore
@@ -2235,6 +2235,20 @@ export const getDescendantRel = (data: any) => {
   for (let rel of data) {
     for (let item of rel) {
       if (item.label === 'USER_DESCENDANT_USER') {
+        result.push(item);
+      }
+    }
+  }
+  // @ts-ignore
+  let res = this.removeDuplicates(result, "identity");
+  return res;
+};
+
+export const getDescendantRelByTreeId = (data: any, treeId: string) => {
+  let result = [];
+  for (let rel of data) {
+    for (let item of rel) {
+      if (item.label === `USER_DESCENDANT_USER_TREE_${treeId}`) {
         result.push(item);
       }
     }
@@ -2287,6 +2301,21 @@ export const getMarriedSubTreeRel = (data: any) => {
   return res;
 };
 
+export const getMarriedSubTreeRelByTreeId = (data: any, treeId: string) => {
+  let result = [];
+  for (let rel of data) {
+    for (let item of rel) {
+      if (item.label === `USER_MARRIED_SUB_TREE_USER_TREE_${treeId}`) {
+        result.push(item);
+      }
+    }
+  }
+
+  // @ts-ignore
+  let res = this.removeDuplicates(result, "identity");
+  return res;
+};
+
 export const getMarriedSubTreeRelByRootUserId = (data: any, rootUserId: string) => {
   let result = [];
   for (let rel of data) {
@@ -2318,7 +2347,7 @@ export const removeDuplicates = (originalArray, prop) => {
 
 export const getSubTreeRootUser = (members, descendantRels, marriedRel, subTreeRel) => {
   if(subTreeRel && subTreeRel.length){
-    const resultOnlySubTreeRel = members.filter(e => subTreeRel.find(a => e.identity == a.start));
+    const resultOnlySubTreeRel = members.filter(e => !subTreeRel.find(a => e.identity == a.start));
     const resultWithoutSubTreeRel = resultOnlySubTreeRel.filter(e => !marriedRel.find(a => e.identity == a.start));
     const rootUser = resultWithoutSubTreeRel.filter(object => {
       return object.labels[0] !== 'Tree';

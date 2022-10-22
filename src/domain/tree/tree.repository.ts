@@ -356,7 +356,7 @@ export class TreeRepository {
     if(!targetUser[0].data.User.properties.myTreeIdByParent1){
       const targetUserTree = await this.addNewTree(
         {
-          name: targetUser[0].data.User.properties.firstName,
+          name: `treeName${treeProperties.userId}`,
           userId: +treeProperties.userId,
         });
       await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUserTree["id"]);
@@ -366,6 +366,10 @@ export class TreeRepository {
 
       const result = await this.query()
     .createMemberAndMarriedSubTreeRelations(treeProperties.userId, treeProperties.toUserId, id)
+    .commitWithReturnEntity();
+
+    await this.query()
+    .createMemberRelation(treeProperties.userId, id)
     .commitWithReturnEntity();
 
     if(result) {
@@ -403,6 +407,10 @@ export class TreeRepository {
   async joinUserToTreeDescendantParent1(userId, toUserId, treeId): Promise<any> {
     await this.query()
     .createMemberAndDescendantRelations(userId, toUserId, treeId)
+    .commitWithReturnEntity();
+
+    await this.query()
+    .createMemberRelation(userId, treeId)
     .commitWithReturnEntity();
 
     await this.query()
