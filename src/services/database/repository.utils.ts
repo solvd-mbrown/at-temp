@@ -2346,25 +2346,26 @@ export const removeDuplicates = (originalArray, prop) => {
 };
 
 export const getSubTreeRootUser = (members, descendantRels, marriedRel, subTreeRel) => {
-  if(subTreeRel && subTreeRel.length){
-    const resultOnlySubTreeRel = members.filter(e => !subTreeRel.find(a => e.identity == a.start));
-    const resultWithoutSubTreeRel = resultOnlySubTreeRel.filter(e => !marriedRel.find(a => e.identity == a.start));
-    const rootUser = resultWithoutSubTreeRel.filter(object => {
-      return object.labels[0] !== 'Tree';
-    });
-    return rootUser;
-
-  }
   // if(subTreeRel && subTreeRel.length){
-  //   const resultWithoutDescendantStart = members.filter(e => !descendantRels.find(a => e.identity == a.start));
-  //   const resultWithoutDescendantRels = resultWithoutDescendantStart.filter(e => !descendantRels.find(a => e.identity == a.end));
-  //   const resultWithoutMarriedRel = resultWithoutDescendantRels.filter(e => !marriedRel.find(a => e.identity == a.start));
-  //   const resultWithoutSubTreeRel = resultWithoutMarriedRel.filter(e => !subTreeRel.find(a => e.identity == a.start));
+  //   const resultOnlySubTreeRel = members.filter(e => !subTreeRel.find(a => e.identity == a.start));
+  //   const resultWithoutSubTreeRel = resultOnlySubTreeRel.filter(e => !marriedRel.find(a => e.identity == a.start));
   //   const rootUser = resultWithoutSubTreeRel.filter(object => {
   //     return object.labels[0] !== 'Tree';
   //   });
   //   return rootUser;
+
   // }
+
+  if(subTreeRel && subTreeRel.length){
+    const resultWithoutDescendantStart = members.filter(e => !descendantRels.find(a => e.identity == a.start));
+    const resultWithoutDescendantRels = resultWithoutDescendantStart.filter(e => !descendantRels.find(a => e.identity == a.end));
+    const resultWithoutMarriedRel = resultWithoutDescendantRels.filter(e => !marriedRel.find(a => e.identity == a.start));
+    const resultWithoutSubTreeRel = resultWithoutMarriedRel.filter(e => !subTreeRel.find(a => e.identity == a.start));
+    const rootUser = resultWithoutSubTreeRel.filter(object => {
+      return object.labels[0] !== 'Tree';
+    });
+    return rootUser;
+  }
 };
 
 export const getRootUser = (members, descendantRels, marriedRel, subTreeRel?) => {
