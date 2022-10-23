@@ -396,7 +396,7 @@ export class TreeRepository {
     if(resultToSubTreeUser[0].data.User.properties.subTreeTargetUser){
       ToSubTreeUser = resultToSubTreeUser[0].data.User.properties.subTreeTargetUser;
     }
-    await this.updateUserParamSubTreeTargetUser(treeProperties.toUserId, ToSubTreeUser);
+    await this.updateUserParamSubTreeTargetUser(treeProperties.userId, ToSubTreeUser);
 
       const result = await this.query()
     .createMemberAndMarriedSubTreeRelations(treeProperties.userId, treeProperties.toUserId, id)
