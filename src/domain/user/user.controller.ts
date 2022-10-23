@@ -5,7 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { FirebaseAuthGuard } from 'src/services/auth/firebase/firebase-auth.guard';
 
 @Controller('user')
-@UseGuards(FirebaseAuthGuard)
+// @UseGuards(FirebaseAuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 

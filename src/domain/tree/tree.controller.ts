@@ -6,7 +6,7 @@ import { JoinToTreeDto } from './dto/join-to-tree.dto';
 import { FirebaseAuthGuard } from 'src/services/auth/firebase/firebase-auth.guard';
 
 @Controller('tree')
-@UseGuards(FirebaseAuthGuard)
+// @UseGuards(FirebaseAuthGuard)
 export class TreeController {
   constructor(private readonly treeService: TreeService) {}
 

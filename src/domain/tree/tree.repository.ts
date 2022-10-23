@@ -264,17 +264,17 @@ export class TreeRepository {
 
     const childrenCurrentParent = await this.query()
     .fetchUserByUserId(+treeProperties.toUserId)
-    .resolveUsersChildrenByRelation()
+    .resolveUsersChildrenByRelation(id)
     .commitWithReturnEntities();
+
+     const marriedUser = await this.query()
+    .fetchUserByUserId(+treeProperties.userId)
+    .commitWithReturnEntity();
 
     const childrenMarriedParent = await this.query()
     .fetchUserByUserId(+treeProperties.userId)
-    .resolveUsersChildrenByRelation()
+    .resolveUsersChildrenByRelation(marriedUser.data.User.properties.myTreeIdByParent1)
     .commitWithReturnEntities();
-
-    const marriedUser = await this.query()
-    .fetchUserByUserId(+treeProperties.userId)
-    .commitWithReturnEntity();
 
     let kidsCurrent;
     let kidsMarried;
@@ -363,6 +363,14 @@ export class TreeRepository {
     }else{
       await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUser[0].data.User.properties.myTreeIdByParent1);
     }
+
+    const resultToSubTreeUser = await this.query()
+    .fetchUserByUserId(treeProperties.toUserId)
+    .commitWithReturnEntities();
+
+    const ToSubTreeUser = resultToSubTreeUser[0].data.User.properties.subTreeTargetUser ? resultToSubTreeUser[0].data.User.properties.subTreeTargetUser : treeProperties.toUserId;
+
+    await this.updateUserParamSubTreeTargetUser(treeProperties.userId, ToSubTreeUser);
 
       const result = await this.query()
     .createMemberAndMarriedSubTreeRelations(treeProperties.userId, treeProperties.toUserId, id)
@@ -477,6 +485,25 @@ export class TreeRepository {
       'User',
       Object.entries({
         'User.myTreeIdByParent2': UtilsRepository.getStringVersion(treeId),
+      }).reduce((valuesAcc, [key, value]) => {
+        return value !== undefined && value !== null
+          ? {
+            ...valuesAcc,
+            [key]: value,
+          }
+          : valuesAcc;
+      }, {}),
+    )
+    .commitWithReturnEntity();
+  }
+  async updateUserParamSubTreeTargetUser(userId, targetUserId): Promise<any> {
+
+    await this.query()
+    .fetchUserByUserId(userId)
+    .updateEntity(
+      'User',
+      Object.entries({
+        'User.subTreeTargetUser': +targetUserId,
       }).reduce((valuesAcc, [key, value]) => {
         return value !== undefined && value !== null
           ? {

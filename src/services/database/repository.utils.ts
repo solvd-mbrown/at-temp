@@ -115,6 +115,17 @@ export class RepositoryQuery {
     return this;
   }
 
+  public findAllUsersByParam(
+    userId: number,
+    entity: string,
+  ): RepositoryQuery {
+    this.query.raw(
+      `MATCH (${entity}:${entity}) WHERE ${entity}.subTreeTargetUser = ${userId}`,
+    );
+    this.returns.push(`${entity}`);
+    return this;
+  }
+
   public fetchDescendantTreeByUserId(
     userId: number,
   ): RepositoryQuery {
@@ -1319,9 +1330,10 @@ export class RepositoryQuery {
   };
 
   public resolveUsersChildrenByRelation = (
+    treeId: string,
   ): RepositoryQuery => {
     this.query.raw(`
-      OPTIONAL MATCH (User)<-[:USER_DESCENDANT_USER]-(UserKList)
+      OPTIONAL MATCH (User)<-[:USER_DESCENDANT_USER_TREE_${treeId}]-(UserKList)
     `);
     this.returns.push('UserKList');
     return this;
@@ -1833,137 +1845,6 @@ export class RepositoryQuery {
       .setVariables(addUpdateDateToProperties(childEntity))
       .with([...this.dependencies.values()].join(','));
     this.returns.push(childEntity);
-    return this;
-  }
-
-  public updateOutcomeAllActionsDoneOnActionChange(toAddDependencies = []) {
-    toAddDependencies.forEach((dep) => {
-      this.dependencies.add(dep);
-    });
-
-    const query = `
-    WITH ${
-      [...this.dependencies.values()].join(',') +
-      ', COLLECT(DISTINCT AddAction) as AllActions'
-    }
-    WITH *, [Act in AllActions WHERE Act.isArchived = false] as ActionListCollected
-    WITH *, ALL(Act in ActionListCollected WHERE Act.status = 'DONE') as IsAllActionsDone, size(ActionListCollected) as ActionsCount     
-    SET Outcome.isAllActionsDone = 
-      CASE Outcome.status 
-        WHEN "COMPLETED"
-        THEN 
-            CASE (Outcome._previousIsAllActionsDone = true OR Outcome._previousIsAllActionsDone IS NULL)
-            WHEN true
-                THEN CASE 
-                  WHEN Action.status = 'DONE' 
-                      THEN null
-                      ELSE false
-                      END                               
-                ELSE null
-            END    
-      ELSE 
-          CASE Outcome.isAllActionsDone
-                WHEN true 
-                  THEN 
-                      CASE IsAllActionsDone
-                          WHEN false 
-                              THEN null
-                              ELSE null
-                              END         
-                  ELSE 
-                  CASE IsAllActionsDone
-                          WHEN true 
-                              THEN CASE ActionsCount = 0
-                                    WHEN true
-                                        THEN null
-                                        ELSE true
-                                        END
-                              ELSE null
-                              END
-            END            
-        END
-      SET Outcome._previousIsAllActionsDone = 
-        CASE ActionsCount = 0
-          WHEN true
-           THEN null
-           ELSE IsAllActionsDone
-        END   
-      WITH * 
-  `;
-
-    this.query.raw(query);
-
-    return this;
-  }
-
-  public updateOutcomeAllActionsDoneOnOutcomeChange(
-    actionIds: number[],
-    tagIds: number[],
-  ) {
-    let query = ``;
-    if (!actionIds?.length) {
-      query = `SET Outcome.isAllActionsDone = null
-      SET Outcome._previousIsAllActionsDone = null  
-      WITH *
-      `;
-    } else {
-      let toAddDependencies = ['User', 'Workspace', 'Outcome'];
-
-      if (tagIds?.length) {
-        toAddDependencies = [...toAddDependencies, 'TagList'];
-      } else {
-        this.removeDependencies(['TagList']);
-      }
-      this.addDependencies(toAddDependencies);
-
-      this.dependencies.delete('ActionList');
-      query += `
-        WITH ${[...this.dependencies.values()].join(
-          ', ',
-        )}, ActionList as AllActionList
-        WITH COLLECT(DISTINCT AllActionList) as ActionList, ${[
-          ...this.dependencies.values(),
-        ].join(', ')}
-        WITH *, all(Act in ActionList WHERE Act.status = 'DONE' ) as IsAllActionsDone, all(Act in ActionList WHERE Act.isArchived = false AND Act.status = 'DONE') as IsWithoutArchived
-        
-        SET Outcome.isAllActionsDone = 
-        CASE size(ActionList) > 0
-            WHEN true
-            THEN
-                CASE Outcome.status 
-                  WHEN "COMPLETED"
-                          THEN CASE ((Outcome._previousIsAllActionsDone = true OR Outcome._previousIsAllActionsDone IS NULL) AND IsWithoutArchived = false)
-                                  WHEN true
-                                    THEN false
-                                    ELSE null
-                               END
-                          ELSE CASE ((Outcome._previousIsAllActionsDone = false OR Outcome._previousIsAllActionsDone IS NULL) AND IsWithoutArchived = true)
-                                  WHEN true
-                                    THEN true
-                                    ELSE null
-                               END
-                END
-            ELSE  CASE Outcome.status 
-                    WHEN "COMPLETED" 
-                    THEN Outcome.isAllActionsDone = false
-                    ELSE Outcome.isAllActionsDone = null
-                  END 
-        END
-      WITH *  
-
-      SET Outcome._previousIsAllActionsDone = 
-        CASE size(ActionList) > 0
-            WHEN true
-            THEN IsWithoutArchived  
-            ELSE false
-        END  
-
-      WITH *
-
-      `;
-    }
-
-    this.query.raw(query);
     return this;
   }
 

@@ -8,7 +8,8 @@ export class UpdateUserDto {
   introduction?: [];
   birthdate?: string;
   dateOfDeath?: string;
-  deceased?: boolean;
+  isDeceased?: boolean;
+  isActivated?: boolean;
   gender?: string;
   hometown?: string;
   homeCountry?: string;

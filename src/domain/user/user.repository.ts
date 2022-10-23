@@ -78,7 +78,7 @@ export class UserRepository {
     if (parent && parent.length && parent[0].data.UserP) {
       const siblingsArr = await this.query()
       .fetchUserByUserId(parent[0].data.UserP.identity)
-      .resolveUsersChildrenByRelation()
+      .resolveUsersChildrenByRelation(parent[0].data.UserP.properties.myTreeIdByParent1)
       .commitWithReturnEntities();
 
       if(siblingsArr && siblingsArr.length && siblingsArr[0].data.UserKList) {
@@ -94,7 +94,7 @@ export class UserRepository {
 
     const childrens = await this.query()
       .fetchUserByUserId(id)
-      .resolveUsersChildrenByRelation()
+      .resolveUsersChildrenByRelation(result.data.User.properties.myTreeIdByParent1)
       .commitWithReturnEntities();
 
     let kids = [];
@@ -105,7 +105,7 @@ export class UserRepository {
     if (!childrens[0].data.UserKList.length && spouses && spouses[0].data.UserS) {
       const spouseChildrens = await this.query()
       .fetchUserByUserId(spouses[0].data.UserS.identity)
-      .resolveUsersChildrenByRelation()
+      .resolveUsersChildrenByRelation(spouses[0].data.UserS.properties.myTreeIdByParent1)
       .commitWithReturnEntities();
 
       if(spouseChildrens && spouseChildrens.length && spouseChildrens[0].data.UserKList) {
@@ -147,7 +147,8 @@ export class UserRepository {
         'User.introduction':params?.introduction ? UtilsRepository.getStringVersion(params?.introduction) : null,
         'User.birthdate': params?.birthdate,
         'User.dateOfDeath': params?.dateOfDeath,
-        'User.deceased': params?.deceased,
+        'User.isDeceased': params?.isDeceased,
+        'User.isActivated': params?.isActivated,
         'User.gender': params?.gender,
         'User.hometown': params?.hometown,
         'User.homeCountry': params?.homeCountry,
