@@ -391,7 +391,7 @@ export class TreeRepository {
       await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUser[0].data.User.properties.myTreeIdByParent1);
     }
 
-    let ToSubTreeUser = treeProperties.toUserId;
+    let ToSubTreeUser = treeProperties.userId;
 
     if(resultToSubTreeUser[0].data.User.properties.subTreeTargetUser){
       ToSubTreeUser = resultToSubTreeUser[0].data.User.properties.subTreeTargetUser;
