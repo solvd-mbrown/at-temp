@@ -2099,9 +2099,12 @@ export const buildSubTree = (data: any, treeId: string, spouseId: number,  curre
   // @ts-ignore
   let subTreeRel = this.getMarriedSubTreeRelByTreeId(data.rList, treeId);
   let tree = null;
-  if(currentSubTree.length){
+  console.log('currentSubTree', currentSubTree);
+  console.log('spouseId', spouseId);
+  console.log('descendantRel', descendantRel);
+  if(currentSubTree.length && spouseId){
     // @ts-ignore
-    let subTreeRootUser = this.getSubTreeRootUser(data.nList, descendantRel, marriedRel, subTreeRel, currentSubTree);
+    let subTreeRootUser = this.getSubTreeRootUser(data.nList, descendantRel, marriedRel, subTreeRel, currentSubTree, spouseId);
     // @ts-ignore
     let EnterPointToSubTree = [{ identity: spouseId }];
     // @ts-ignore
@@ -2227,7 +2230,7 @@ export const removeDuplicates = (originalArray, prop) => {
   return newArray;
 };
 
-export const getSubTreeRootUser = (members, descendantRels, marriedRel, subTreeRel, currentSubTree) => {
+export const getSubTreeRootUser = (members, descendantRels, marriedRel, subTreeRel, currentSubTree, spouseId) => {
   // if(subTreeRel && subTreeRel.length){
   //   const resultOnlySubTreeRel = members.filter(e => !subTreeRel.find(a => e.identity == a.start));
   //   const resultWithoutSubTreeRel = resultOnlySubTreeRel.filter(e => !marriedRel.find(a => e.identity == a.start));
@@ -2244,9 +2247,13 @@ export const getSubTreeRootUser = (members, descendantRels, marriedRel, subTreeR
     const resultWithoutDescendantRels = resultWithoutDescendantStart.filter(e => !descendantRels.find(a => e.identity == a.end));
     const resultWithoutMarriedRel = resultWithoutDescendantRels.filter(e => !marriedRel.find(a => e.identity == a.start));
     const resultWithoutSubTreeRel = resultWithoutMarriedRel.filter(e => !subTreeRel.find(a => e.identity == a.start));
-    const rootUser = resultWithoutSubTreeRel.filter(object => {
+    const resultWithoutTree = resultWithoutSubTreeRel.filter(object => {
       return object.labels[0] !== 'Tree';
     });
+    const rootUser = resultWithoutTree.filter(object => {
+      return object.properties.subTreeTargetUser == +spouseId;
+    });
+    console.log('rootUser', rootUser);
     return rootUser;
   }
 };
