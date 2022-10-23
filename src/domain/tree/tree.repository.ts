@@ -150,11 +150,22 @@ export class TreeRepository {
       parentId = userId;
     }
 
+    const spouses = await this.query()
+    .fetchUserByUserId(+userId)
+    .resolveUsersSpouseByRelationByTreeId(treeId.toString())
+    .commitWithReturnEntities();
+    let spouseId = null;
+    if(spouses && spouses.length && spouses[0].data.UserS) {
+      spouseId = spouses[0].data.UserS.identity;
+    }
+
+   const currentSubTree = await this.getMarriedSubTreeUsersByUserId(spouseId);
+
     if (result) {
       const data = result.data;
       const partTree = await cypher.buildPartTreeWithoutSubTreeRel(data, parentId, treeId.toString());
       const rootPart = await cypher.buildRootPartTree(data, parentId, treeId.toString());
-      const subTree = await cypher.buildSubTree(data, treeId.toString());
+      const subTree = await cypher.buildSubTree(data, treeId.toString(), spouseId, currentSubTree,);
       return {
         id: data.Tree.identity,
         ...data.Tree.properties,
@@ -166,11 +177,11 @@ export class TreeRepository {
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
-  async joinToTreeDescendant(id, treeProperties: any): Promise<any> {
+  async joinToTreeDescendant(id: number, treeProperties: any): Promise<any> {
 
       const spouses = await this.query()
       .fetchUserByUserId(treeProperties.toUserId)
-      .resolveUsersSpouseByRelationByTreeId(id)
+      .resolveUsersSpouseByRelationByTreeId(id.toString())
       .commitWithReturnEntities();
       let spouseId = null;
       if(spouses && spouses.length && spouses[0].data.UserS) {
@@ -257,19 +268,29 @@ export class TreeRepository {
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
  }
 
-  async joinToTreeMarried(id, treeProperties: any): Promise<any> {
+  async joinToTreeMarried(id: number, treeProperties: any): Promise<any> {
     const result = await this.query()
     .createMemberAndMarriedRelations(treeProperties.userId, treeProperties.toUserId, id)
     .commitWithReturnEntity();
 
     const childrenCurrentParent = await this.query()
     .fetchUserByUserId(+treeProperties.toUserId)
-    .resolveUsersChildrenByRelation(id)
+    .resolveUsersChildrenByRelation(UtilsRepository.getStringVersion(id))
     .commitWithReturnEntities();
 
      const marriedUser = await this.query()
     .fetchUserByUserId(+treeProperties.userId)
     .commitWithReturnEntity();
+
+     const marriedToUser = await this.query()
+    .fetchUserByUserId(+treeProperties.toUserId)
+    .commitWithReturnEntity();
+
+     if(marriedToUser && marriedToUser.data.User.properties.myTreeIdByParent2){
+       await this.query()
+       .createMemberAndMarriedRelations(treeProperties.toUserId, treeProperties.userId, marriedToUser.data.User.properties.myTreeIdByParent2)
+       .commitWithReturnEntity();
+     }
 
     const childrenMarriedParent = await this.query()
     .fetchUserByUserId(+treeProperties.userId)
@@ -279,15 +300,15 @@ export class TreeRepository {
     let kidsCurrent;
     let kidsMarried;
 
-    if(childrenCurrentParent.length && !childrenMarriedParent.length) {
+    if(childrenCurrentParent.length && !childrenMarriedParent.length && marriedUser.data.User.properties.myTreeIdByParent1) {
       kidsCurrent = childrenCurrentParent[0].data.UserKList;
       if(kidsCurrent.length == 1) {
-        await this.joinUserToTreeDescendantParent2(+kidsCurrent[0].identity, +treeProperties.userId, +marriedUser.data.User.properties.myTreeIdByParent1);
+        await this.joinUserToTreeDescendantParent2(+kidsCurrent[0].identity, +treeProperties.userId, marriedUser.data.User.properties.myTreeIdByParent1);
       }
 
       if(kidsCurrent.length > 1) {
         for (let item of kidsCurrent) {
-          await this.joinUserToTreeDescendantParent2(+item.identity, +treeProperties.userId, +marriedUser.data.User.properties.myTreeIdByParent1);
+          await this.joinUserToTreeDescendantParent2(+item.identity, +treeProperties.userId, marriedUser.data.User.properties.myTreeIdByParent1);
         }
       }
     }
@@ -296,11 +317,11 @@ export class TreeRepository {
       kidsMarried = childrenMarriedParent[0].data.UserKList;
 
       if (kidsMarried.length == 1) {
-        await this.joinUserToTreeDescendantParent2(+kidsMarried[0].identity, treeProperties.toUserId, +id);
+        await this.joinUserToTreeDescendantParent2(+kidsMarried[0].identity, treeProperties.toUserId, id);
 
         if (kidsMarried.length > 1) {
           for (let item of kidsCurrent) {
-            await this.joinUserToTreeDescendantParent2(+item.identity, treeProperties.toUserId, +id);
+            await this.joinUserToTreeDescendantParent2(+item.identity, treeProperties.toUserId, id);
           }
         }
       }
@@ -314,10 +335,12 @@ export class TreeRepository {
       // const diffKidsForP = kidsMarried.filter(e => !kidsCurrent.find(a => e.identity == a.identity));
       // const diffKidsForM = kidsCurrent.filter(e => !kidsMarried.find(a => e.identity == a.identity));
       for (let item of diffKidsForP) {
-        await this.joinUserToTreeDescendantParent2(+item.identity, +treeProperties.toUserId, +id);
+        await this.joinUserToTreeDescendantParent2(+item.identity, +treeProperties.toUserId, id);
       }
       for (let item of diffKidsForM) {
-        await this.joinUserToTreeDescendantParent2(+item.identity, +treeProperties.userId, +marriedUser.data.User.properties.myTreeIdByParent1);
+        if(marriedUser.data.User.properties.myTreeIdByParent1){
+          await this.joinUserToTreeDescendantParent2(+item.identity, +treeProperties.userId, marriedUser.data.User.properties.myTreeIdByParent1);
+        }
       }
     }
 
@@ -347,10 +370,14 @@ export class TreeRepository {
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
-  async joinToTreeMarriedSubTree(id, treeProperties: any): Promise<any> {
+  async joinToTreeMarriedSubTree(id: number, treeProperties: any): Promise<any> {
 
     const targetUser = await this.query()
     .fetchUserByUserId(treeProperties.userId)
+    .commitWithReturnEntities();
+
+    const resultToSubTreeUser = await this.query()
+    .fetchUserByUserId(treeProperties.toUserId)
     .commitWithReturnEntities();
 
     if(!targetUser[0].data.User.properties.myTreeIdByParent1){
@@ -364,12 +391,11 @@ export class TreeRepository {
       await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUser[0].data.User.properties.myTreeIdByParent1);
     }
 
-    const resultToSubTreeUser = await this.query()
-    .fetchUserByUserId(treeProperties.toUserId)
-    .commitWithReturnEntities();
+    let ToSubTreeUser = treeProperties.toUserId;
 
-    const ToSubTreeUser = resultToSubTreeUser[0].data.User.properties.subTreeTargetUser ? resultToSubTreeUser[0].data.User.properties.subTreeTargetUser : treeProperties.toUserId;
-
+    if(resultToSubTreeUser[0].data.User.properties.subTreeTargetUser){
+      ToSubTreeUser = resultToSubTreeUser[0].data.User.properties.subTreeTargetUser;
+    }
     await this.updateUserParamSubTreeTargetUser(treeProperties.userId, ToSubTreeUser);
 
       const result = await this.query()
@@ -389,9 +415,13 @@ export class TreeRepository {
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
-  async joinUserToTreeDescendantParent2(userId, toUserId, treeId): Promise<any> {
+  async joinUserToTreeDescendantParent2(userId: number, toUserId: number, treeId: number): Promise<any> {
     await this.query()
     .createMemberAndDescendantRelations(userId, toUserId, treeId)
+    .commitWithReturnEntity();
+
+    await this.query()
+    .createMemberRelation(userId, treeId)
     .commitWithReturnEntity();
 
     await this.query()
@@ -515,4 +545,20 @@ export class TreeRepository {
     )
     .commitWithReturnEntity();
   }
+
+  async getMarriedSubTreeUsersByUserId( userId: number): Promise<any>  {
+  let testMethod = []
+  testMethod = await this.query()
+  .findAllUsersByParam(userId, 'User')
+  .commitWithReturnEntities();
+  if (testMethod) {
+    return testMethod.map(({ data }) => {
+      const testMethod = data;
+      return {
+        id: testMethod.User.identity,
+        ...testMethod.User.properties,
+      };
+    });
+  }
+};
 }

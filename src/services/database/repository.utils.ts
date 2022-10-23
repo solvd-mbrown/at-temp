@@ -2091,7 +2091,7 @@ export const buildPartTreeWithoutSubTreeRel = (data: any, userId: string, treeId
   return tree;
 };
 
-export const buildSubTree = (data: any, treeId: string) => {
+export const buildSubTree = (data: any, treeId: string, spouseId: number,  currentSubTree: any) => {
   // @ts-ignore
   let marriedRel = this.getMarriedRelByTreeId(data.rList, treeId);
   // @ts-ignore
@@ -2099,11 +2099,11 @@ export const buildSubTree = (data: any, treeId: string) => {
   // @ts-ignore
   let subTreeRel = this.getMarriedSubTreeRelByTreeId(data.rList, treeId);
   let tree = null;
-  if(subTreeRel.length){
+  if(currentSubTree.length){
     // @ts-ignore
-    let subTreeRootUser = this.getSubTreeRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
+    let subTreeRootUser = this.getSubTreeRootUser(data.nList, descendantRel, marriedRel, subTreeRel, currentSubTree);
     // @ts-ignore
-    let EnterPointToSubTree = this.getEnterPointToSubTree(subTreeRel);
+    let EnterPointToSubTree = [{ identity: spouseId }];
     // @ts-ignore
     tree = this.buildTreeFromRelations(subTreeRootUser, data.nList, subTreeRel, marriedRel, EnterPointToSubTree);
     return tree;
@@ -2227,7 +2227,7 @@ export const removeDuplicates = (originalArray, prop) => {
   return newArray;
 };
 
-export const getSubTreeRootUser = (members, descendantRels, marriedRel, subTreeRel) => {
+export const getSubTreeRootUser = (members, descendantRels, marriedRel, subTreeRel, currentSubTree) => {
   // if(subTreeRel && subTreeRel.length){
   //   const resultOnlySubTreeRel = members.filter(e => !subTreeRel.find(a => e.identity == a.start));
   //   const resultWithoutSubTreeRel = resultOnlySubTreeRel.filter(e => !marriedRel.find(a => e.identity == a.start));
@@ -2238,7 +2238,8 @@ export const getSubTreeRootUser = (members, descendantRels, marriedRel, subTreeR
 
   // }
 
-  if(subTreeRel && subTreeRel.length){
+  if(subTreeRel && subTreeRel.length && currentSubTree.length){
+    subTreeRel = subTreeRel.filter(e => currentSubTree.find(a => e.start == a.identity));
     const resultWithoutDescendantStart = members.filter(e => !descendantRels.find(a => e.identity == a.start));
     const resultWithoutDescendantRels = resultWithoutDescendantStart.filter(e => !descendantRels.find(a => e.identity == a.end));
     const resultWithoutMarriedRel = resultWithoutDescendantRels.filter(e => !marriedRel.find(a => e.identity == a.start));
