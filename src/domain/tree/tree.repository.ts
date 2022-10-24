@@ -387,7 +387,7 @@ export class TreeRepository {
 
   async joinToTreeMarriedSubTree(id: number, treeProperties: any): Promise<any> {
 
-    await this.updateUserParamMyTreeIdByParent1(treeProperties.userId, id);
+    await this.updateUserParamMyTreeIdByParent2(treeProperties.userId, id);
 
     const targetUser = await this.query()
     .fetchUserByUserId(treeProperties.userId)
@@ -407,7 +407,7 @@ export class TreeRepository {
       await this.updateUserParamMyTreeIdByParent1(treeProperties.userId, +targetUserTree["id"]);
       await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUserTree["id"]);
     }else{
-      // await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUser[0].data.User.properties.myTreeIdByParent1);
+      await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUser[0].data.User.properties.myTreeIdByParent1);
       await this.updateUserParamMyTreeIdByParent1(treeProperties.userId, +targetUser[0].data.User.properties.myTreeIdByParent1);
     }
 
