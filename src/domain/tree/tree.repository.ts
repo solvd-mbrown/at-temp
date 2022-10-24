@@ -424,14 +424,14 @@ export class TreeRepository {
       await this.updateUserParamMyTreeIdByParent1(treeProperties.userId, +targetUserTree["id"]);
       await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUserTree["id"]);
     }else{
-      if(spouseId) {
-        if(!spouses[0].data.UserS.properties.myTreeIdByParent1){
-          // add current spouse in current tree
-          await this.query()
-          .createMemberAndMarriedRelations(treeProperties.toUserId, spouseId, +targetUser[0].data.User.properties.myTreeIdByParent1)
-          .commitWithReturnEntity();
-        }
-      }
+      // if(spouseId) {
+      //   if(!spouses[0].data.UserS.properties.myTreeIdByParent1){
+      //     // add current spouse in current tree
+      //     await this.query()
+      //     .createMemberAndMarriedRelations(treeProperties.toUserId, spouseId, +targetUser[0].data.User.properties.myTreeIdByParent1)
+      //     .commitWithReturnEntity();
+      //   }
+      // }
       await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUser[0].data.User.properties.myTreeIdByParent1);
       await this.updateUserParamMyTreeIdByParent1(treeProperties.userId, +targetUser[0].data.User.properties.myTreeIdByParent1);
     }
