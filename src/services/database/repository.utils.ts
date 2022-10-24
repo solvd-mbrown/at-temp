@@ -2054,21 +2054,7 @@ export const buildPartTree = (data: any, userId: string, treeId: string) => {
   // @ts-ignore
   let marriedRel = this.getMarriedRelByTreeId(data.rList, treeId);
   // @ts-ignore
-  let subTreeRel = this.getMarriedSubTreeRelByTreeId(data.rList, treeId);
-  // let tree = null;
-  // if(subTreeRel.length){
-  //   // @ts-ignore
-  //   let subTreeRootUser = this.getSubTreeRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
-  //   // @ts-ignore
-  //   let EnterPointToSubTree = this.getEnterPointToSubTree(subTreeRel);
-  //   // @ts-ignore
-  //   let subTree = this.buildTreeFromRelations(subTreeRootUser, data.nList, subTreeRel, marriedRel);
-  //   // @ts-ignore
-  //   let rootUser = this.getRootUser(data.nList, descendantRel, marriedRel, subTreeRel);
-  //   // @ts-ignore
-  //   let tree = this.buildTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel, subTree, EnterPointToSubTree);
-  //   return tree;
-  // } else {
+  // let subTreeRel = this.getMarriedSubTreeRelByTreeId(data.rList, treeId);
     // @ts-ignore
     let rootUser =  [{ identity: userId }];
     // @ts-ignore
@@ -2099,9 +2085,6 @@ export const buildSubTree = (data: any, treeId: string, spouseId: number,  curre
   // @ts-ignore
   let subTreeRel = this.getMarriedSubTreeRelByTreeId(data.rList, treeId);
   let tree = null;
-  console.log('currentSubTree', currentSubTree);
-  console.log('spouseId', spouseId);
-  console.log('descendantRel', descendantRel);
   if(currentSubTree.length && spouseId){
     // @ts-ignore
     let subTreeRootUser = this.getSubTreeRootUser(data.nList, descendantRel, marriedRel, subTreeRel, currentSubTree, spouseId);
@@ -2253,7 +2236,6 @@ export const getSubTreeRootUser = (members, descendantRels, marriedRel, subTreeR
     const rootUser = resultWithoutTree.filter(object => {
       return object.properties.subTreeTargetUser == +spouseId;
     });
-    console.log('rootUser', rootUser);
     return rootUser;
   }
 };

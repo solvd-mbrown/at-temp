@@ -28,6 +28,8 @@ export class TreeRepository {
     .createMemberRelation(treeData.userId, result.data.Tree.identity)
     .commitWithReturnEntity();
 
+    await this.updateUserParamTreeOwner(treeData.userId);
+
     await this.query()
     .fetchUserByUserId(treeData.userId)
     .updateEntity(
@@ -241,7 +243,7 @@ export class TreeRepository {
       const result = await this.query()
       .createMemberAndDescendantRelations(treeProperties.userId, treeProperties.toUserId, id)
       .commitWithReturnEntity();
-
+      await this.updateUserParamMyTreeIdByParent1(treeProperties.toUserId, treeProperties.userId);
       await this.query()
       .fetchUserByUserId(treeProperties.userId)
       .updateEntity(
@@ -286,10 +288,25 @@ export class TreeRepository {
     .fetchUserByUserId(+treeProperties.toUserId)
     .commitWithReturnEntity();
 
-     if(marriedToUser && marriedToUser.data.User.properties.myTreeIdByParent2){
+     if(marriedToUser && marriedToUser.data.User.properties.myTreeIdByParent1){
        await this.query()
-       .createMemberAndMarriedRelations(treeProperties.toUserId, treeProperties.userId, marriedToUser.data.User.properties.myTreeIdByParent2)
+       .createMemberAndMarriedRelations(treeProperties.toUserId, treeProperties.userId, marriedToUser.data.User.properties.myTreeIdByParent1)
        .commitWithReturnEntity();
+     }
+
+     if(marriedToUser && marriedToUser.data.User.properties.subTreeTargetUser){
+       const subTreeUser = await this.query()
+       .fetchUserByUserId(marriedToUser.data.User.properties.subTreeTargetUser)
+       .commitWithReturnEntity();
+
+       if(subTreeUser && subTreeUser.data.User.properties.myTreeIdByParent1){
+         console.log('marriedToUser', );
+         await this.query()
+         .createMemberAndMarriedRelations(treeProperties.toUserId, treeProperties.userId, subTreeUser.data.User.properties.myTreeIdByParent1)
+         .commitWithReturnEntity();
+
+
+       }
      }
 
     const childrenMarriedParent = await this.query()
@@ -344,6 +361,10 @@ export class TreeRepository {
       }
     }
 
+    // if(!marriedUser.data.User.properties.myTreeIdByParent1){
+    //
+    // }
+
     await this.query()
     .fetchUserByUserId(treeProperties.userId)
     .updateEntity(
@@ -386,14 +407,16 @@ export class TreeRepository {
           name: `treeName${treeProperties.userId}`,
           userId: +treeProperties.userId,
         });
+      await this.updateUserParamMyTreeIdByParent1(treeProperties.userId, +targetUserTree["id"]);
       await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUserTree["id"]);
     }else{
       await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUser[0].data.User.properties.myTreeIdByParent1);
+      await this.updateUserParamMyTreeIdByParent1(treeProperties.userId, +targetUser[0].data.User.properties.myTreeIdByParent1);
     }
 
     let ToSubTreeUser = treeProperties.userId;
 
-    if(resultToSubTreeUser[0].data.User.properties.subTreeTargetUser){
+    if(resultToSubTreeUser.length && resultToSubTreeUser[0].data.User.properties.subTreeTargetUser){
       ToSubTreeUser = resultToSubTreeUser[0].data.User.properties.subTreeTargetUser;
     }
     await this.updateUserParamSubTreeTargetUser(treeProperties.toUserId, ToSubTreeUser);
@@ -534,6 +557,26 @@ export class TreeRepository {
       'User',
       Object.entries({
         'User.subTreeTargetUser': +targetUserId,
+      }).reduce((valuesAcc, [key, value]) => {
+        return value !== undefined && value !== null
+          ? {
+            ...valuesAcc,
+            [key]: value,
+          }
+          : valuesAcc;
+      }, {}),
+    )
+    .commitWithReturnEntity();
+  }
+
+  async updateUserParamTreeOwner(userId): Promise<any> {
+
+    await this.query()
+    .fetchUserByUserId(userId)
+    .updateEntity(
+      'User',
+      Object.entries({
+        'User.treeOwner': true,
       }).reduce((valuesAcc, [key, value]) => {
         return value !== undefined && value !== null
           ? {
