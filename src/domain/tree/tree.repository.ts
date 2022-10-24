@@ -300,7 +300,6 @@ export class TreeRepository {
        .commitWithReturnEntity();
 
        if(subTreeUser && subTreeUser.data.User.properties.myTreeIdByParent1){
-         console.log('marriedToUser', );
          await this.query()
          .createMemberAndMarriedRelations(treeProperties.toUserId, treeProperties.userId, subTreeUser.data.User.properties.myTreeIdByParent1)
          .commitWithReturnEntity();
@@ -407,6 +406,7 @@ export class TreeRepository {
           name: `treeName${treeProperties.userId}`,
           userId: +treeProperties.userId,
         });
+      await this.updateUserParamTreeOwner(treeProperties.userId);
       await this.updateUserParamMyTreeIdByParent1(treeProperties.userId, +targetUserTree["id"]);
       await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUserTree["id"]);
     }else{
