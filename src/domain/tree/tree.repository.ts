@@ -288,11 +288,11 @@ export class TreeRepository {
     .fetchUserByUserId(+treeProperties.toUserId)
     .commitWithReturnEntity();
 
-     if(marriedToUser && marriedToUser.data.User.properties.myTreeIdByParent1){
-       await this.query()
-       .createMemberAndMarriedRelations(treeProperties.toUserId, treeProperties.userId, marriedToUser.data.User.properties.myTreeIdByParent1)
-       .commitWithReturnEntity();
-     }
+     // if(marriedUser && marriedToUser.data.User.properties.myTreeIdByParent1){
+     //   await this.query()
+     //   .createMemberAndMarriedRelations(treeProperties.toUserId, treeProperties.userId, marriedToUser.data.User.properties.myTreeIdByParent1)
+     //   .commitWithReturnEntity();
+     // }
 
      if(marriedToUser && marriedToUser.data.User.properties.subTreeTargetUser){
        const subTreeUser = await this.query()
@@ -391,6 +391,8 @@ export class TreeRepository {
   }
 
   async joinToTreeMarriedSubTree(id: number, treeProperties: any): Promise<any> {
+
+    await this.updateUserParamMyTreeIdByParent1(treeProperties.userId, id);
 
     const targetUser = await this.query()
     .fetchUserByUserId(treeProperties.userId)
