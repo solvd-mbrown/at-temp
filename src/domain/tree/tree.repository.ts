@@ -293,7 +293,6 @@ export class TreeRepository {
      //   .createMemberAndMarriedRelations(treeProperties.toUserId, treeProperties.userId, marriedToUser.data.User.properties.myTreeIdByParent1)
      //   .commitWithReturnEntity();
      // }
-
      if(marriedToUser && marriedToUser.data.User.properties.subTreeTargetUser){
        const subTreeUser = await this.query()
        .fetchUserByUserId(marriedToUser.data.User.properties.subTreeTargetUser)
@@ -302,7 +301,7 @@ export class TreeRepository {
        if(subTreeUser && subTreeUser.data.User.properties.myTreeIdByParent1){
          await this.updateUserParamMyTreeIdByParent1(treeProperties.toUserId, subTreeUser.data.User.properties.myTreeIdByParent1);
          await this.query()
-         .createMemberAndMarriedRelations(treeProperties.toUserId, treeProperties.userId, subTreeUser.data.User.properties.myTreeIdByParent1)
+         .createMemberAndMarriedRelations(treeProperties.userId, treeProperties.toUserId, subTreeUser.data.User.properties.myTreeIdByParent1)
          .commitWithReturnEntity();
        }
      }
