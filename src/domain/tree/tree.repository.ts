@@ -413,12 +413,10 @@ export class TreeRepository {
           userId: +treeProperties.userId,
         });
       if(spouseId) {
-        if(!spouses[0].data.UserS.properties.myTreeIdByParent1){
           // add current spouse in new tree
           await this.query()
-          .createMemberAndMarriedRelations(treeProperties.toUserId, spouseId, +targetUserTree["id"])
+          .createMemberAndMarriedRelations(spouses[0].data.UserS.identity, treeProperties.userId, +targetUserTree["id"])
           .commitWithReturnEntity();
-        }
       }
       await this.updateUserParamTreeOwner(treeProperties.userId);
       await this.updateUserParamMyTreeIdByParent1(treeProperties.userId, +targetUserTree["id"]);
