@@ -417,6 +417,26 @@ export class TreeRepository {
           await this.query()
           .createMemberAndMarriedRelations(spouses[0].data.UserS.identity, treeProperties.userId, +targetUserTree["id"])
           .commitWithReturnEntity();
+
+        const childrenCurrentParent = await this.query()
+        .fetchUserByUserId(spouses[0].data.UserS.identity)
+        .resolveUsersChildrenByRelation(UtilsRepository.getStringVersion(id))
+        .commitWithReturnEntities();
+
+        let kidsCurrent;
+
+        if(childrenCurrentParent.length) {
+          kidsCurrent = childrenCurrentParent[0].data.UserKList;
+          if(kidsCurrent.length == 1) {
+            await this.joinUserToTreeDescendantParent2(+kidsCurrent[0].identity, +treeProperties.userId, +targetUserTree["id"]);
+          }
+
+          if(kidsCurrent.length > 1) {
+            for (let item of kidsCurrent) {
+              await this.joinUserToTreeDescendantParent2(+item.identity, +treeProperties.userId, +targetUserTree["id"]);
+            }
+          }
+        }
       }
 
       await this.updateUserParamTreeOwner(treeProperties.userId);
@@ -434,7 +454,7 @@ export class TreeRepository {
     }
     await this.updateUserParamSubTreeTargetUser(treeProperties.toUserId, ToSubTreeUser);
 
-      const result = await this.query()
+     const result = await this.query()
     .createMemberAndMarriedSubTreeRelations(treeProperties.userId, treeProperties.toUserId, id)
     .commitWithReturnEntity();
 
