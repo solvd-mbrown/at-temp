@@ -396,40 +396,33 @@ export class TreeRepository {
     .fetchUserByUserId(treeProperties.toUserId)
     .commitWithReturnEntities();
 
-    const spouses = await this.query()
-    .fetchUserByUserId(treeProperties.toUserId)
-    .resolveUsersSpouseByRelationByTreeId(id.toString())
-    .commitWithReturnEntities();
-    let spouseId = null;
-    if(spouses && spouses.length && spouses[0].data.UserS) {
-      spouseId = spouses[0].data.UserS.identity;
-    }
-
-
     if(!targetUser[0].data.User.properties.myTreeIdByParent1){
       const targetUserTree = await this.addNewTree(
         {
           name: `treeName${treeProperties.userId}`,
           userId: +treeProperties.userId,
         });
+
+      const spouses = await this.query()
+      .fetchUserByUserId(treeProperties.userId)
+      .resolveUsersSpouseByRelationByTreeId(id.toString())
+      .commitWithReturnEntities();
+      let spouseId = null;
+      if(spouses && spouses.length && spouses[0].data.UserS) {
+        spouseId = spouses[0].data.UserS.identity;
+      }
+
       if(spouseId) {
           // add current spouse in new tree
           await this.query()
           .createMemberAndMarriedRelations(spouses[0].data.UserS.identity, treeProperties.userId, +targetUserTree["id"])
           .commitWithReturnEntity();
       }
+
       await this.updateUserParamTreeOwner(treeProperties.userId);
       await this.updateUserParamMyTreeIdByParent1(treeProperties.userId, +targetUserTree["id"]);
       await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUserTree["id"]);
     }else{
-      // if(spouseId) {
-      //   if(!spouses[0].data.UserS.properties.myTreeIdByParent1){
-      //     // add current spouse in current tree
-      //     await this.query()
-      //     .createMemberAndMarriedRelations(treeProperties.toUserId, spouseId, +targetUser[0].data.User.properties.myTreeIdByParent1)
-      //     .commitWithReturnEntity();
-      //   }
-      // }
       await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUser[0].data.User.properties.myTreeIdByParent1);
       await this.updateUserParamMyTreeIdByParent1(treeProperties.userId, +targetUser[0].data.User.properties.myTreeIdByParent1);
     }
