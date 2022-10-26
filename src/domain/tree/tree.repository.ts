@@ -396,7 +396,7 @@ export class TreeRepository {
     .fetchUserByUserId(treeProperties.toUserId)
     .commitWithReturnEntities();
 
-    if(!targetUser[0].data.User.properties.myTreeIdByParent1){
+    if(!targetUser[0].data.User.properties.myTreeIdByParent1 || +targetUser[0].data.User.properties.myTreeIdByParent1 == id){
       const targetUserTree = await this.addNewTree(
         {
           name: `treeName${treeProperties.userId}`,
