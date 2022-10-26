@@ -2042,7 +2042,7 @@ export const buildRootPartTree = (data: any, userId: string, treeId: string, cur
   let stopPoint = userId;
   let tree = null;
   // @ts-ignore
-  let rootUser = this.getRootUser(data.nList, descendantRel, marriedRel, subTreeRel, currentSubTree);
+  let rootUser = this.getRootUser(data.nList, descendantRel, marriedRel, subTreeRel, treeId);
   // @ts-ignore
   tree = this.buildRootPartTreeFromRelations(rootUser, data.nList, descendantRel, marriedRel, stopPoint);
   return tree;
@@ -2240,15 +2240,17 @@ export const getSubTreeRootUser = (members, descendantRels, marriedRel, subTreeR
   }
 };
 
-export const getRootUser = (members, descendantRels, marriedRel, subTreeRel?, currentSubTree?) => {
+export const getRootUser = (members, descendantRels, marriedRel, subTreeRel?, treeId?) => {
   if(subTreeRel && subTreeRel.length) {
-    subTreeRel = subTreeRel.filter(e => currentSubTree.find(a => e.start == a.identity));
     const resultWithoutDescendantRels = members.filter(e => !descendantRels.find(a => e.identity == a.start));
     const resultWithoutMarriedRel = resultWithoutDescendantRels.filter(e => !marriedRel.find(a => e.identity == a.start));
     const resultWithoutSubTreeStart = resultWithoutMarriedRel.filter(e => !subTreeRel.find(a => e.identity == a.start));
     const resultWithoutSubTreeRel = resultWithoutSubTreeStart.filter(e => !subTreeRel.find(a => e.identity == a.end));
-    const rootUser = resultWithoutSubTreeRel.filter(object => {
+    const resultWithoutTree = resultWithoutSubTreeRel.filter(object => {
       return object.labels[0] !== 'Tree';
+    });
+    const rootUser = resultWithoutTree.filter(object => {
+      return object.properties.myTreeIdByParent1 == +treeId;
     });
     return rootUser;
   } else {
