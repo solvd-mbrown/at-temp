@@ -2256,8 +2256,11 @@ export const getRootUser = (members, descendantRels, marriedRel, subTreeRel?, tr
   } else {
     const resultWithoutDescendantRels = members.filter(e => !descendantRels.find(a => e.identity == a.start));
     const resultWithoutMarriedRel = resultWithoutDescendantRels.filter(e => !marriedRel.find(a => e.identity == a.start));
-    const rootUser = resultWithoutMarriedRel.filter(object => {
+    const resultWithoutTree = resultWithoutMarriedRel.filter(object => {
       return object.labels[0] !== 'Tree';
+    });
+    const rootUser = resultWithoutTree.filter(object => {
+      return object.properties.myTreeIdByParent1 == +treeId;
     });
     return rootUser;
   }
