@@ -414,9 +414,9 @@ export class TreeRepository {
 
       if(spouseId) {
           // add current spouse in new tree
-          await this.query()
-          .createMemberAndMarriedRelations(spouses[0].data.UserS.identity, treeProperties.userId, +targetUserTree["id"])
-          .commitWithReturnEntity();
+        await this.query()
+        .createMemberAndMarriedRelations(spouses[0].data.UserS.identity, treeProperties.userId, +targetUserTree["id"])
+        .commitWithReturnEntity();
 
         const childrenCurrentParent = await this.query()
         .fetchUserByUserId(spouses[0].data.UserS.identity)
@@ -443,6 +443,7 @@ export class TreeRepository {
       await this.updateUserParamMyTreeIdByParent1(treeProperties.userId, +targetUserTree["id"]);
       await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUserTree["id"]);
     }else{
+      await this.updateUserParamMyTreeIdByParent1(treeProperties.toUserId, +targetUser[0].data.User.properties.myTreeIdByParent1);
       await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUser[0].data.User.properties.myTreeIdByParent1);
       await this.updateUserParamMyTreeIdByParent1(treeProperties.userId, +targetUser[0].data.User.properties.myTreeIdByParent1);
     }
