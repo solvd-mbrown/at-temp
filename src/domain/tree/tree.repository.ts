@@ -440,6 +440,7 @@ export class TreeRepository {
       }
 
       await this.updateUserParamTreeOwner(treeProperties.userId);
+      await this.updateUserParamMyTreeIdByParent1(treeProperties.toUserId, +targetUserTree["id"]);
       await this.updateUserParamMyTreeIdByParent1(treeProperties.userId, +targetUserTree["id"]);
       await this.joinUserToTreeDescendantParent1(treeProperties.userId, treeProperties.toUserId, +targetUserTree["id"]);
     }else{
