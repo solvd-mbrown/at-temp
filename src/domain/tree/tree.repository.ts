@@ -191,6 +191,19 @@ export class TreeRepository {
       }
 
       if(spouseId) {
+        const childrenCurrentParent = await this.query()
+        .fetchUserByUserId(+treeProperties.toUserId)
+        .resolveUsersChildrenByRelation(UtilsRepository.getStringVersion(id))
+        .commitWithReturnEntities();
+
+        let kidsCurrent;
+        kidsCurrent = childrenCurrentParent[0].data.UserKList;
+
+        const childrenMarriedParent = await this.query()
+        .fetchUserByUserId(+treeProperties.userId)
+        .resolveUsersChildrenByRelation(spouses[0].data.UserS.properties.myTreeIdByParent1)
+        .commitWithReturnEntities();
+
         if(!spouses[0].data.UserS.properties.myTreeIdByParent1){
 
           // crate new tree for spouse
@@ -209,8 +222,19 @@ export class TreeRepository {
          //add kind into new tree for spouse
           await this.joinUserToTreeDescendantParent2(+treeProperties.userId, +spouseId, +spouseTree["id"]);
 
-          } else{
+          if(childrenCurrentParent.length && spouseTree["id"]) {
+            if(kidsCurrent.length == 1) {
+              await this.joinUserToTreeDescendantParent2(+kidsCurrent[0].identity, +spouseId, spouseTree["id"]);
+            }
 
+            if(kidsCurrent.length > 1) {
+              for (let item of kidsCurrent) {
+                await this.joinUserToTreeDescendantParent2(+item.identity, +spouseId, spouseTree["id"]);
+              }
+            }
+          }
+
+          } else{
             let spouseInMarriedTree;
             let userInMarriedTree;
             spouseInMarriedTree = await this.query()
@@ -223,20 +247,15 @@ export class TreeRepository {
               .commitWithReturnEntity();
               await this.updateUserParamSpouseTreeId(spouseId, id);
            }
+            userInMarriedTree = await this.query()
+            .fetchUserInTree(+kidsCurrent[0].identity, spouses[0].data.UserS.properties.myTreeIdByParent1)
+            .commitWithReturnEntity();
+              // add existed in fathers`s tree kid in mather`s tree
+            if(!userInMarriedTree) {
+              await this.joinUserToTreeDescendantParent2(+kidsCurrent[0].identity, +spouseId, spouses[0].data.UserS.properties.myTreeIdByParent1);
+            }
 
           await this.joinUserToTreeDescendantParent2(+treeProperties.userId, +spouseId, +spouses[0].data.UserS.properties.myTreeIdByParent1);
-   //
-   //        userInMarriedTree = await this.query()
-   //        .fetchUserInTree(treeProperties.userId, spouses[0].data.UserS.properties.myTreeIdByParent1)
-   //        .commitWithReturnEntity();
-   // console.log('userInMarriedTree', userInMarriedTree);
-   //        if(!userInMarriedTree) {
-   //          await this.joinUserToTreeDescendantParent2(+treeProperties.userId, +spouseId, +spouses[0].data.UserS.properties.myTreeIdByParent1);
-   //        }
-   //
-   //        if(userInMarriedTree) {
-   //          await this.updateUserParamMyTreeIdByParent2(+treeProperties.userId, +spouses[0].data.UserS.properties.myTreeIdByParent1);
-   //        }
         }
       }
 
