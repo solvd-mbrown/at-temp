@@ -90,6 +90,30 @@ export class TreeRepository {
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
+  async removeUserFromTree(id: number): Promise<any> {
+    const result = await this.query()
+    .deleteUserFromTree('User', id)
+    .commitWithReturnEntity();
+    if (result) {
+      return  {
+        "response": "done"
+      };
+    }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
+  }
+
+  async removeTree(id: number): Promise<any> {
+    const result = await this.query()
+    .deleteEntityById('Tree', id)
+    .commitWithReturnEntity();
+    if (result) {
+      return  {
+        "response": "done"
+      };
+    }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
+  }
+
   async getTreeByUUID(id: any): Promise<Tree[]> {
     const result = await this.query()
     .fetchAllByEntityUUUID(id, 'Tree')
@@ -174,6 +198,39 @@ export class TreeRepository {
        rootPartTree: rootPart ? rootPart[0] : null,
        subTree: subTree ? subTree[0] : null,
        bottomPartTree: partTree ? partTree[0] : null,
+      };
+    }
+    throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
+  }
+
+  async updateTreeEntity(
+    treeId,
+    treeParams,
+  ): Promise<any> {
+    const params = treeParams;
+    // @ts-ignore
+    const result = await this.query()
+    .findEntityById('Tree', treeId)
+    .updateEntity(
+      'Tree',
+      Object.entries({
+        'Tree.name': params.name,
+      }).reduce((valuesAcc, [key, value]) => {
+        return value !== undefined && value !== null
+          ? {
+            ...valuesAcc,
+            [key]: value,
+          }
+          : valuesAcc;
+      }, {}),
+    )
+    .commitWithReturnEntity();
+
+    if (result !== null) {
+      const data = result.data;
+      return {
+        id: data.Tree.identity,
+        ...data.Tree.properties,
       };
     }
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);

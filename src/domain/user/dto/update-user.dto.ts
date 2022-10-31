@@ -3,7 +3,7 @@ export class UpdateUserDto {
   userPictureLink?: string;
   userPictureKey?: string;
   firstName?: string;
-  middleName?: string;
+  maidenName?: string;
   lastName?: string;
   introduction?: [];
   birthdate?: string;

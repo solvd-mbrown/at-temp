@@ -44,8 +44,9 @@ export class TreeService {
     return result;
   }
 
-  update(id: number, updateTreeDto: UpdateTreeDto) {
-    return `This action updates a #${id} tree`;
+  async update(id: number, updateTreeDto: UpdateTreeDto) {
+    const result = await this.treeRepository.updateTreeEntity(id, UpdateTreeDto);
+    return result;
   }
 
   async join(id: number, joinToTreeProperty) {
@@ -62,7 +63,15 @@ export class TreeService {
     return result;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} tree`;
+  async remove(id: number) {
+    const result = await this.treeRepository.removeTree(id);
+    return result;
   }
+
+  async removeUserFromTree(id: number) {
+    const result = await this.treeRepository.removeUserFromTree(id);
+    return result;
+  }
+
+
 }

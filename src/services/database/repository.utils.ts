@@ -815,6 +815,21 @@ export class RepositoryQuery {
     return this;
   }
 
+  public deleteUserFromTree(
+    entity: string,
+    id: number,
+  ): RepositoryQuery {
+    this.query.raw(
+      ` 
+            MATCH (${entity})
+            WHERE ID(${entity}) = ${id}
+            MATCH (n)-[r]->() 
+            DELETE r
+          `,
+    );
+    return this;
+  }
+
   public deleteEntitiesByParents(
     childEntity: string,
     parentEntity: string,
@@ -1153,15 +1168,10 @@ export class RepositoryQuery {
   }
 
   public findUserByEmail(email: string): RepositoryQuery {
-    this.dependencies.add('User');
-    this.query = this.connection
-      .match([
-        node('User', 'User', {
-          email,
-        }),
-      ])
-      .with([...this.dependencies.values()].join(','));
-
+    this.query.raw(`
+      MATCH (User:User) 
+      WHERE User.email = '${email}'
+    `);
     this.returns.push('User');
     return this;
   }
