@@ -1,4 +1,4 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './user.repository';
 import { FirebaseAuthStrategy } from "../../services/auth/firebase/firebase-auth.strategy";
@@ -21,6 +21,11 @@ export class UserService {
 
   async findOne(id: number) {
     const result = await this.userRepository.getUserEntity(id);
+    return result;
+  }
+
+  async findOneByEmail(email: string) {
+    const result = await this.userRepository.getUserFromEmail(email);
     return result;
   }
 

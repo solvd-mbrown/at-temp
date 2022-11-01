@@ -142,7 +142,7 @@ export class UserRepository {
         'User.userPictureLink': params?.userPictureLink,
         'User.userPictureKey': params?.userPictureKey,
         'User.firstName': params?.firstName,
-        'User.middleName': params?.middleName,
+        'User.maidenName': params?.maidenName,
         'User.lastName': params?.lastName,
         'User.introduction':params?.introduction ? UtilsRepository.getStringVersion(params?.introduction) : null,
         'User.birthdate': params?.birthdate,
@@ -197,7 +197,10 @@ export class UserRepository {
 
     if (result) {
       const data = result.data;
-      return cypher.mapCypherResultToEntity(data.User);
+      return {
+        id: data.User.identity,
+        ...data.User.properties,
+      };
     }
   }
 

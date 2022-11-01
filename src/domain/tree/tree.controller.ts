@@ -65,4 +65,9 @@ export class TreeController {
   remove(@Param('id') id: string) {
     return this.treeService.remove(+id);
   }
+
+  @Delete('user/:id')
+  removeUserFromTree(@Param('id') id: string) {
+    return this.treeService.removeUserFromTree(+id);
+  }
 }

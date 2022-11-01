@@ -6,7 +6,7 @@ export class User {
   treeName?: Nullable<string>;
   email: string;
   firstName?: Nullable<string>;
-  middleName?: Nullable<string>
+  maidenName?: Nullable<string>
   lastName?: Nullable<string>;
   createDate?: Nullable<string>;
   updateDate?: Nullable<string>;

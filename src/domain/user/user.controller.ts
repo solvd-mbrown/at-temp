@@ -24,6 +24,11 @@ export class UserController {
     return this.userService.findOne(+id);
   }
 
+  @Get('email/:email')
+  findOneByEmail(@Param('email') email: string) {
+    return this.userService.findOneByEmail(email);
+  }
+
   @Get('initUser/:token')
   initUser(@Param('token') jwt: string) {
     return this.userService.initUser(jwt);

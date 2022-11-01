@@ -1,7 +1,7 @@
 export class CreateUserDto {
   userPictureLink?: string;
   firstName: string;
-  middleName?: string;
+  maidenName?: string;
   lastName: string;
   birthdate?: string;
   gender?: string;
