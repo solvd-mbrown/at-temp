@@ -304,11 +304,13 @@ export class TreeRepository {
               .commitWithReturnEntity();
               await this.updateUserParamSpouseTreeId(spouseId, id);
            }
-            userInMarriedTree = await this.query()
-            .fetchUserInTree(+kidsCurrent[0].identity, spouses[0].data.UserS.properties.myTreeIdByParent1)
-            .commitWithReturnEntity();
+            if(kidsCurrent && kidsCurrent.length){
+              userInMarriedTree = await this.query()
+              .fetchUserInTree(+kidsCurrent[0].identity, spouses[0].data.UserS.properties.myTreeIdByParent1)
+              .commitWithReturnEntity();
+            }
               // add existed in fathers`s tree kid in mather`s tree
-            if(!userInMarriedTree) {
+            if(!userInMarriedTree && kidsCurrent.length) {
               await this.joinUserToTreeDescendantParent2(+kidsCurrent[0].identity, +spouseId, spouses[0].data.UserS.properties.myTreeIdByParent1);
             }
 
