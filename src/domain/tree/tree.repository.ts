@@ -247,6 +247,11 @@ export class TreeRepository {
         spouseId = spouses[0].data.UserS.identity;
       }
 
+      const arrayOfSpouses = await this.getArrayOfSpouses(treeProperties.toUserId, id, spouseId);
+      for (let item of arrayOfSpouses) {
+        await this.joinUserToTreeDescendantParent2(treeProperties.userId, treeProperties.toUserId, item.data.UserS.properties.myTreeIdByParent1);
+      }
+
       if(spouseId) {
         const childrenCurrentParent = await this.query()
         .fetchUserByUserId(+treeProperties.toUserId)
@@ -702,7 +707,54 @@ export class TreeRepository {
     .commitWithReturnEntity();
   }
 
-  async getMarriedSubTreeUsersByUserId( userId: number): Promise<any>  {
+  // =======================================>
+  async getArrayOfSpouses(userId, treeId, spouseId): Promise<any> {
+
+    let result = await this.getRecursiveSpouses(userId, treeId);
+
+    if(spouseId){
+      result.filter(object => {
+        console.log('object>>>>>>>>>>>>>', object);
+        return object.identity !== spouseId;
+      });
+    }
+
+    console.log('result', result);
+    return result;
+  }
+
+  async getRecursiveSpouses(userId: number, treeId: string): Promise<any> {
+      let result = []
+
+      const parent = await this.query()
+      .fetchUserByUserId(userId)
+      .resolveUsersParentsByRelation(treeId)
+      .commitWithReturnEntities();
+
+      let spouse = null;
+
+      if(parent && parent.length && parent[0].data.UserP){
+         spouse = await this.query()
+        .fetchUserByUserId(parent[0].data.UserP.identity)
+        .resolveUsersSpouseByRelationByTreeId(treeId.toString())
+        .commitWithReturnEntities();
+      }
+
+      if(spouse && spouse.length && spouse[0].data.UserS) {
+        result.push(spouse[0].data.UserS);
+      }
+
+      // base case
+      if (parent && parent.length && parent[0].data.UserP) {
+        await this.getRecursiveSpouses(parent[0].data.UserP.identity, treeId);
+      } else {
+        return result;
+      }
+  }
+
+  //=======================================================>
+
+  async getMarriedSubTreeUsersByUserId(userId: number): Promise<any>  {
   let testMethod = []
   testMethod = await this.query()
   .findAllUsersByParam(userId, 'User')
