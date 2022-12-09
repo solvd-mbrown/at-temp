@@ -233,4 +233,19 @@ export class UserRepository {
       };
     }
   }
+
+  public async getUsersWithStorageFileId(): Promise<User[]> {
+    const result = await this.query()
+      .raw(
+        `MATCH(User:User)
+    WHERE User.storageFolderId IS NOT NULL
+    RETURN User{.*, id: id(User)} as User`
+      )
+      .commit();
+
+    if (result[0]?.User) {
+      return result as User[];
+    }
+    return null;
+  }
 }

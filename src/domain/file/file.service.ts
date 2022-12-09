@@ -6,8 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { S3_BUCKET, S3_TAG_KEYS } from "./file.constants";
 import { UserRepository } from "../user/user.repository";
 import * as converter from "json-2-csv";
-// var fs = require("fs");
-import * as nodemailer from "nodemailer";
+import { User } from "../user/entities/user.entity";
 
 @Injectable()
 export class FileService {
@@ -40,8 +39,7 @@ export class FileService {
   async uploadS3(file: Express.Multer.File, fileName: string, email: string) {
     const s3 = this.getS3();
     const params: S3.PutObjectRequest = {
-      // Bucket: S3_BUCKET,
-      Bucket: "arr-tree-for-testing",
+      Bucket: S3_BUCKET,
       Key: fileName,
       ContentType: file.mimetype,
       Body: file.buffer,
@@ -86,9 +84,13 @@ export class FileService {
   }
 
   async findOne(id: number) {
+    return `This action returns ${id} file`;
+  }
+
+  async getUploadSizeByEmailReport(users: User[]): Promise<string> {
     const s3 = this.getS3();
     var params = {
-      Bucket: "arr-tree-for-testing",
+      Bucket: S3_BUCKET,
       Prefix: "feb773191670571295624",
     };
     const bucketData: S3.ListObjectsV2Output = await s3
@@ -102,36 +104,7 @@ export class FileService {
 
     const csv = await converter.json2csvAsync(json);
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "laura.for.solvd@gmail.com",
-        pass: "mgtdrrtzjkxbewzq",
-      },
-    });
-
-    var mailOptions = {
-      from: "laura.for.solvd@gmail.com",
-      to: "terekhin.konst@gmail.com",
-      subject: "Sending Attachment Email using Node.js",
-      text: "That was easy! 123",
-      attachments: [
-        {
-          filename: "report.csv",
-          content: csv,
-        },
-      ],
-    };
-
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log("Email sent: " + info.response);
-      }
-    });
-
-    return bucketData;
+    return csv;
   }
 
   update(id: number, updateFileDto: UpdateFileDto) {
