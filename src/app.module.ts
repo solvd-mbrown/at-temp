@@ -6,7 +6,6 @@ import { AppService } from "./app.service";
 import { TreeController } from "./domain/tree/tree.controller";
 import { TreeService } from "./domain/tree/tree.service";
 import { UserController } from "./domain/user/user.controller";
-import { UserModule } from "./domain/user/user.module";
 import { UserService } from "./domain/user/user.service";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import {

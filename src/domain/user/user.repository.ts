@@ -239,12 +239,12 @@ export class UserRepository {
       .raw(
         `MATCH(User:User)
     WHERE User.storageFolderId IS NOT NULL
-    RETURN User{.*, id: id(User)} as User`
+    RETURN COLLECT(User{.*, id: id(User)}) as Users`
       )
       .commit();
 
-    if (result[0]?.User) {
-      return result as User[];
+    if (result[0]?.Users) {
+      return result[0]?.Users as User[];
     }
     return null;
   }

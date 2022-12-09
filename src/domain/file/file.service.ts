@@ -89,22 +89,43 @@ export class FileService {
 
   async getUploadSizeByEmailReport(users: User[]): Promise<string> {
     const s3 = this.getS3();
-    var params = {
-      Bucket: S3_BUCKET,
-      Prefix: "feb773191670571295624",
-    };
-    const bucketData: S3.ListObjectsV2Output = await s3
-      .listObjectsV2(params)
-      .promise();
+    const groupedByEmailJson = [];
 
-    const json = bucketData.Contents.map(({ Size }, idx) => ({
-      email: idx,
-      size: Size,
-    }));
+    for (const user of users) {
+      const data: S3.ListObjectsV2Output = await s3
+        .listObjectsV2({ Bucket: S3_BUCKET, Prefix: user.storageFolderId })
+        .promise();
 
-    const csv = await converter.json2csvAsync(json);
+      const size = data.Contents.reduce((acc, { Size }) => {
+        acc += Size;
+        return acc;
+      }, 0);
+
+      groupedByEmailJson.push({
+        email: user.email,
+        size: this.convertBytes(size),
+      });
+    }
+
+    const csv = await converter.json2csvAsync(groupedByEmailJson);
 
     return csv;
+  }
+
+  private convertBytes(bytes: number) {
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+
+    if (bytes == 0) {
+      return 0;
+    }
+
+    const i = parseInt(`${Math.floor(Math.log(bytes) / Math.log(1024))}`);
+
+    if (i == 0) {
+      return bytes + " " + sizes[i];
+    }
+
+    return (bytes / Math.pow(1024, i)).toFixed(1) + " " + sizes[i];
   }
 
   update(id: number, updateFileDto: UpdateFileDto) {

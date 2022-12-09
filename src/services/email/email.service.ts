@@ -1,4 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
+import { clearGlobalAppDefaultCred } from "firebase-admin/lib/app/credential-factory";
 import { FileService } from "src/domain/file/file.service";
 import { UserRepository } from "src/domain/user/user.repository";
 import { EmailProvider, IEmailProvider } from "./email.interface";

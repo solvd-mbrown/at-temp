@@ -12,7 +12,7 @@ export class NodemailerService implements IEmailProvider {
     private readonly envConfig: ConfigType<typeof configuration>
   ) {}
 
-  sendEmail({
+  public async sendEmail({
     emails,
     attachments,
     subject,
