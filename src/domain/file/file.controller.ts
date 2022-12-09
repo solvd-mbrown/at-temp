@@ -18,11 +18,11 @@ import { FirebaseAuthGuard } from "src/services/auth/firebase/firebase-auth.guar
 import { Express } from "express";
 
 @Controller("file")
-@UseGuards(FirebaseAuthGuard)
+// @UseGuards(FirebaseAuthGuard)
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
-  @Post("upload")
+  @Post("upload/:email")
   @UseInterceptors(FileInterceptor("file"))
   async upload(
     @UploadedFile() file: Express.Multer.File,

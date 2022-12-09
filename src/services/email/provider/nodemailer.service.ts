@@ -48,7 +48,11 @@ export class NodemailerService implements IEmailProvider {
         if (error) {
           rej(error);
         } else {
-          res("Email sent: " + info.response);
+          res(
+            `Email sent. Accepted: ${
+              info?.accepted?.join(",") || null
+            }. Rejected: ${info?.rejected?.join(", ") || null}}`
+          );
         }
       });
     });
