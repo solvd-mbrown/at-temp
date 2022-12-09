@@ -1,13 +1,17 @@
-import { Injectable } from '@nestjs/common';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UserRepository } from './user.repository';
+import { Injectable } from "@nestjs/common";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { UserRepository } from "./user.repository";
 import { FirebaseAuthStrategy } from "../../services/auth/firebase/firebase-auth.strategy";
+import { generateTestUsers } from "./test/user.test.utils";
+import { FileService } from "../file/file.service";
+import { v4 as uuidv4 } from "uuid";
 
 @Injectable()
 export class UserService {
   constructor(
-    private readonly userRepository: UserRepository,
+    private readonly fileService: FileService,
     private readonly firebaseService: FirebaseAuthStrategy,
+    private readonly userRepository: UserRepository
   ) {}
 
   async create(usersProperties): Promise<any> {
@@ -30,7 +34,10 @@ export class UserService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    const result = await this.userRepository.updateUserEntity(id, updateUserDto);
+    const result = await this.userRepository.updateUserEntity(
+      id,
+      updateUserDto
+    );
     return result;
   }
 
@@ -39,12 +46,20 @@ export class UserService {
     return result;
   }
 
-  public async initUser(jwt :string) {
+  public async initUser(jwt: string) {
     const jwtParsed = await this.firebaseService.validate(jwt);
-    const result = await this.userRepository.getUserFromEmail(
-      jwtParsed.email,
-    );
+    const result = await this.userRepository.getUserFromEmail(jwtParsed.email);
     return result;
   }
 
+  // ----dev-----
+  public async test(file) {
+    // const users = generateTestUsers(2);
+    // const createdUsers = await Promise.all(users.map((u) => this.create(u)));
+    // return createdUsers;
+    // const email = "test0@gtest0.com";
+
+    // return await this.fileService.upload(file, email);
+    return this.fileService.findOne(1);
+  }
 }

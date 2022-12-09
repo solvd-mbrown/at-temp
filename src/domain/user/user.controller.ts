@@ -1,15 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { FirebaseAuthGuard } from 'src/services/auth/firebase/firebase-auth.guard';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  UploadedFile,
+  UseInterceptors,
+} from "@nestjs/common";
+import { UserService } from "./user.service";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { FirebaseAuthGuard } from "src/services/auth/firebase/firebase-auth.guard";
+import { FileInterceptor } from "@nestjs/platform-express";
 
-@Controller('user')
+@Controller("user")
 // @UseGuards(FirebaseAuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('add')
+  @Post("add")
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
@@ -19,28 +31,35 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get(":id")
+  findOne(@Param("id") id: string) {
     return this.userService.findOne(+id);
   }
 
-  @Get('email/:email')
-  findOneByEmail(@Param('email') email: string) {
+  @Get("email/:email")
+  findOneByEmail(@Param("email") email: string) {
     return this.userService.findOneByEmail(email);
   }
 
-  @Get('initUser/:token')
-  initUser(@Param('token') jwt: string) {
+  @Get("initUser/:token")
+  initUser(@Param("token") jwt: string) {
     return this.userService.initUser(jwt);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  @Patch(":id")
+  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);
   }
 
-  @Delete('remove/:id')
-  remove(@Param('id') id: string) {
+  @Delete("remove/:id")
+  remove(@Param("id") id: string) {
     return this.userService.remove(+id);
+  }
+
+  // ---dev----
+  @Post("test")
+  @UseInterceptors(FileInterceptor("file"))
+  test(@UploadedFile() file) {
+    return this.userService.test(file);
   }
 }

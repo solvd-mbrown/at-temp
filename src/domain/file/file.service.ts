@@ -1,12 +1,17 @@
-import { S3 } from 'aws-sdk';
-import { Logger, Injectable } from '@nestjs/common';
-import { CreateFileDto } from './dto/create-file.dto';
-import { UpdateFileDto } from './dto/update-file.dto';
-import {v4 as uuidv4} from 'uuid';
-import { S3_BUCKET } from './file.constants';
+import { S3 } from "aws-sdk";
+import { Logger, Injectable } from "@nestjs/common";
+import { CreateFileDto } from "./dto/create-file.dto";
+import { UpdateFileDto } from "./dto/update-file.dto";
+import { v4 as uuidv4 } from "uuid";
+import { S3_BUCKET, S3_TAG_KEYS } from "./file.constants";
+import { UserRepository } from "../user/user.repository";
+import * as converter from "json-2-csv";
+// var fs = require("fs");
+import * as nodemailer from "nodemailer";
 
 @Injectable()
 export class FileService {
+  constructor(private readonly userRepository: UserRepository) {}
 
   getS3() {
     return new S3({
@@ -15,22 +20,32 @@ export class FileService {
     });
   }
 
-  async upload(file) {
-    const newUuid = uuidv4();
-    const partuuid = newUuid.slice(0,8);
-    const result = await this.uploadS3(file, partuuid);
+  async upload(file: Express.Multer.File, email: string) {
+    let user = await this.userRepository.getUserFromEmail(email);
+    const timestamp = Date.now();
+    const iddateUser = `${uuidv4().slice(0, 8)}${timestamp}`;
+    const iddateFile = `${uuidv4().slice(0, 8)}${timestamp}`;
+    if (!user?.storageFolderId) {
+      user = await this.userRepository.updateUserEntity(user.id, {
+        storageFolderId: iddateUser,
+      });
+    }
+
+    const fileName = `${user.storageFolderId}/${iddateFile}${file.originalname}`;
+
+    const result = await this.uploadS3(file, fileName, email);
     return result;
   }
 
-  async uploadS3(file, uuid) {
+  async uploadS3(file: Express.Multer.File, fileName: string, email: string) {
     const s3 = this.getS3();
-    const timestamp = Date.now();
-    const fileName = `${uuid}${timestamp}${file.originalname}`
-    const params = {
-      Bucket: S3_BUCKET,
+    const params: S3.PutObjectRequest = {
+      // Bucket: S3_BUCKET,
+      Bucket: "arr-tree-for-testing",
       Key: fileName,
       ContentType: file.mimetype,
       Body: file.buffer,
+      Tagging: `${S3_TAG_KEYS.email}=${email}`,
     };
     return new Promise((resolve, reject) => {
       s3.upload(params, (err, data) => {
@@ -43,35 +58,80 @@ export class FileService {
     });
   }
 
- async removeFileFromS3(fileKey) {
+  async removeFileFromS3(fileKey) {
     const s3 = this.getS3();
     const params = {
       Bucket: S3_BUCKET,
       Key: fileKey,
     };
     return new Promise((resolve, reject) => {
-     const result = s3.deleteObject(params, (err, data) => {
+      const result = s3.deleteObject(params, (err, data) => {
         if (err) {
           Logger.error(err);
           reject(err.message);
         }
-        resolve( {
-          "response": "done"
+        resolve({
+          response: "done",
         });
       });
     });
   }
 
   create(createFileDto: CreateFileDto) {
-    return 'This action adds a new file';
+    return "This action adds a new file";
   }
 
   findAll() {
     return `This action returns all file`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} file`;
+  async findOne(id: number) {
+    const s3 = this.getS3();
+    var params = {
+      Bucket: "arr-tree-for-testing",
+      Prefix: "feb773191670571295624",
+    };
+    const bucketData: S3.ListObjectsV2Output = await s3
+      .listObjectsV2(params)
+      .promise();
+
+    const json = bucketData.Contents.map(({ Size }, idx) => ({
+      email: idx,
+      size: Size,
+    }));
+
+    const csv = await converter.json2csvAsync(json);
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "laura.for.solvd@gmail.com",
+        pass: "mgtdrrtzjkxbewzq",
+      },
+    });
+
+    var mailOptions = {
+      from: "laura.for.solvd@gmail.com",
+      to: "terekhin.konst@gmail.com",
+      subject: "Sending Attachment Email using Node.js",
+      text: "That was easy! 123",
+      attachments: [
+        {
+          filename: "report.csv",
+          content: csv,
+        },
+      ],
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Email sent: " + info.response);
+      }
+    });
+
+    return bucketData;
   }
 
   update(id: number, updateFileDto: UpdateFileDto) {
