@@ -89,23 +89,47 @@ export class FileService {
 
   async getUploadSizeByEmailReport(users: User[]): Promise<string> {
     const s3 = this.getS3();
-    const groupedByEmailJson = [];
+    let groupedByStorePrefix = {};
+    let truncated = true;
+    let bucketParams: S3.Types.ListObjectsV2Request = { Bucket: S3_BUCKET };
 
-    for (const user of users) {
-      const data: S3.ListObjectsV2Output = await s3
-        .listObjectsV2({ Bucket: S3_BUCKET, Prefix: user.storageFolderId })
-        .promise();
+    const usersWithStorageFileIdObject = users.reduce((acc, user) => {
+      acc[user.storageFolderId] = user.email;
+      return acc;
+    }, {});
 
-      const size = data.Contents.reduce((acc, { Size }) => {
-        acc += Size;
-        return acc;
-      }, 0);
+    const loopBucket = async () => {
+      while (truncated) {
+        const res = await s3.listObjectsV2(bucketParams).promise();
+        truncated = res?.IsTruncated;
 
-      groupedByEmailJson.push({
-        email: user.email,
-        size: this.convertBytes(size),
-      });
-    }
+        res.Contents.forEach((item) => {
+          const storageFolderId = item.Key.split("/")[0];
+          groupedByStorePrefix = {
+            ...groupedByStorePrefix,
+            [storageFolderId]:
+              item.Size + (groupedByStorePrefix[storageFolderId] || 0),
+          };
+        });
+
+        if (truncated) {
+          bucketParams.ContinuationToken = res.ContinuationToken;
+        }
+      }
+    };
+
+    await loopBucket();
+
+    const groupedByEmailJson = Object.entries(groupedByStorePrefix)
+      .map(([key, size]: [string, number]) => {
+        const email = usersWithStorageFileIdObject[key];
+
+        if (!email) return null;
+
+        const data = { email, size: this.convertBytes(size) };
+        return data;
+      })
+      .filter(Boolean);
 
     const csv = await converter.json2csvAsync(groupedByEmailJson);
 

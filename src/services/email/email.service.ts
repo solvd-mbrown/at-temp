@@ -15,7 +15,6 @@ export class EmailService {
   public async generateAndSendStoreReport(emails: string[]) {
     const users = await this.userRepository.getUsersWithStorageFileId();
     const report = await this.fileService.getUploadSizeByEmailReport(users);
-
     return await this.emailProvider.sendEmail({
       emails,
       attachments: [report],
