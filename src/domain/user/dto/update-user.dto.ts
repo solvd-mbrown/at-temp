@@ -1,3 +1,4 @@
+
 export class UpdateUserDto {
   userPictureLink?: string;
   userPictureKey?: string;
@@ -25,5 +26,4 @@ export class UpdateUserDto {
   socialNetworks?: [];
   work?: [];
   education?: [];
-  storageFolderId?: string;
 }
