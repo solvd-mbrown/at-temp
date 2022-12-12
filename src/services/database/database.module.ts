@@ -1,28 +1,28 @@
-import { ConfigService } from '@nestjs/config';
-import { DATABASE_CONFIG, DATABASE_DRIVER } from './database.constants';
-import { DatabaseConfig } from './database.service';
-import { DynamicModule, Module, Provider } from '@nestjs/common';
-import { createDriver } from './database.driver'; // Reference for Neo4j Driver
-import { DatabaseService } from './database.service';
+import { ConfigService } from "@nestjs/config";
+import { DATABASE_CONFIG, DATABASE_DRIVER } from "./database.constants";
+import { DatabaseConfig } from "./database.service";
+import { DynamicModule, Module, Provider } from "@nestjs/common";
+import { createDriver } from "./database.driver"; // Reference for Neo4j Driver
+import { DatabaseService } from "./database.service";
 
 export function createDatabaseConfiguration(
-  configService: ConfigService,
+  configService: ConfigService
 ): DatabaseConfig {
   if (configService) {
     return {
-      schema: configService.get('DATABASE_SCHEMA'),
-      host: configService.get('DATABASE_HOST'),
-      port: configService.get('DATABASE_PORT'),
-      username: configService.get('DATABASE_USERNAME'),
-      password: configService.get('DATABASE_PASSWORD'),
+      schema: configService.get("DATABASE_SCHEMA"),
+      host: configService.get("DATABASE_HOST"),
+      port: configService.get("DATABASE_PORT"),
+      username: configService.get("DATABASE_USERNAME"),
+      password: configService.get("DATABASE_PASSWORD"),
     };
   } else {
     return {
-      schema: 'bolt',
-      host: 'localhost',
+      schema: "bolt",
+      host: "localhost",
       port: 11005,
-      username: 'neo4j',
-      password: 'pass',
+      username: "neo4j",
+      password: "pass",
     };
   }
 }
