@@ -18,7 +18,7 @@ import { FirebaseAuthGuard } from "src/services/auth/firebase/firebase-auth.guar
 import { Express } from "express";
 
 @Controller("file")
-@UseGuards(FirebaseAuthGuard)
+// @UseGuards(FirebaseAuthGuard)
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
