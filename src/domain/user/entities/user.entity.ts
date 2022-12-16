@@ -1,12 +1,12 @@
 type Nullable<T> = T | null;
 
 export class User {
-  __typename?: "User";
+  __typename?: 'User';
   id: number;
   treeName?: Nullable<string>;
   email: string;
   firstName?: Nullable<string>;
-  maidenName?: Nullable<string>;
+  maidenName?: Nullable<string>
   lastName?: Nullable<string>;
   createDate?: Nullable<string>;
   updateDate?: Nullable<string>;
@@ -17,5 +17,4 @@ export class User {
   hometown?: Nullable<string>;
   phone?: Nullable<string>;
   address?: Nullable<string>;
-  storageFolderId?: Nullable<string>;
 }
