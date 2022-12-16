@@ -19,7 +19,7 @@ export class TreeRepository {
     return new cypher.RepositoryQuery(this.connection);
   }
 
-  async addNewTree(treeData: any): Promise<Tree[]> {
+  async addNewTree(treeData: any): Promise<Tree> {
     const result = await this.query()
       .createEntity<{ [key in keyof Partial<Tree>]: any }>(
         "Tree",
@@ -163,17 +163,21 @@ export class TreeRepository {
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
-  async getTreeInPartsUserId(treeId: number, userId: string): Promise<Tree[]> {
+  async getDataFromTree(treeId: number, userId: string) {
+    // find userId father and mother
     const parent = await this.query()
       .fetchUserByUserId(+userId)
       .resolveUsersParentsByRelation(treeId.toString())
       .commitWithReturnEntities();
 
+    // parentId = userId => DESCENDANT => parent
+    // >>incorrect -> returns mom1.id
     let parentId = null;
     if (parent && parent.length && parent[0].data.UserP) {
       parentId = parent[0].data.UserP.identity;
     }
-
+    // fetch entrire DB by id
+    // >>seems valid-> neede more investigation after filtered out
     const result = await this.query()
       .fetchAllByEntityId(treeId, "Tree")
       .commitWithReturnEntity();
@@ -182,6 +186,7 @@ export class TreeRepository {
       parentId = userId;
     }
 
+    // find spouse of father
     const spouses = await this.query()
       .fetchUserByUserId(+parentId)
       .resolveUsersSpouseByRelationByTreeId(treeId.toString())
@@ -191,16 +196,81 @@ export class TreeRepository {
       spouseId = spouses[0].data.UserS.identity;
     }
 
+    // find if spouse has subtree rel-n
+    // via subTreeTargetUser rel-n
+    // >>incorrect => empty value for mom1
+    const currentSubTree = await this.getMarriedSubTreeUsersByUserId(spouseId);
+    return { result, currentSubTree, parentId, spouseId };
+  }
+
+  async getTreeInPartsUserId(treeId: number, userId: string): Promise<any> {
+    const userDataRaw = await this.query()
+      .findEntityById("User", +userId)
+      .commitWithReturnEntities();
+
+    const userData = userDataRaw[0].data.User;
+
+    const myTreeIdByParent1 = userData?.properties?.myTreeIdByParent1;
+    const spouseTreeId = userData?.properties?.spouseTreeId;
+
+    if (myTreeIdByParent1 && spouseTreeId) {
+      var isSpouseWithSubTree = await this.query()
+        .findEntityById("User", +userId)
+        .raw(
+          `OPTIONAL MATCH(User)-[:USER_MARRIED_SUB_TREE_USER_TREE_${spouseTreeId}]-(Parent:User)
+      OPTIONAL MATCH(User)-[:USER_DESCENDANT_USER_TREE_79${myTreeIdByParent1}]-(Parent)
+      WITH User, Parent
+      OPTIONAL MATCH(User)-[:USER_MARRIED_USER_TREE_${spouseTreeId}]-(CurrentSpouseMarriedTo:User)
+      RETURN User, Parent, CurrentSpouseMarriedTo
+      `
+        )
+        .commit();
+    }
+
+    const parent = await this.query()
+      .fetchUserByUserId(+userId)
+      .resolveUsersParentsByRelation(treeId.toString())
+      .commitWithReturnEntities();
+
+    // parentId = userId => DESCENDANT => parent
+    // >>incorrect -> returns mom1.id
+    let parentId = null;
+    if (parent && parent.length && parent[0].data.UserP) {
+      parentId = parent[0].data.UserP.identity;
+    }
+    // fetch entrire DB by id
+    // >>seems valid-> neede more investigation after filtered out
+    const result = await this.query()
+      .fetchAllByEntityId(treeId, "Tree")
+      .commitWithReturnEntity();
+
+    if (parentId === null) {
+      parentId = userId;
+    }
+
+    // find spouse of father
+    const spouses = await this.query()
+      .fetchUserByUserId(+parentId)
+      .resolveUsersSpouseByRelationByTreeId(treeId.toString())
+      .commitWithReturnEntities();
+    let spouseId = null;
+    if (spouses && spouses.length && spouses[0].data.UserS) {
+      spouseId = spouses[0].data.UserS.identity;
+    }
+
+    // find if spouse has subtree rel-n
+    // via subTreeTargetUser rel-n
+    // >>incorrect => empty value for mom1
     const currentSubTree = await this.getMarriedSubTreeUsersByUserId(spouseId);
 
     if (result) {
       const data = result.data;
-      const partTree = await cypher.buildPartTreeWithoutSubTreeRel(
+      const bottomPartTree = await cypher.buildPartTreeWithoutSubTreeRel(
         data,
         parentId,
         treeId.toString()
       );
-      const rootPart = await cypher.buildRootPartTree(
+      const rootPartTree = await cypher.buildRootPartTree(
         data,
         parentId,
         treeId.toString(),
@@ -215,9 +285,9 @@ export class TreeRepository {
       return {
         id: data.Tree.identity,
         ...data.Tree.properties,
-        rootPartTree: rootPart ? rootPart[0] : null,
+        rootPartTree: rootPartTree ? rootPartTree[0] : null,
         subTree: subTree ? subTree[0] : null,
-        bottomPartTree: partTree ? partTree[0] : null,
+        bottomPartTree: bottomPartTree ? bottomPartTree[0] : null,
       };
     }
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
@@ -580,29 +650,34 @@ export class TreeRepository {
     id: number,
     treeProperties: any
   ): Promise<any> {
+    // >>DOUBLE WORK -> ALREADY HAVE USER
+    // WHY WE NEED THIS PROPERTY?
     await this.updateUserParamMyTreeIdByParent2(treeProperties.userId, id);
 
     const targetUser = await this.query()
       .fetchUserByUserId(treeProperties.userId)
       .commitWithReturnEntities();
-
+    // >>DOUBLE WORK -> 1 REQ TO GET USERS BY ID
     const resultToSubTreeUser = await this.query()
       .fetchUserByUserId(treeProperties.toUserId)
       .commitWithReturnEntities();
-
     if (
+      // >>EXTRACT INTO 1 VARIABLE
       !targetUser[0].data.User.properties.myTreeIdByParent1 ||
       +targetUser[0].data.User.properties.myTreeIdByParent1 == id
     ) {
+      // WHY WE NEED A NEW TREE?
       const targetUserTree = await this.addNewTree({
         name: `treeName${treeProperties.userId}`,
         userId: +treeProperties.userId,
       });
-
+      // >> DOUBLE WORK -> ALREADY HAVE USER
       const spouses = await this.query()
         .fetchUserByUserId(treeProperties.userId)
         .resolveUsersSpouseByRelationByTreeId(id.toString())
         .commitWithReturnEntities();
+
+      // >> REFACTOR THIS BLOCK
       let spouseId = null;
       if (spouses && spouses.length && spouses[0].data.UserS) {
         spouseId = spouses[0].data.UserS.identity;
@@ -610,10 +685,12 @@ export class TreeRepository {
 
       if (spouseId) {
         // add current spouse in new tree
+        // WHAT IS THE PURPOSE?
         await this.query()
           .createMemberAndMarriedRelations(
             spouses[0].data.UserS.identity,
             treeProperties.userId,
+            // >>PYTHON?!
             +targetUserTree["id"]
           )
           .commitWithReturnEntity();
@@ -627,6 +704,8 @@ export class TreeRepository {
 
         if (childrenCurrentParent.length) {
           kidsCurrent = childrenCurrentParent[0].data.UserKList;
+          // >> WHY WE NEED THIS IF CHECK
+          // IF BELOWE WE HAVE THE SAME
           if (kidsCurrent.length == 1) {
             await this.joinUserToTreeDescendantParent2(
               +kidsCurrent[0].identity,
@@ -636,6 +715,7 @@ export class TreeRepository {
           }
 
           if (kidsCurrent.length > 1) {
+            // >>WHY JS ??? CAN DO IT 1 REQ IN NEO4J
             for (let item of kidsCurrent) {
               await this.joinUserToTreeDescendantParent2(
                 +item.identity,
@@ -646,7 +726,8 @@ export class TreeRepository {
           }
         }
       }
-
+      // >> PROMISE ALL?
+      // >> 1 REQ ? -> JUST UPDATE
       await this.updateUserParamTreeOwner(treeProperties.userId);
       await this.updateUserParamMyTreeIdByParent1(
         treeProperties.toUserId,
@@ -691,6 +772,7 @@ export class TreeRepository {
       ToSubTreeUser
     );
 
+    // WHAT IS THE PURPOSE?
     const result = await this.query()
       .createMemberAndMarriedSubTreeRelations(
         treeProperties.userId,
@@ -717,6 +799,9 @@ export class TreeRepository {
     toUserId: number,
     treeId: number
   ): Promise<any> {
+    // >>WHAT IS THE DIFFERENCE TO joinUserToTreeDescendantParent1 ??? 1 PARAM?
+
+    // >>DO ALL IN 1 QUERY
     await this.query()
       .createMemberAndDescendantRelations(userId, toUserId, treeId)
       .commitWithReturnEntity();
@@ -911,7 +996,6 @@ export class TreeRepository {
   }
 
   //=======================================================>
-
   async getMarriedSubTreeUsersByUserId(userId: number): Promise<any> {
     let testMethod = [];
     testMethod = await this.query()
