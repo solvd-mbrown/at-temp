@@ -1,19 +1,30 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, UseGuards  } from '@nestjs/common';
-import { FileService } from './file.service';
-import { CreateFileDto } from './dto/create-file.dto';
-import { UpdateFileDto } from './dto/update-file.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { FirebaseAuthGuard } from 'src/services/auth/firebase/firebase-auth.guard';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  UploadedFile,
+  UseGuards,
+} from "@nestjs/common";
+import { FileService } from "./file.service";
+import { CreateFileDto } from "./dto/create-file.dto";
+import { UpdateFileDto } from "./dto/update-file.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { FirebaseAuthGuard } from "src/services/auth/firebase/firebase-auth.guard";
 
-@Controller('file')
-@UseGuards(FirebaseAuthGuard)
+@Controller("file")
+// @UseGuards(FirebaseAuthGuard)
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  async upload(@UploadedFile() file) {
-    return await this.fileService.upload(file);
+  @Post("upload/:email")
+  @UseInterceptors(FileInterceptor("file"))
+  async upload(@UploadedFile() file, @Param("email") email: string) {
+    return await this.fileService.upload(file, email);
   }
 
   @Post()
