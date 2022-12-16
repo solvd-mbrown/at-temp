@@ -15,19 +15,15 @@ import { CreateFileDto } from "./dto/create-file.dto";
 import { UpdateFileDto } from "./dto/update-file.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { FirebaseAuthGuard } from "src/services/auth/firebase/firebase-auth.guard";
-import { Express } from "express";
 
 @Controller("file")
-@UseGuards(FirebaseAuthGuard)
+// @UseGuards(FirebaseAuthGuard)
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
   @Post("upload/:email")
   @UseInterceptors(FileInterceptor("file"))
-  async upload(
-    @UploadedFile() file: Express.Multer.File,
-    @Param("email") email: string
-  ) {
+  async upload(@UploadedFile() file, @Param("email") email: string) {
     return await this.fileService.upload(file, email);
   }
 
