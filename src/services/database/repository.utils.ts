@@ -2128,6 +2128,7 @@ export const buildSubTree = (
       currentSubTree,
       spouseId
     );
+
     // @ts-ignore
     let EnterPointToSubTree = [{ identity: spouseId }];
     // @ts-ignore
