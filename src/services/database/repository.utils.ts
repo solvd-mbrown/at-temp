@@ -1313,6 +1313,16 @@ export class RepositoryQuery {
     return this;
   };
 
+  public resolveUsersChildrenByRelationUtilEnd = (
+    treeId: string
+  ): RepositoryQuery => {
+    this.query.raw(`
+      OPTIONAL MATCH (User)<-[:USER_DESCENDANT_USER_TREE_${treeId}*]-(UserKList)
+    `);
+    this.returns.push("UserKList");
+    return this;
+  };
+
   public resolveInternalRelations = (
     childEntity: string,
     parentEntity: string,
@@ -2083,8 +2093,8 @@ export const buildPartTree = (data: any, userId: string, treeId: string) => {
 };
 
 export const buildPartTreeWithoutSubTreeRel = (
-  data: any,
-  userId: string,
+  data: any, //entire tree
+  userId: string, //parentId
   treeId: string
 ) => {
   // @ts-ignore
@@ -2372,6 +2382,7 @@ export const buildTreeFromRelations = (
   EnterPointToSubTree?,
   subTree?
 ) => {
+  // remove self-linked
   descendantRels = descendantRels.filter((object) => {
     return object.end !== object.start;
   });

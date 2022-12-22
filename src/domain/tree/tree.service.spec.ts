@@ -309,6 +309,23 @@ describe("TreeService", () => {
       relation: TreeRelationType.MARRIED,
     });
 
+    const father1_father_father = await userService.create(
+      userFactory("f1_f_f")
+    );
+    const father1_father_mom = await userService.create(userFactory("f1_f_m"));
+
+    await treeService.join(tree_child1.id, {
+      relation: TreeRelationType.DESCENDANT,
+      toUserId: father1_father_father.id,
+      userId: father1_father.id,
+    });
+
+    await treeService.join(tree_child1.id, {
+      userId: father1_father_mom.id,
+      toUserId: father1_father_father.id,
+      relation: TreeRelationType.MARRIED,
+    });
+
     // subtree -> will create new treeId
     const mom1_father = await userService.create(userFactory("m1_f"));
     //  add to sub tree in top
@@ -346,11 +363,31 @@ describe("TreeService", () => {
       relation: TreeRelationType.MARRIED,
     });
 
-    const rel_mom1 = await treeService.getTreeInPartsUserId(
-      tree_child1.id,
-      mom1.id.toString()
+    const mom1_father_father = await userService.create(userFactory("m1_f_f"));
+    const mom1_father_mom = await userService.create(userFactory("m1_f_m"));
+
+    const mom1_fetched: any = await userService.findOne(mom1.id);
+
+    await treeService.join(mom1_fetched.myTreeIdByParent1, {
+      relation: TreeRelationType.DESCENDANT,
+      toUserId: mom1_father_father.id,
+      userId: mom1_father.id,
+    });
+
+    await treeService.join(mom1_fetched.myTreeIdByParent1, {
+      relation: TreeRelationType.MARRIED,
+      userId: mom1_father_mom.id,
+      toUserId: mom1_father_father.id,
+    });
+
+    const userToFetchId = mom1.id;
+    const userToFetch: any = await userService.findOne(userToFetchId);
+
+    const result = await treeService.getTreeInPartsUserId(
+      userToFetch.myTreeIdByParent1,
+      userToFetchId.toString()
     );
 
-    expect(rel_mom1).toBeTruthy();
+    expect(result).toBeTruthy();
   }, 999999999);
 });
