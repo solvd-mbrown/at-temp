@@ -307,10 +307,12 @@ export class TreeRepository {
         .commit();
     }
 
+    const firstSpouse = spouseRels?.length > 0 && spouseRels[0];
+
     // if we are fetching spouse -> find parent in her tree
-    if (spouseRels[0]?.Parent?.identity) {
+    if (firstSpouse?.Parent?.identity) {
       var userType = HusbandTreeUserType.SPOUSE_WITH_SUBTREE;
-    } else if (spouseRels[0]?.CurrentSpouseMarriedTo?.identity) {
+    } else if (firstSpouse?.CurrentSpouseMarriedTo?.identity) {
       var userType = HusbandTreeUserType.SPOUSE_NO_SUBTREE;
     } else {
       var userType = HusbandTreeUserType.HUSBAND;
@@ -367,18 +369,19 @@ export class TreeRepository {
 
         if (result) {
           const data = result.data;
-          const bottomPartTreeInit =
+          const [[bottomPartTreeInit]] =
             await cypher.buildPartTreeWithoutSubTreeRel(
               data,
               bottomParentId,
               bottomTreeId.toString()
             );
 
-          const bottomPartTree = {
-            ...bottomPartTreeInit,
-            user: bottomPartTreeInit.married,
-            married: bottomPartTreeInit.user,
-          };
+          const married = [...bottomPartTreeInit.married];
+          const user = { ...bottomPartTreeInit.user };
+
+          const bottomPartTree = [
+            { ...bottomPartTreeInit, user: married[0], married: [user] },
+          ];
 
           const rootPartTree = await cypher.buildRootPartTree(
             data,
@@ -392,7 +395,7 @@ export class TreeRepository {
             ...data.Tree.properties,
             rootPartTree: rootPartTree ? rootPartTree[0] : null,
             subTree: null,
-            bottomPartTree: bottomPartTree ? bottomPartTree[0] : null,
+            bottomPartTree: bottomPartTree || null,
           };
         }
         break;
@@ -422,9 +425,6 @@ export class TreeRepository {
               bottomTreeId.toString()
             );
 
-          const married = [...bottomPartTreeInit.married];
-          const user = { ...bottomPartTreeInit.user };
-
           const oneLevelAboveSpouse = await this.query()
             .fetchUserByUserId(+topParentId)
             .resolveUsersSpouseByRelationByTreeId(topTreeId.toString())
@@ -432,6 +432,9 @@ export class TreeRepository {
 
           const father = oneLevelAboveSpouse.data.User;
           const fatherSpouse = oneLevelAboveSpouse.data?.UserS;
+
+          const married = [...bottomPartTreeInit.married];
+          const user = { ...bottomPartTreeInit.user };
 
           const bottomPartTree = [
             {
