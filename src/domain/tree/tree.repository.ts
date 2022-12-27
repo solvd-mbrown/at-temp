@@ -800,6 +800,16 @@ export class TreeRepository {
           )
           .commitWithReturnEntity();
       }
+
+      if (subTreeUser && subTreeUser.data.User.properties.spouseTreeId) {
+        await this.query()
+          .createMemberAndMarriedRelations(
+            treeProperties.userId,
+            treeProperties.toUserId,
+            subTreeUser.data.User.properties.spouseTreeId
+          )
+          .commitWithReturnEntity();
+      }
     }
 
     // kids of spouse
@@ -947,47 +957,38 @@ export class TreeRepository {
     id: number,
     treeProperties: any
   ): Promise<any> {
-    // >>DOUBLE WORK -> ALREADY HAVE USER
-    // WHY WE NEED THIS PROPERTY?
     await this.updateUserParamMyTreeIdByParent2(treeProperties.userId, id);
 
     const targetUser = await this.query()
       .fetchUserByUserId(treeProperties.userId)
       .commitWithReturnEntities();
-    // >>DOUBLE WORK -> 1 REQ TO GET USERS BY ID
+
     const resultToSubTreeUser = await this.query()
       .fetchUserByUserId(treeProperties.toUserId)
       .commitWithReturnEntities();
     if (
-      // >>EXTRACT INTO 1 VARIABLE
       !targetUser[0].data.User.properties.myTreeIdByParent1 ||
       +targetUser[0].data.User.properties.myTreeIdByParent1 == id
     ) {
-      // WHY WE NEED A NEW TREE?
       const targetUserTree = await this.addNewTree({
         name: `treeName${treeProperties.userId}`,
         userId: +treeProperties.userId,
       });
-      // >> DOUBLE WORK -> ALREADY HAVE USER
       const spouses = await this.query()
         .fetchUserByUserId(treeProperties.userId)
         .resolveUsersSpouseByRelationByTreeId(id.toString())
         .commitWithReturnEntities();
 
-      // >> REFACTOR THIS BLOCK
       let spouseId = null;
       if (spouses && spouses.length && spouses[0].data.UserS) {
         spouseId = spouses[0].data.UserS.identity;
       }
 
       if (spouseId) {
-        // add current spouse in new tree
-        // WHAT IS THE PURPOSE?
         await this.query()
           .createMemberAndMarriedRelations(
             spouses[0].data.UserS.identity,
             treeProperties.userId,
-            // >>PYTHON?!
             +targetUserTree["id"]
           )
           .commitWithReturnEntity();
@@ -1001,8 +1002,6 @@ export class TreeRepository {
 
         if (childrenCurrentParent.length) {
           kidsCurrent = childrenCurrentParent[0].data.UserKList;
-          // >> WHY WE NEED THIS IF CHECK
-          // IF BELOWE WE HAVE THE SAME
           if (kidsCurrent.length == 1) {
             await this.joinUserToTreeDescendantParent2(
               +kidsCurrent[0].identity,
@@ -1012,7 +1011,6 @@ export class TreeRepository {
           }
 
           if (kidsCurrent.length > 1) {
-            // >>WHY JS ??? CAN DO IT 1 REQ IN NEO4J
             for (let item of kidsCurrent) {
               await this.joinUserToTreeDescendantParent2(
                 +item.identity,
@@ -1023,8 +1021,7 @@ export class TreeRepository {
           }
         }
       }
-      // >> PROMISE ALL?
-      // >> 1 REQ ? -> JUST UPDATE
+
       await this.updateUserParamTreeOwner(treeProperties.userId);
       await this.updateUserParamMyTreeIdByParent1(
         treeProperties.toUserId,
@@ -1049,6 +1046,14 @@ export class TreeRepository {
         treeProperties.toUserId,
         +targetUser[0].data.User.properties.myTreeIdByParent1
       );
+
+      await this.query()
+        .createMemberRelation(
+          treeProperties.toUserId,
+          +targetUser[0].data.User.properties.myTreeIdByParent1
+        )
+        .commitWithReturnEntity();
+
       await this.updateUserParamMyTreeIdByParent1(
         treeProperties.userId,
         +targetUser[0].data.User.properties.myTreeIdByParent1
@@ -1069,7 +1074,6 @@ export class TreeRepository {
       ToSubTreeUser
     );
 
-    // WHAT IS THE PURPOSE?
     const result = await this.query()
       .createMemberAndMarriedSubTreeRelations(
         treeProperties.userId,

@@ -70,7 +70,7 @@ export class RepositoryQuery {
   public fetchAllByEntityId(entityId: number, entity: string): RepositoryQuery {
     this.query.raw(
       `MATCH (${entity}:${entity}) WHERE ID(${entity}) = ${entityId}
-       MATCH (${entity})-[rList*..3]-(nList)`
+       MATCH (${entity})-[rList*..4]-(nList)`
     );
     this.returns.push(`${entity}`, "rList", "nList");
     return this;
