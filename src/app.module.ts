@@ -1,10 +1,10 @@
+import { NodemailerService } from "./services/email/provider/nodemailer.service";
 import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { TreeController } from "./domain/tree/tree.controller";
 import { TreeService } from "./domain/tree/tree.service";
 import { UserController } from "./domain/user/user.controller";
-import { UserModule } from "./domain/user/user.module";
 import { UserService } from "./domain/user/user.service";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import {
@@ -24,9 +24,10 @@ import { PostRepository } from "./domain/post/post.repository";
 import { CommentController } from "./domain/comment/comment.controller";
 import { CommentRepository } from "./domain/comment/comment.repository";
 import { CommentService } from "./domain/comment/comment.service";
-import * as firebase from "firebase-admin";
-import { FirebaseAdminModule } from "./services/auth/auth.module";
 import { FirebaseAuthStrategy } from "./services/auth/firebase/firebase-auth.strategy";
+import { EmailController } from "./services/email/email.controller";
+import { EmailService } from "./services/email/email.service";
+import { EmailProvider } from "./services/email/email.interface";
 
 @Module({
   imports: [
@@ -58,8 +59,10 @@ import { FirebaseAuthStrategy } from "./services/auth/firebase/firebase-auth.str
     FileController,
     PostController,
     CommentController,
+    EmailController,
   ],
   providers: [
+    NodemailerService,
     AppService,
     FirebaseAuthStrategy,
     UserService,
@@ -71,6 +74,11 @@ import { FirebaseAuthStrategy } from "./services/auth/firebase/firebase-auth.str
     PostRepository,
     CommentService,
     CommentRepository,
+    EmailService,
+    {
+      provide: EmailProvider,
+      useClass: NodemailerService,
+    },
   ],
 })
 export class AppModule {}

@@ -21,10 +21,10 @@ import { FirebaseAuthGuard } from "src/services/auth/firebase/firebase-auth.guar
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
-  @Post("upload")
+  @Post("upload/:email")
   @UseInterceptors(FileInterceptor("file"))
-  async upload(@UploadedFile() file) {
-    return await this.fileService.upload(file);
+  async upload(@UploadedFile() file, @Param("email") email: string) {
+    return await this.fileService.upload(file, email);
   }
 
   @Post()

@@ -7,8 +7,8 @@ import { UserRepository } from "./user.repository";
 @Injectable()
 export class UserService {
   constructor(
-    private readonly userRepository: UserRepository,
-    private readonly firebaseService: FirebaseAuthStrategy
+    private readonly firebaseService: FirebaseAuthStrategy,
+    private readonly userRepository: UserRepository
   ) {}
 
   async create(usersProperties): Promise<User> {

@@ -174,6 +174,7 @@ export class UserRepository {
           "User.spouseTreeId": params?.spouseTreeId,
           "User.myTreeIdByParent1": params?.myTreeIdByParent1,
           "User.myTreeIdByParent2": params?.myTreeIdByParent2,
+          "User.storageFolderId": params?.storageFolderId,
           "User.spouse": params?.spouse
             ? UtilsRepository.getStringVersion(params?.spouse)
             : null,
@@ -231,5 +232,20 @@ export class UserRepository {
         ...data.User.properties,
       };
     }
+  }
+
+  public async getUsersWithStorageFileId(): Promise<User[]> {
+    const result = await this.query()
+      .raw(
+        `MATCH(User:User)
+    WHERE User.storageFolderId IS NOT NULL
+    RETURN COLLECT(User{.*, id: id(User)}) as Users`
+      )
+      .commit();
+
+    if (result[0]?.Users) {
+      return result[0]?.Users as User[];
+    }
+    return null;
   }
 }
