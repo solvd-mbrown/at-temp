@@ -1,6 +1,7 @@
+import { TreeRelationType } from "../tree.constants";
 
 export class JoinToTreeDto {
   userId: number;
-  relation: string;
+  relation: TreeRelationType;
   toUserId: number;
 }
