@@ -1,20 +1,22 @@
-import { Injectable } from "@nestjs/common";
-import { CreateTreeDto } from "./dto/create-tree.dto";
-import { UpdateTreeDto } from "./dto/update-tree.dto";
-import { JoinToTreeDto } from "./dto/join-to-tree.dto";
-import { TreeRepository } from "./tree.repository";
-import { Tree } from "./entities/tree.entity";
+import { Injectable } from '@nestjs/common';
+import { CreateTreeDto } from './dto/create-tree.dto';
+import { UpdateTreeDto } from './dto/update-tree.dto';
+import { JoinToTreeDto } from './dto/join-to-tree.dto';
+import { TreeRepository } from './tree.repository';
 
 @Injectable()
 export class TreeService {
-  constructor(private readonly treeRepository: TreeRepository) {}
-
-  async create(treeProperties: CreateTreeDto): Promise<Tree> {
+  constructor(
+    private readonly treeRepository: TreeRepository,
+  ) {}
+  
+  async create(treeProperties): Promise<any> {
     const result = await this.treeRepository.addNewTree(treeProperties);
     return result;
   }
 
   findAll() {
+
     return `This action returns all tree`;
   }
 
@@ -34,47 +36,29 @@ export class TreeService {
   }
 
   async getPartTreeByUserId(treeId: number, userId: number) {
-    const result = await this.treeRepository.getPartTreeByUserId(
-      treeId,
-      userId
-    );
+    const result = await this.treeRepository.getPartTreeByUserId(treeId, userId);
     return result;
   }
   async getTreeInPartsUserId(treeId: number, userId: string) {
-    const result = await this.treeRepository.getTreeInPartsUserId(
-      treeId,
-      userId
-    );
+    const result = await this.treeRepository.getTreeInPartsUserId(treeId, userId);
     return result;
   }
 
   async update(id: number, updateTreeDto: UpdateTreeDto) {
-    const result = await this.treeRepository.updateTreeEntity(
-      id,
-      updateTreeDto
-    );
+    const result = await this.treeRepository.updateTreeEntity(id, UpdateTreeDto);
     return result;
   }
 
-  async join(id: number, joinToTreeProperty: JoinToTreeDto) {
+  async join(id: number, joinToTreeProperty) {
     let result = null;
-    if (joinToTreeProperty.relation == "MARRIED") {
-      result = await this.treeRepository.joinToTreeMarried(
-        id,
-        joinToTreeProperty
-      );
+    if (joinToTreeProperty.relation == 'MARRIED') {
+      result = await this.treeRepository.joinToTreeMarried(id, joinToTreeProperty);
     }
-    if (joinToTreeProperty.relation == "DESCENDANT") {
-      result = await this.treeRepository.joinToTreeDescendant(
-        id,
-        joinToTreeProperty
-      );
+    if (joinToTreeProperty.relation == 'DESCENDANT'){
+      result = await this.treeRepository.joinToTreeDescendant(id, joinToTreeProperty);
     }
-    if (joinToTreeProperty.relation == "MARRIEDSUBTREE") {
-      result = await this.treeRepository.joinToTreeMarriedSubTree(
-        id,
-        joinToTreeProperty
-      );
+    if (joinToTreeProperty.relation == 'MARRIEDSUBTREE'){
+      result = await this.treeRepository.joinToTreeMarriedSubTree(id, joinToTreeProperty);
     }
     return result;
   }
@@ -88,4 +72,6 @@ export class TreeService {
     const result = await this.treeRepository.removeUserFromTree(id);
     return result;
   }
+
+
 }
