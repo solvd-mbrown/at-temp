@@ -19,7 +19,7 @@ export class UserRepository {
     return new cypher.RepositoryQuery(this.connection);
   }
 
-  async addNewUser(userData: any): Promise<User[]> {
+  async addNewUser(userData: any): Promise<User> {
     const result = await this.query()
       .createEntity<{ [key in keyof Partial<User>]: any }>("User", userData)
       .commitWithReturnEntity();
