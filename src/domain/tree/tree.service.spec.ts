@@ -413,7 +413,7 @@ describe("TreeService", () => {
       toUserId: mom1_father_father.id,
     });
 
-    const userToFetchId = mom1.id;
+    const userToFetchId = child1.id;
     const userToFetch: any = await userService.findOne(userToFetchId);
 
     const result = await treeService.getTreeInPartsUserId(
