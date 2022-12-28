@@ -1,5 +1,4 @@
 import { NodemailerService } from "./services/email/provider/nodemailer.service";
-import { EmailModule } from "./services/email/email.module";
 import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -52,19 +51,6 @@ import { EmailProvider } from "./services/email/email.interface";
       useFactory: (configService: ConfigService): DatabaseConfig =>
         createDatabaseConfiguration(configService),
     }),
-    //   FirebaseAdminModule.forRootAsync({
-    //     imports: [ConfigModule],
-    //     inject: [ConfigService],
-    //     useFactory: async (configService: ConfigService) => {
-    //       return {
-    //         credential: firebase.credential.cert({
-    //           projectId: configService.get('FIREBASE_PROJECT_ID'),
-    //           clientEmail: configService.get('FIREBASE_CLIENT_EMAIL'),
-    //           privateKey: configService.get('FIREBASE_PRIVATE_KEY'),
-    //         }),
-    //       };
-    //     },
-    //   }),
   ],
   controllers: [
     AppController,

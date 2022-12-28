@@ -1,0 +1,5 @@
+export enum TreeRelationType {
+  "MARRIED" = "MARRIED",
+  "DESCENDANT" = "DESCENDANT",
+  "MARRIEDSUBTREE" = "MARRIEDSUBTREE",
+}

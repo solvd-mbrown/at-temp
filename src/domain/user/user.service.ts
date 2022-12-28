@@ -1,18 +1,17 @@
 import { Injectable } from "@nestjs/common";
+import { FirebaseAuthStrategy } from "src/services/auth/firebase/firebase-auth.strategy";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { User } from "./entities/user.entity";
 import { UserRepository } from "./user.repository";
-import { FirebaseAuthStrategy } from "../../services/auth/firebase/firebase-auth.strategy";
-import { FileService } from "../file/file.service";
 
 @Injectable()
 export class UserService {
   constructor(
-    private readonly fileService: FileService,
     private readonly firebaseService: FirebaseAuthStrategy,
     private readonly userRepository: UserRepository
   ) {}
 
-  async create(usersProperties): Promise<any> {
+  async create(usersProperties): Promise<User> {
     const result = await this.userRepository.addNewUser(usersProperties);
     return result;
   }
@@ -21,17 +20,17 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<User> {
     const result = await this.userRepository.getUserEntity(id);
     return result;
   }
 
-  async findOneByEmail(email: string) {
+  async findOneByEmail(email: string): Promise<User> {
     const result = await this.userRepository.getUserFromEmail(email);
     return result;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const result = await this.userRepository.updateUserEntity(
       id,
       updateUserDto
