@@ -283,7 +283,7 @@ export class TreeRepository {
     };
   }
 
-  async getTreeInPartsUserId(treeId: number, userId: string): Promise<any> {
+  async getTreeInPartsUserIdNew(treeId: number, userId: string): Promise<any> {
     const userDataRaw = await this.query()
       .findEntityById("User", +userId)
       .commitWithReturnEntities();
@@ -480,7 +480,7 @@ export class TreeRepository {
   }
 
   // DONE
-  async getTreeInPartsUserIdOld(treeId: number, userId: string): Promise<any> {
+  async getTreeInPartsUserId(treeId: number, userId: string): Promise<any> {
     const { currentSubTree, parentId, result, spouseId } =
       await this.getDataFromTree(treeId, userId);
 
