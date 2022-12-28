@@ -58,6 +58,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "28.0.3",
+    "jest-jasmine2": "^29.3.1",
     "prettier": "^2.3.2",
     "source-map-support": "^0.5.20",
     "supertest": "^6.1.3",
@@ -79,9 +80,23 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.(t|j)s",
+      "!scripts/**/*.(t|j)s",
+      "!services/database/schemas/**/*.(t|j)s",
+      "!**/*exceptions.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "setupFiles": [
+      "dotenv/config"
+    ],
+    "reporters": [
+      "default"
+    ],
+    "testTimeout": 30000,
+    "moduleNameMapper": {
+      "^src/(.*)": "<rootDir>/$1"
+    },
+    "testRunner": "jest-jasmine2"
   }
 }
