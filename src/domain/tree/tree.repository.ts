@@ -561,6 +561,24 @@ export class TreeRepository {
   }
 
   async joinToTreeDescendant(id: number, treeProperties: any): Promise<any> {
+    // [v1]
+    // identify if being added to the bottom of the tree
+    // if bottom take action ->
+    // take tree and all other tree ids where myTreeIdByParent1 is different
+    // merge with curr child
+    const [{ Tree: treeGoingDown }] = await this.query()
+      .fetchUserByUserId(treeProperties.toUserId)
+      .raw(
+        `OPTIONAL MATCH(User)-[TreeUserRelations:TREE_MEMBER_USER]->(Tree:Tree)
+    WHERE id(Tree)=${id}`
+      )
+      .customReturn(`Tree`)
+      .commit();
+
+    if (treeGoingDown?.identity) {
+      var childId = treeProperties.userId;
+    }
+
     // create spouse personal tree
     // add child into spouse personal tree
     const spouses = await this.query()
@@ -731,6 +749,32 @@ export class TreeRepository {
       )
       .commitWithReturnEntity();
 
+    // [KT] add child to every tree
+    if (childId) {
+      const [vals] = await this.query()
+        .raw(
+          `MATCH(Tree:Tree)
+          WHERE id(Tree) = ${id} 
+          OPTIONAL MATCH(Tree)<-[:TREE_MEMBER_USER]-(User:User)
+          WHERE User.myTreeIdByParent1 <> "${id}"
+          
+          WITH COLLECT(DISTINCT toInteger(User.myTreeIdByParent1)) as treeIdsToAttach
+          RETURN treeIdsToAttach
+          `
+        )
+        .commit();
+
+      const { treeIdsToAttach } = vals;
+
+      if (treeIdsToAttach?.length > 0) {
+        await this.query()
+          .raw(
+            `OPTIONAL MATCH (Tree:Tree) WHERE id(Tree) IN [${treeIdsToAttach}] WITH Tree MATCH (User:User) WHERE id(User)=${childId} WITH User, Tree MERGE (Tree)<-[:TREE_MEMBER_USER]-(User) RETURN Tree, User`
+          )
+          .commit();
+      }
+    }
+
     if (result) {
       const output = result.data;
       return {
@@ -782,7 +826,10 @@ export class TreeRepository {
 
     // >>>Q1
     // if father(non-spouse) has sub-tree??
-    if (marriedToUser && marriedToUser.data.User.properties.subTreeTargetUser) {
+    if (
+      marriedToUser &&
+      marriedToUser?.data?.User?.properties.subTreeTargetUser
+    ) {
       const subTreeUser = await this.query()
         .fetchUserByUserId(marriedToUser.data.User.properties.subTreeTargetUser)
         .commitWithReturnEntity();
@@ -801,7 +848,7 @@ export class TreeRepository {
           .commitWithReturnEntity();
       }
 
-      if (subTreeUser && subTreeUser.data.User.properties.spouseTreeId) {
+      if (subTreeUser && subTreeUser?.data?.User?.properties.spouseTreeId) {
         await this.query()
           .createMemberAndMarriedRelations(
             treeProperties.userId,
@@ -829,7 +876,7 @@ export class TreeRepository {
       .resolveUsersChildrenByRelation(UtilsRepository.getStringVersion(id))
       .commitWithReturnEntities();
 
-    // all descendants of father recc-ly
+    // [KT] all descendants of father recc-ly
     const descendantsCurrentParent = await this.query()
       .fetchUserByUserId(+treeProperties.toUserId)
       .resolveUsersChildrenByRelationUtilEnd(
