@@ -782,7 +782,10 @@ export class TreeRepository {
 
     // >>>Q1
     // if father(non-spouse) has sub-tree??
-    if (marriedToUser && marriedToUser.data.User.properties.subTreeTargetUser) {
+    if (
+      marriedToUser &&
+      marriedToUser?.data?.User?.properties.subTreeTargetUser
+    ) {
       const subTreeUser = await this.query()
         .fetchUserByUserId(marriedToUser.data.User.properties.subTreeTargetUser)
         .commitWithReturnEntity();
@@ -801,7 +804,7 @@ export class TreeRepository {
           .commitWithReturnEntity();
       }
 
-      if (subTreeUser && subTreeUser.data.User.properties.spouseTreeId) {
+      if (subTreeUser && subTreeUser?.data?.User?.properties.spouseTreeId) {
         await this.query()
           .createMemberAndMarriedRelations(
             treeProperties.userId,
@@ -829,7 +832,7 @@ export class TreeRepository {
       .resolveUsersChildrenByRelation(UtilsRepository.getStringVersion(id))
       .commitWithReturnEntities();
 
-    // all descendants of father recc-ly
+    // [KT] all descendants of father recc-ly
     const descendantsCurrentParent = await this.query()
       .fetchUserByUserId(+treeProperties.toUserId)
       .resolveUsersChildrenByRelationUtilEnd(
