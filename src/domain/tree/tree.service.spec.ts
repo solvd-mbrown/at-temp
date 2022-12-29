@@ -276,18 +276,6 @@ describe("TreeService", () => {
       userId: child1.id,
     });
 
-    // add married to main tree
-    // {
-    // "userId": new married user,
-    // "toUserId": user in main tree,
-    // "relation": "MARRIED"
-    // }
-    await treeService.join(tree_child1.id, {
-      userId: mom1.id,
-      toUserId: father1.id,
-      relation: TreeRelationType.MARRIED,
-    });
-
     // ---GRAND - PARENTS
     // const father1_father = await userService.create(userFactory("f1_f"));
     // const father1_mom = await userService.create(userFactory("f1_m"));
@@ -347,6 +335,14 @@ describe("TreeService", () => {
       toUserId: child1.id,
       relation: TreeRelationType.DESCENDANT,
     });
+
+    // ---ADD MOM AS SPOUSE
+    await treeService.join(tree_child1.id, {
+      userId: mom1.id,
+      toUserId: father1.id,
+      relation: TreeRelationType.MARRIED,
+    });
+
     await treeService.join(tree_child1.id, {
       userId: child1_child2.id,
       toUserId: child1.id,
@@ -392,7 +388,7 @@ describe("TreeService", () => {
       relation: TreeRelationType.MARRIED,
     });
 
-    const userToFetchId = mom1_mom.id;
+    const userToFetchId = mom1.id;
     const userToFetch: any = await userService.findOne(userToFetchId);
 
     const result = await treeService.getTreeInPartsUserId(
