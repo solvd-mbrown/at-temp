@@ -1546,7 +1546,7 @@ export class RepositoryQuery {
       WHERE id(${entity}List) IN [${ids}]
     `);
     if (includeWith) {
-      if (customWith.length) {
+      if (customWith?.length) {
         this.query.raw(`WITH ${customWith.join(", ")}`);
       } else {
         this.query.with([...this.dependencies.values()].join(","));
@@ -1577,7 +1577,7 @@ export class RepositoryQuery {
         params.map((p, idx) => {
           const searchQuery = `${childEntity}.${p} CONTAINS(${query})`;
 
-          if (idx == params.length - 1) {
+          if (idx == params?.length - 1) {
             return {
               query: searchQuery,
             };
@@ -1781,7 +1781,7 @@ export class RepositoryQuery {
   }
 
   public updateEntity(childEntity: string, properties = {}): RepositoryQuery {
-    if (Object.keys(properties).length) {
+    if (Object.keys(properties)?.length) {
       this.query
         .setValues(properties)
         .setVariables(addUpdateDateToProperties(childEntity));
@@ -1795,7 +1795,7 @@ export class RepositoryQuery {
     childEntity: string,
     properties = {}
   ): RepositoryQuery {
-    if (Object.keys(properties).length) {
+    if (Object.keys(properties)?.length) {
       this.query
         .setValues(properties)
         .setVariables(addUpdateDateToProperties(`${childEntity}List`))
@@ -2128,7 +2128,7 @@ export const buildSubTree = (
   // @ts-ignore
   let subTreeRel = this.getMarriedSubTreeRelByTreeId(data.rList, treeId);
   let tree = null;
-  if (currentSubTree.length && spouseId) {
+  if (currentSubTree?.length && spouseId) {
     // @ts-ignore
     let subTreeRootUser = this.getSubTreeRootUser(
       data.nList,
@@ -2291,7 +2291,7 @@ export const getSubTreeRootUser = (
 
   // }
 
-  if (subTreeRel && subTreeRel.length && currentSubTree.length) {
+  if (subTreeRel && subTreeRel?.length && currentSubTree?.length) {
     subTreeRel = subTreeRel.filter((e) =>
       currentSubTree.find((a) => e.start == a.identity)
     );
@@ -2324,7 +2324,7 @@ export const getRootUser = (
   subTreeRel?,
   treeId?
 ) => {
-  if (subTreeRel && subTreeRel.length) {
+  if (subTreeRel && subTreeRel?.length) {
     const resultWithoutDescendantRels = members.filter(
       (e) => !descendantRels.find((a) => e.identity == a.start)
     );
@@ -2362,12 +2362,12 @@ export const getRootUser = (
 };
 
 export const getEnterPointToSubTree = (subTreeRel) => {
-  if (subTreeRel.length) {
+  if (subTreeRel?.length) {
     const result = subTreeRel.filter(
       (e) => !subTreeRel.find((a) => e.start == a.end)
     );
     let enterPoint = null;
-    if (result.length) {
+    if (result?.length) {
       enterPoint = result[0].start;
     }
     return enterPoint;
@@ -2429,7 +2429,7 @@ export const buildTreeFromRelations = (
       });
 
       let married = null;
-      if (marRel.length) {
+      if (marRel?.length) {
         married = members.filter((obj) => {
           let member = marRel[0];
           return obj.identity == member.start;
@@ -2461,7 +2461,7 @@ export const buildTreeFromRelations = (
         });
       }
 
-      if (resultItem.length > 1) {
+      if (resultItem?.length > 1) {
         resultItem = resultItem.filter((obj) => {
           return obj.hasOwnProperty("descendant");
         });
@@ -2537,7 +2537,7 @@ export const buildRootPartTreeFromRelations = (
       }
 
       let married = null;
-      if (marRel.length) {
+      if (marRel?.length) {
         married = members.filter((obj) => {
           let member = marRel[0];
           return obj.identity == member.start;
@@ -2553,7 +2553,7 @@ export const buildRootPartTreeFromRelations = (
         });
       }
 
-      if (resultItem.length > 1) {
+      if (resultItem?.length > 1) {
         resultItem = resultItem.filter((obj) => {
           return obj.hasOwnProperty("descendant");
         });
