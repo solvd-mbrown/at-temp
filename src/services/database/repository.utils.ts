@@ -2174,6 +2174,7 @@ export const getDescendantRelByTreeId = (data: any, treeId: string) => {
   for (let rel of data) {
     for (let item of rel) {
       if (item.label === `USER_DESCENDANT_USER_TREE_${treeId}`) {
+      // if (item.label.includes(`USER_DESCENDANT_USER_TREE`)) {
         result.push(item);
       }
     }

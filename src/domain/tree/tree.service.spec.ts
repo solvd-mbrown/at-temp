@@ -276,43 +276,27 @@ describe("TreeService", () => {
       userId: child1.id,
     });
 
-    // ---GRAND - PARENTS
-    // const father1_father = await userService.create(userFactory("f1_f"));
-    // const father1_mom = await userService.create(userFactory("f1_m"));
+    await treeService.join(tree_child1.id, {
+      userId: mom1.id,
+      toUserId: father1.id,
+      relation: TreeRelationType.MARRIED,
+    });
 
-    // await treeService.join(tree_child1.id, {
-    //   relation: TreeRelationType.DESCENDANT,
-    //   toUserId: father1_father.id,
-    //   userId: father1.id,
-    // });
+    // ----SUBTREE -> will create new treeId
+    const mom1_father = await userService.create(userFactory("m1_f"));
+    const mom1_mom = await userService.create(userFactory("m1_m"));
 
-    // // add married to main tree
-    // // {
-    // // "userId": new married user,
-    // // "toUserId": user in main tree,
-    // // "relation": "MARRIED"
-    // // }
-    // await treeService.join(tree_child1.id, {
-    //   userId: father1_mom.id,
-    //   toUserId: father1_father.id,
-    //   relation: TreeRelationType.MARRIED,
-    // });
+    await treeService.join(tree_child1.id, {
+      relation: TreeRelationType.MARRIEDSUBTREE,
+      userId: mom1.id,
+      toUserId: mom1_father.id,
+    });
 
-    // --------MOM - SISTER REL IN SUBTREE
-    // const mom1_sister = await userService.create(userFactory("m1_sis"));
-    // // add to sub tree in bottom
-    // // {
-    // // "userId": new user,
-    // // "toUserId": user in main tree,
-    // // "relation": "MARRIEDSUBTREE"
-    // // }
-    // // ---------
-    // // >> WILL BE ERROR HERE
-    // await treeService.join(tree_child1.id, {
-    //   relation: TreeRelationType.MARRIEDSUBTREE,
-    //   userId: mom1_sister.id,
-    //   toUserId: mom1_father.id,
-    // });
+    await treeService.join(tree_child1.id, {
+      userId: mom1_mom.id,
+      toUserId: mom1_father.id,
+      relation: TreeRelationType.MARRIED,
+    });
 
     const child1_child = await userService.create(userFactory("c1_c"));
     const child1_child2 = await userService.create(userFactory("c1_c2"));
@@ -334,13 +318,6 @@ describe("TreeService", () => {
       userId: child1_child.id,
       toUserId: child1.id,
       relation: TreeRelationType.DESCENDANT,
-    });
-
-    // ---ADD MOM AS SPOUSE
-    await treeService.join(tree_child1.id, {
-      userId: mom1.id,
-      toUserId: father1.id,
-      relation: TreeRelationType.MARRIED,
     });
 
     await treeService.join(tree_child1.id, {
@@ -367,28 +344,7 @@ describe("TreeService", () => {
       relation: TreeRelationType.MARRIED,
     });
 
-    // ----SUBTREE -> will create new treeId
-    const mom1_father = await userService.create(userFactory("m1_f"));
-    const mom1_mom = await userService.create(userFactory("m1_m"));
-    //  add to sub tree in top
-    // {
-    // "userId": root user in main tree,
-    // "toUserId": new user,
-    // "relation": "MARRIEDSUBTREE"
-    // }
-    await treeService.join(tree_child1.id, {
-      relation: TreeRelationType.MARRIEDSUBTREE,
-      userId: mom1.id,
-      toUserId: mom1_father.id,
-    });
-
-    await treeService.join(tree_child1.id, {
-      userId: mom1_mom.id,
-      toUserId: mom1_father.id,
-      relation: TreeRelationType.MARRIED,
-    });
-
-    const userToFetchId = mom1.id;
+    const userToFetchId = mom1_mom.id;
     const userToFetch: any = await userService.findOne(userToFetchId);
 
     const result = await treeService.getTreeInPartsUserId(
@@ -403,8 +359,6 @@ describe("TreeService", () => {
     const child1Params = userFactory("c1");
     const child2Params = userFactory("c2");
     const child1 = await userService.create(child1Params);
-    const child2 = await userService.create(child2Params);
-    const child2_spouse = await userService.create(userFactory("c2_sp"));
     expect(child1.email).toBe(child1Params.email);
 
     const tree_child1 = await treeService.create({
@@ -427,19 +381,6 @@ describe("TreeService", () => {
       relation: TreeRelationType.DESCENDANT,
       toUserId: father1.id,
       userId: child1.id,
-    });
-
-    // ---CHILD 2
-    await treeService.join(tree_child1.id, {
-      relation: TreeRelationType.DESCENDANT,
-      toUserId: father1.id,
-      userId: child2.id,
-    });
-    // ---CHILD -- SPOUSE
-    await treeService.join(tree_child1.id, {
-      userId: child2_spouse.id,
-      toUserId: child2.id,
-      relation: TreeRelationType.MARRIED,
     });
 
     // Does mom have DESCENDANT? -> nope
@@ -564,7 +505,53 @@ describe("TreeService", () => {
       toUserId: mom1_father_father.id,
     });
 
-    const userToFetchId = child1.id;
+    const child1_child = await userService.create(userFactory("c1_c"));
+    const child1_child2 = await userService.create(userFactory("c1_c2"));
+    const child1_child_spouse = await userService.create(
+      userFactory("c1_c_sp")
+    );
+    const child1_child_child = await userService.create(userFactory("c1_c_c"));
+    const child1_child_child_spouse = await userService.create(
+      userFactory("c1_c_c_sp")
+    );
+
+    //  add to tree in bottom
+    // {
+    // "userId": new user,
+    // "toUserId": user in main tree,
+    // "relation": "DESCENDANT"
+    // }
+    await treeService.join(tree_child1.id, {
+      userId: child1_child.id,
+      toUserId: child1.id,
+      relation: TreeRelationType.DESCENDANT,
+    });
+
+    await treeService.join(tree_child1.id, {
+      userId: child1_child2.id,
+      toUserId: child1.id,
+      relation: TreeRelationType.DESCENDANT,
+    });
+
+    await treeService.join(tree_child1.id, {
+      userId: child1_child_child.id,
+      toUserId: child1_child.id,
+      relation: TreeRelationType.DESCENDANT,
+    });
+
+    await treeService.join(tree_child1.id, {
+      userId: child1_child_spouse.id,
+      toUserId: child1_child.id,
+      relation: TreeRelationType.MARRIED,
+    });
+
+    await treeService.join(tree_child1.id, {
+      userId: child1_child_child_spouse.id,
+      toUserId: child1_child_child.id,
+      relation: TreeRelationType.MARRIED,
+    });
+
+    const userToFetchId = mom1_mom.id;
     const userToFetch: any = await userService.findOne(userToFetchId);
 
     const result = await treeService.getTreeInPartsUserId(
