@@ -60,7 +60,7 @@ export class UserRepository {
       )
       .commitWithReturnEntities();
     let parents = [];
-    if (parent && parent.length && parent[0].data.UserP) {
+    if (parent && parent?.length && parent[0].data.UserP) {
       parents.push(parent[0].data.UserP);
       if (parent[0].data.UserM) {
         parents.push(parent[0].data.UserM);
@@ -74,12 +74,12 @@ export class UserRepository {
       )
       .commitWithReturnEntities();
     let spouse = [];
-    if (spouses && spouses.length && spouses[0].data.UserS) {
+    if (spouses && spouses?.length && spouses[0].data.UserS) {
       spouse.push(spouses[0].data.UserS);
     }
 
     let siblings = [];
-    if (parent && parent.length && parent[0].data.UserP) {
+    if (parent && parent?.length && parent[0].data.UserP) {
       const siblingsArr = await this.query()
         .fetchUserByUserId(parent[0].data.UserP.identity)
         .resolveUsersChildrenByRelation(
@@ -87,7 +87,7 @@ export class UserRepository {
         )
         .commitWithReturnEntities();
 
-      if (siblingsArr && siblingsArr.length && siblingsArr[0].data.UserKList) {
+      if (siblingsArr && siblingsArr?.length && siblingsArr[0].data.UserKList) {
         let famalyLine = siblingsArr[0].data.UserKList;
         if (famalyLine.length > 1) {
           famalyLine = famalyLine.filter((object) => {

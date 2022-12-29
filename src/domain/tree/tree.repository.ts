@@ -144,7 +144,7 @@ export class TreeRepository {
       .resolveUsersSpouseByRelationByTreeId(treeId.toString())
       .commitWithReturnEntities();
     let spouseId = null;
-    if (spouses && spouses.length && spouses[0].data.UserS) {
+    if (spouses && spouses?.length && spouses[0].data.UserS) {
       spouseId = spouses[0].data.UserS.identity;
     }
 
@@ -171,7 +171,7 @@ export class TreeRepository {
       .commitWithReturnEntities();
 
     let parentId = null;
-    if (parent && parent.length && parent[0].data.UserP) {
+    if (parent && parent?.length && parent[0].data.UserP) {
       parentId = parent[0].data.UserP.identity;
     }
 
@@ -188,7 +188,7 @@ export class TreeRepository {
       .resolveUsersSpouseByRelationByTreeId(treeId.toString())
       .commitWithReturnEntities();
     let spouseId = null;
-    if (spouses && spouses.length && spouses[0].data.UserS) {
+    if (spouses && spouses?.length && spouses[0].data.UserS) {
       spouseId = spouses[0].data.UserS.identity;
     }
 
@@ -250,7 +250,7 @@ export class TreeRepository {
       .resolveUsersParentsByRelation(topTreeId.toString())
       .commitWithReturnEntities();
 
-    if (parent && parent.length && parent[0].data.UserP) {
+    if (parent && parent?.length && parent[0].data.UserP) {
       topParentId = parent[0].data.UserP.identity;
     }
 
@@ -263,7 +263,7 @@ export class TreeRepository {
       .resolveUsersSpouseByRelationByTreeId(topTreeId.toString())
       .commitWithReturnEntities();
 
-    if (spouses && spouses.length && spouses[0].data.UserS) {
+    if (spouses && spouses?.length && spouses[0].data.UserS) {
       topSpouseId = spouses[0].data.UserS.identity;
     }
 
@@ -568,7 +568,7 @@ export class TreeRepository {
       .resolveUsersSpouseByRelationByTreeId(id.toString())
       .commitWithReturnEntities();
     let spouseId = null;
-    if (spouses && spouses.length && spouses[0].data.UserS) {
+    if (spouses && spouses?.length && spouses[0].data.UserS) {
       spouseId = spouses[0].data.UserS.identity;
     }
 
@@ -579,9 +579,9 @@ export class TreeRepository {
       spouseId
     );
 
-    // if arrayOfSpouses.length
+    // if arrayOfspouses?.length
     // adding child to each spouse's personal tree -> grand // grand-grandmom // ect...
-    if (arrayOfSpouses.length) {
+    if (arrayOfSpouses?.length) {
       for (let item of arrayOfSpouses) {
         await this.joinUserToTreeDescendantParent2(
           treeProperties.userId,
@@ -638,8 +638,8 @@ export class TreeRepository {
         );
 
         // js error -> separated
-        if (childrenCurrentParent.length && spouseTree["id"]) {
-          if (kidsCurrent.length == 1) {
+        if (childrenCurrentParent?.length && spouseTree["id"]) {
+          if (kidsCurrent?.length == 1) {
             await this.joinUserToTreeDescendantParent2(
               +kidsCurrent[0].identity,
               +spouseId,
@@ -647,7 +647,7 @@ export class TreeRepository {
             );
           }
 
-          if (kidsCurrent.length > 1) {
+          if (kidsCurrent?.length > 1) {
             for (let item of kidsCurrent) {
               await this.joinUserToTreeDescendantParent2(
                 +item.identity,
@@ -679,7 +679,7 @@ export class TreeRepository {
             .commitWithReturnEntity();
           await this.updateUserParamSpouseTreeId(spouseId, id);
         }
-        if (kidsCurrent && kidsCurrent.length) {
+        if (kidsCurrent && kidsCurrent?.length) {
           userInMarriedTree = await this.query()
             .fetchUserInTree(
               +kidsCurrent[0].identity,
@@ -688,7 +688,7 @@ export class TreeRepository {
             .commitWithReturnEntity();
         }
         // add existed in fathers`s tree kid in mather`s tree
-        if (!userInMarriedTree && kidsCurrent.length) {
+        if (!userInMarriedTree && kidsCurrent?.length) {
           await this.joinUserToTreeDescendantParent2(
             +kidsCurrent[0].identity,
             +spouseId,
@@ -852,12 +852,12 @@ export class TreeRepository {
     // add every single kid till the tree end
     // recc in neo4j
     if (
-      childrenCurrentParent.length &&
-      !childrenMarriedParent.length &&
+      childrenCurrentParent?.length &&
+      !childrenMarriedParent?.length &&
       marriedUser.data.User.properties.myTreeIdByParent1
     ) {
       kidsCurrent = childrenCurrentParent[0].data.UserKList;
-      if (kidsCurrent.length == 1) {
+      if (kidsCurrent?.length == 1) {
         await this.joinUserToTreeDescendantParent2(
           +kidsCurrent[0].identity,
           +treeProperties.userId,
@@ -865,7 +865,7 @@ export class TreeRepository {
         );
       }
 
-      if (kidsCurrent.length > 1) {
+      if (kidsCurrent?.length > 1) {
         for (let item of kidsCurrent) {
           await this.joinUserToTreeDescendantParent2(
             +item.identity,
@@ -876,17 +876,17 @@ export class TreeRepository {
       }
     }
 
-    if (childrenMarriedParent.length && !childrenCurrentParent.length) {
+    if (childrenMarriedParent?.length && !childrenCurrentParent?.length) {
       kidsMarried = childrenMarriedParent[0].data.UserKList;
 
-      if (kidsMarried.length == 1) {
+      if (kidsMarried?.length == 1) {
         await this.joinUserToTreeDescendantParent2(
           +kidsMarried[0].identity,
           treeProperties.toUserId,
           id
         );
 
-        if (kidsMarried.length > 1) {
+        if (kidsMarried?.length > 1) {
           for (let item of kidsCurrent) {
             await this.joinUserToTreeDescendantParent2(
               +item.identity,
@@ -898,7 +898,7 @@ export class TreeRepository {
       }
     }
 
-    if (childrenMarriedParent.length && childrenCurrentParent.length) {
+    if (childrenMarriedParent?.length && childrenCurrentParent?.length) {
       kidsMarried = childrenMarriedParent[0].data.UserKList;
       kidsCurrent = childrenCurrentParent[0].data.UserKList;
       const diffKidsForP = kidsMarried.filter(
@@ -980,7 +980,7 @@ export class TreeRepository {
         .commitWithReturnEntities();
 
       let spouseId = null;
-      if (spouses && spouses.length && spouses[0].data.UserS) {
+      if (spouses && spouses?.length && spouses[0].data.UserS) {
         spouseId = spouses[0].data.UserS.identity;
       }
 
@@ -1000,9 +1000,9 @@ export class TreeRepository {
 
         let kidsCurrent;
 
-        if (childrenCurrentParent.length) {
+        if (childrenCurrentParent?.length) {
           kidsCurrent = childrenCurrentParent[0].data.UserKList;
-          if (kidsCurrent.length == 1) {
+          if (kidsCurrent?.length == 1) {
             await this.joinUserToTreeDescendantParent2(
               +kidsCurrent[0].identity,
               +treeProperties.userId,
@@ -1010,7 +1010,7 @@ export class TreeRepository {
             );
           }
 
-          if (kidsCurrent.length > 1) {
+          if (kidsCurrent?.length > 1) {
             for (let item of kidsCurrent) {
               await this.joinUserToTreeDescendantParent2(
                 +item.identity,
@@ -1280,7 +1280,7 @@ export class TreeRepository {
 
     let spouse = null;
 
-    if (parent && parent.length && parent[0].data.UserP) {
+    if (parent && parent?.length && parent[0].data.UserP) {
       spouse = await this.query()
         .fetchUserByUserId(parent[0].data.UserP.identity)
         .resolveUsersSpouseByRelationByTreeId(treeId.toString())
@@ -1292,7 +1292,7 @@ export class TreeRepository {
     }
 
     // base case
-    if (parent && parent.length && parent[0].data.UserP) {
+    if (parent && parent?.length && parent[0].data.UserP) {
       await this.getRecursiveSpouses(parent[0].data.UserP.identity, treeId);
     } else {
       return result;
