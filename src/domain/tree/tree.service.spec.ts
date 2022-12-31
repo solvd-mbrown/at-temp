@@ -551,7 +551,7 @@ describe("TreeService", () => {
       relation: TreeRelationType.MARRIED,
     });
 
-    const userToFetchId = mom1_mom.id;
+    const userToFetchId = mom1.id;
     const userToFetch: any = await userService.findOne(userToFetchId);
 
     const result = await treeService.getTreeInPartsUserId(
