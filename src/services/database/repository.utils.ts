@@ -1287,6 +1287,18 @@ export class RepositoryQuery {
     return this;
   };
 
+  public resolveHusbandTreeUntillEnd = (treeId: string): RepositoryQuery => {
+    this.query.raw(`
+      OPTIONAL MATCH path=(User)-[:USER_DESCENDANT_USER_TREE_${treeId}*]->(RootParent:User)
+      WITH *
+      ORDER BY LENGTH(path) DESC
+      LIMIT 1
+      RETURN RootParent
+    `);
+    this.returns.push("RootParent");
+    return this;
+  };
+
   public resolveUsersSpouseByRelation = (): RepositoryQuery => {
     this.query.raw(`
       OPTIONAL MATCH (User)-[:USER_MARRIED_USER]-(UserS)

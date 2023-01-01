@@ -499,7 +499,9 @@ describe("TreeService", () => {
       toUserId: mom1_father.id,
     });
 
-    await treeService.join(tree_child1.id, {
+    const mom1_fetched: any = await userService.findOne(mom1.id);
+
+    await treeService.join(mom1_fetched.myTreeIdByParent1, {
       userId: mom1_mom.id,
       toUserId: mom1_father.id,
       relation: TreeRelationType.MARRIED,
@@ -551,7 +553,8 @@ describe("TreeService", () => {
       relation: TreeRelationType.MARRIED,
     });
 
-    const userToFetchId = mom1.id;
+    const userToFetchId = child1_child.id;
+    // const userToFetchId = mom1_father.id;
     const userToFetch: any = await userService.findOne(userToFetchId);
 
     const result = await treeService.getTreeInPartsUserId(
@@ -560,7 +563,9 @@ describe("TreeService", () => {
     );
 
     // TODOS:
-    // m1 no husband(f1)
+    // m1 no husband(f1) --> DONE
+
+    // fix married rel -> make sure that spouse tree gets all children
 
     // check if i pass in correct treeId into query that gets all rels and nodes
     // check if the spouse's tree get all the correct rels -> we add kids before/after
