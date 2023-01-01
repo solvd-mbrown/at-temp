@@ -306,6 +306,8 @@ export class TreeRepository {
       .fetchAllByEntityId(topTreeId, "Tree")
       .commitWithReturnEntity();
 
+    const resForBottomTree = await this.getOverwriteTreeForSpouse(bottomTreeId);
+
     const spouses = await this.query()
       .fetchUserByUserId(+topParentId)
       .resolveUsersSpouseByRelationByTreeId(topTreeId.toString())
@@ -321,6 +323,7 @@ export class TreeRepository {
 
     return {
       result,
+      resForBottomTree,
       currentSubTree,
       topParentId,
       topSpouseId,
@@ -470,6 +473,7 @@ export class TreeRepository {
       case HusbandTreeUserType.SPOUSE_WITH_SUBTREE:
         var {
           result,
+          resForBottomTree,
           currentSubTree,
           topParentId,
           topSpouseId,
@@ -494,7 +498,7 @@ export class TreeRepository {
 
           const [[bottomPartTreeInit]] =
             await cypher.buildPartTreeWithoutSubTreeRel(
-              data,
+              resForBottomTree.data,
               bottomParentId,
               bottomTreeId.toString()
             );

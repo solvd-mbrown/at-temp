@@ -507,6 +507,25 @@ describe("TreeService", () => {
       relation: TreeRelationType.MARRIED,
     });
 
+    // ----SUBTREE of SUBTREE
+    const mom1_mom_father = await userService.create(userFactory("m1_m_f"));
+    const mom1_mom_mom = await userService.create(userFactory("m1_m_m"));
+    const mom1_father_fetched: any = await userService.findOne(mom1_father.id);
+
+    await treeService.join(mom1_father_fetched.myTreeIdByParent1, {
+      relation: TreeRelationType.MARRIEDSUBTREE,
+      userId: mom1_mom.id,
+      toUserId: mom1_mom_father.id,
+    });
+
+    const mom1_mom_fetched: any = await userService.findOne(mom1_mom.id);
+
+    await treeService.join(mom1_mom_fetched.myTreeIdByParent1, {
+      userId: mom1_mom_mom.id,
+      toUserId: mom1_mom_father.id,
+      relation: TreeRelationType.MARRIED,
+    });
+
     const child1_child = await userService.create(userFactory("c1_c"));
     const child1_child2 = await userService.create(userFactory("c1_c2"));
     const child1_child_spouse = await userService.create(
@@ -553,8 +572,8 @@ describe("TreeService", () => {
       relation: TreeRelationType.MARRIED,
     });
 
-    const userToFetchId = child1_child.id;
-    // const userToFetchId = mom1_father.id;
+    // const userToFetchId = child1_child.id;
+    const userToFetchId = mom1_father.id;
     const userToFetch: any = await userService.findOne(userToFetchId);
 
     const result = await treeService.getTreeInPartsUserId(
@@ -563,13 +582,8 @@ describe("TreeService", () => {
     );
 
     // TODOS:
-    // m1 no husband(f1) --> DONE
-
-    // fix married rel -> make sure that spouse tree gets all children
-
-    // check if i pass in correct treeId into query that gets all rels and nodes
-    // check if the spouse's tree get all the correct rels -> we add kids before/after
-    // what if we add someone on top of her?
+    // nested subtrees -> mom of mom has subtree
+    // does not work for spouse w/ subtree
 
     expect(result).toBeTruthy();
   }, 999999999);
