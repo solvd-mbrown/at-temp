@@ -1410,7 +1410,7 @@ export class TreeRepository {
 
     // remove current wife -> need to add only to all wifes above
     if (spouseId) {
-      result.filter((object) => {
+      result?.filter((object) => {
         console.log("object>>>>>>>>>>>>>", object);
         return object.identity !== spouseId;
       });
@@ -1418,7 +1418,7 @@ export class TreeRepository {
 
     console.log("result", result);
     // to each wife's personal tree add child -> userId
-    return result;
+    return result || [];
   }
 
   async getRecursiveSpouses(userId: number, treeId: string): Promise<any> {

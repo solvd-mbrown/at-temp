@@ -471,12 +471,6 @@ describe("TreeService", () => {
     const mom1 = await userService.create(userFactory("m1"));
 
     // ---PARENTS
-    // add to tree in top
-    // {
-    // "relation": "DESCENDANT"
-    // "toUserId": new user,
-    // "userId": root user in main tree,
-    // }
     await treeService.join(tree_child1.id, {
       relation: TreeRelationType.DESCENDANT,
       toUserId: father1.id,
@@ -526,6 +520,49 @@ describe("TreeService", () => {
       relation: TreeRelationType.MARRIED,
     });
 
+    // ---SUBTREE -> HUSBAND BRANCH
+    const mom1_father_father = await userService.create(userFactory("m1_f_f"));
+    const mom1_father_mom = await userService.create(userFactory("m1_f_m"));
+    await treeService.join(mom1_father_fetched.myTreeIdByParent1, {
+      relation: TreeRelationType.DESCENDANT,
+      toUserId: mom1_father_father.id,
+      userId: mom1_father.id,
+    });
+
+    await treeService.join(mom1_father_fetched.myTreeIdByParent1, {
+      userId: mom1_father_mom.id,
+      toUserId: mom1_father_father.id,
+      relation: TreeRelationType.MARRIED,
+    });
+
+    // ----SUBTREE of SUBTREE in HUSBAND BRANCH
+    const mom1_father_mom_father = await userService.create(
+      userFactory("m1_f_m_f")
+    );
+    const mom1_father_mom_mom = await userService.create(
+      userFactory("m1_f_m_m")
+    );
+    const mom1_father_father_fetched: any = await userService.findOne(
+      mom1_father_father.id
+    );
+
+    await treeService.join(mom1_father_father_fetched.myTreeIdByParent1, {
+      relation: TreeRelationType.MARRIEDSUBTREE,
+      userId: mom1_father_mom.id,
+      toUserId: mom1_father_mom_father.id,
+    });
+
+    const mom1_father_mom_fetched: any = await userService.findOne(
+      mom1_father_mom.id
+    );
+
+    await treeService.join(mom1_father_mom_fetched.myTreeIdByParent1, {
+      userId: mom1_father_mom_mom.id,
+      toUserId: mom1_father_mom_father.id,
+      relation: TreeRelationType.MARRIED,
+    });
+
+    // ----CHILDREN OF CHILDREN
     const child1_child = await userService.create(userFactory("c1_c"));
     const child1_child2 = await userService.create(userFactory("c1_c2"));
     const child1_child_spouse = await userService.create(
@@ -573,7 +610,7 @@ describe("TreeService", () => {
     });
 
     // const userToFetchId = child1_child.id;
-    const userToFetchId = mom1_father.id;
+    const userToFetchId = mom1.id;
     const userToFetch: any = await userService.findOne(userToFetchId);
 
     const result = await treeService.getTreeInPartsUserId(
@@ -581,10 +618,13 @@ describe("TreeService", () => {
       userToFetchId.toString()
     );
 
-    // TODOS:
-    // nested subtrees -> mom of mom has subtree
-    // does not work for spouse w/ subtree
-
     expect(result).toBeTruthy();
   }, 999999999);
 });
+
+// errors
+// ----- 1. mom1_father
+// spouseId=m1_mom (empty m1_f tree up)
+// ---with non-empty m1_f tree up
+// spouseId = m1_f_m -> look for subtree in parents?
+// what is the correct behaviour?
