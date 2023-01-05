@@ -113,7 +113,7 @@ describe("TreeService", () => {
       userId: child2.id,
     });
 
-    const userToFetchId = mom1.id;
+    const userToFetchId = father1_father.id;
     const userToFetch: any = await userService.findOne(userToFetchId);
 
     const result = await treeService.getTreeInPartsUserId(
@@ -248,6 +248,26 @@ describe("TreeService", () => {
     //   toUserId: child1_child_child.id,
     //   relation: TreeRelationType.MARRIED,
     // });
+  }, 999999999);
+
+  it("should work for single user", async () => {
+    const child1Params = userFactory("c1");
+    const child1 = await userService.create(child1Params);
+    expect(child1.email).toBe(child1Params.email);
+
+    const tree_child1 = await treeService.create({
+      name: child1.firstName,
+      userId: child1.id,
+    });
+
+    expect(tree_child1).toBeDefined();
+
+    const tree_result = await treeService.getTreeInPartsUserId(
+      tree_child1.id,
+      child1.id.toString()
+    );
+
+    expect(tree_result).toBeTruthy();
   }, 999999999);
 });
 

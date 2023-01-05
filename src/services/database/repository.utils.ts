@@ -2437,24 +2437,24 @@ export const buildTreeFromRelations = (
     const result = [];
     for (let i = 0; i < subItems.length; i++) {
       let subItem = subItems[i];
-      let resultItem = members.filter((obj) => {
+      let resultItem = members?.filter((obj) => {
         return obj.identity == subItem.start;
       });
 
       let descendants = findNodes(subItem.start, items, members);
-      let marRel = marriedRel.filter((obj) => {
+      let marRel = marriedRel?.filter((obj) => {
         return obj.end == subItem.start || obj.start == subItem.start;
       });
 
       let married = null;
       if (marRel?.length) {
-        married = members.filter((obj) => {
+        married = members?.filter((obj) => {
           let member = marRel[0];
           return (
-            (obj.identity == member.start &&
-              obj.identity != resultItem[0].identity) ||
-            (obj.identity == member.end &&
-              obj.identity != resultItem[0].identity)
+            (obj?.identity == member?.start &&
+              obj?.identity != resultItem[0]?.identity) ||
+            (obj?.identity == member?.end &&
+              obj?.identity != resultItem[0]?.identity)
           );
         });
       }
@@ -2496,6 +2496,7 @@ export const buildTreeFromRelations = (
   let treeResult = findNodes("ROOT", descendantRels, members);
 
   treeResult[0][0].levelCount = levelCount;
+
   if (EnterPointToSubTree) {
     treeResult[0][0].enterPointToSubTree = EnterPointToSubTree;
   }
@@ -2548,13 +2549,13 @@ export const buildRootPartTreeFromRelations = (
         return obj.identity == subItem.start;
       });
 
-      let descendants = findNodes(subItem.start, items, members);
+      let descendants = findNodes(subItem?.start, items, members);
       let marRel = marriedRel.filter((obj) => {
         return obj.end == subItem.start;
       });
 
       let isBuild = true;
-      if (resultItem[0].identity == stopPoint) {
+      if (resultItem[0]?.identity == stopPoint) {
         isBuild = false;
         currentLevelCount = levelCount;
       }
@@ -2590,6 +2591,7 @@ export const buildRootPartTreeFromRelations = (
   if (stopPoint) {
     treeResult[0][0].enterPointToRootPartTree = stopPoint;
   }
+
   return treeResult;
 };
 

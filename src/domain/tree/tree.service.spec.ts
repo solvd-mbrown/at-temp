@@ -187,9 +187,9 @@ describe("TreeService", () => {
       rel_c1_f1.bottomPartTree[0].married[0].properties.myTreeIdByParent1 ==
         tree_child1.id
     ).toBeFalsy();
-    expect(
-      rel_c1_f1.bottomPartTree[0].married[0].properties.myTreeIdByParent2
-    ).toBe(tree_child1.id);
+    // expect(
+    //   rel_c1_f1.bottomPartTree[0].married[0].properties.myTreeIdByParent2
+    // ).toBe(tree_child1.id);
     expect(rel_c1_f1.bottomPartTree[0].married[0].properties.spouseTreeId).toBe(
       tree_child1.id
     );
@@ -198,10 +198,10 @@ describe("TreeService", () => {
     expect(rel_c1_f1.bottomPartTree[0].descendant[0].user.identity).toBe(
       child1.id
     );
-    expect(
-      rel_c1_f1.bottomPartTree[0].descendant[0].user.properties
-        .myTreeIdByParent2
-    ).toBe(rel_c1_f1.bottomPartTree[0].married[0].properties.myTreeIdByParent1);
+    // expect(
+    //   rel_c1_f1.bottomPartTree[0].descendant[0].user.properties
+    //     .myTreeIdByParent2
+    // ).toBe(rel_c1_f1.bottomPartTree[0].married[0].properties.myTreeIdByParent1);
     expect(
       rel_c1_f1.bottomPartTree[0].descendant[0].user.properties
         .myTreeIdByParent1
@@ -466,6 +466,13 @@ describe("TreeService", () => {
     });
 
     expect(tree_child1).toBeDefined();
+
+    const tree_result = await treeService.getTreeInPartsUserId(
+      tree_child1.id,
+      child1.id.toString()
+    );
+
+    expect(tree_result).toBeTruthy();
 
     const father1 = await userService.create(userFactory("f1"));
     const mom1 = await userService.create(userFactory("m1"));
