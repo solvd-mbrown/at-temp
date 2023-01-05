@@ -3,7 +3,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { DatabaseService } from "src/services/database/database.service";
 import { AppTestingModule } from "src/testing/app-testing.module";
 import { UserService } from "../../user/user.service";
-import { TreeService } from ".././tree.service";
+import { TreeService } from "../tree.service";
 import { v4 } from "uuid";
 import { User } from "../../user/entities/user.entity";
 import { CreateUserDto } from "../../user/dto/create-user.dto";
