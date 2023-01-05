@@ -270,10 +270,3 @@ describe("TreeService", () => {
     expect(tree_result).toBeTruthy();
   }, 999999999);
 });
-
-// errors
-// ----- 1. mom1_father
-// spouseId=m1_mom (empty m1_f tree up)
-// ---with non-empty m1_f tree up
-// spouseId = m1_f_m -> look for subtree in parents?
-// what is the correct behaviour?

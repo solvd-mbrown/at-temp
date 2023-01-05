@@ -398,7 +398,7 @@ export class TreeRepository {
           );
 
           if (!bottomPartTree[0][0]?.user) {
-            bottomPartTree[0][0].user = rootPartTreeUser;
+            bottomPartTree[0][0].user = rootPartTreeUser[0];
           }
           const rootPartTree = await cypher.buildRootPartTree(
             data,
@@ -408,7 +408,7 @@ export class TreeRepository {
             rootPartTreeUser
           );
           if (!rootPartTree[0][0]?.user) {
-            rootPartTree[0][0].user = rootPartTreeUser;
+            rootPartTree[0][0].user = rootPartTreeUser[0];
           }
           const subTree = await cypher.buildSubTree(
             resultForSubTree.data,
