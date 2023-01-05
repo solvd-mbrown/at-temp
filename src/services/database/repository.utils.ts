@@ -1287,6 +1287,18 @@ export class RepositoryQuery {
     return this;
   };
 
+  public resolveHusbandTreeUntillEnd = (treeId: string): RepositoryQuery => {
+    this.query.raw(`
+      OPTIONAL MATCH path=(User)-[:USER_DESCENDANT_USER_TREE_${treeId}*]->(RootParent:User)
+      WITH *
+      ORDER BY LENGTH(path) DESC
+      LIMIT 1
+      RETURN RootParent
+    `);
+    this.returns.push("RootParent");
+    return this;
+  };
+
   public resolveUsersSpouseByRelation = (): RepositoryQuery => {
     this.query.raw(`
       OPTIONAL MATCH (User)-[:USER_MARRIED_USER]-(UserS)
@@ -2042,7 +2054,8 @@ export const buildRootPartTree = (
   data: any,
   userId: string,
   treeId: string,
-  currentSubTree: any
+  currentSubTree: any,
+  rootUser?: any
 ) => {
   // @ts-ignore
   let descendantRel = this.getDescendantRelByTreeId(data.rList, treeId);
@@ -2053,14 +2066,18 @@ export const buildRootPartTree = (
   // @ts-ignore
   let stopPoint = userId;
   let tree = null;
-  // @ts-ignore
-  let rootUser = this.getRootUser(
-    data.nList,
-    descendantRel,
-    marriedRel,
-    subTreeRel,
-    treeId
-  );
+
+  if (!rootUser) {
+    // @ts-ignore
+    rootUser = this.getRootUser(
+      data.nList,
+      descendantRel,
+      marriedRel,
+      subTreeRel,
+      treeId
+    );
+  }
+
   // @ts-ignore
   tree = this.buildRootPartTreeFromRelations(
     rootUser,
@@ -2174,6 +2191,7 @@ export const getDescendantRelByTreeId = (data: any, treeId: string) => {
   for (let rel of data) {
     for (let item of rel) {
       if (item.label === `USER_DESCENDANT_USER_TREE_${treeId}`) {
+        // if (item.label.includes(`USER_DESCENDANT_USER_TREE`)) {
         result.push(item);
       }
     }
@@ -2425,14 +2443,19 @@ export const buildTreeFromRelations = (
 
       let descendants = findNodes(subItem.start, items, members);
       let marRel = marriedRel.filter((obj) => {
-        return obj.end == subItem.start;
+        return obj.end == subItem.start || obj.start == subItem.start;
       });
 
       let married = null;
       if (marRel?.length) {
         married = members.filter((obj) => {
           let member = marRel[0];
-          return obj.identity == member.start;
+          return (
+            (obj.identity == member.start &&
+              obj.identity != resultItem[0].identity) ||
+            (obj.identity == member.end &&
+              obj.identity != resultItem[0].identity)
+          );
         });
       }
 
