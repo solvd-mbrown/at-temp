@@ -313,8 +313,13 @@ export class TreeRepository {
       .resolveUsersSpouseByRelationByTreeId(topTreeId.toString())
       .commitWithReturnEntities();
 
-    if (spouses && spouses?.length && spouses[0].data.UserS) {
-      topSpouseId = spouses[0].data.UserS.identity;
+    if (
+      spouses &&
+      spouses?.length &&
+      (spouses[0].data.UserS || spouses[0].data.User)
+    ) {
+      topSpouseId =
+        spouses[0]?.data?.UserS?.identity || spouses[0].data.User.identity;
     }
 
     const currentSubTree = await this.getMarriedSubTreeUsersByUserId(
