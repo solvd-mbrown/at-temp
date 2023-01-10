@@ -32,11 +32,17 @@ export const userFactory: (prefix?: string) => CreateUserDto = (prefix) => {
   };
 };
 
-describe("TreeService", () => {
+describe("Husband Tree tests", () => {
   let db: DatabaseService;
   let app: NestApplication;
   let treeService: TreeService;
   let userService: UserService;
+
+  let child1;
+  let spouse1;
+  let tree_child1;
+  let spouse1_father;
+  let child1_child;
 
   afterAll(async () => {
     await removeTestUsers(db);

@@ -2,12 +2,12 @@ import { NestApplication } from "@nestjs/core";
 import { Test, TestingModule } from "@nestjs/testing";
 import { DatabaseService } from "src/services/database/database.service";
 import { AppTestingModule } from "src/testing/app-testing.module";
-import { UserService } from "../user/user.service";
-import { TreeService } from "./tree.service";
+import { UserService } from "../../user/user.service";
+import { TreeService } from "../tree.service";
 import { v4 } from "uuid";
-import { User } from "../user/entities/user.entity";
-import { CreateUserDto } from "../user/dto/create-user.dto";
-import { TreeRelationType } from "./tree.constants";
+import { User } from "../../user/entities/user.entity";
+import { CreateUserDto } from "../../user/dto/create-user.dto";
+import { TreeRelationType } from "../tree.constants";
 
 export const TEST_ACCOUNT = "TEST_ACCOUNT";
 
@@ -520,6 +520,11 @@ describe("TreeService", () => {
     });
 
     const mom1_mom_fetched: any = await userService.findOne(mom1_mom.id);
+
+    const mom1_father_mom_tree = await treeService.getTreeInPartsUserId(
+      mom1_mom_fetched.myTreeIdByParent1,
+      mom1_mom_fetched.id.toString()
+    );
 
     await treeService.join(mom1_mom_fetched.myTreeIdByParent1, {
       userId: mom1_mom_mom.id,
