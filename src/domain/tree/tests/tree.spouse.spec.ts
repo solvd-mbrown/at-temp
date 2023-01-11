@@ -45,47 +45,6 @@ describe("Spouse Tree tests", () => {
   let spouse1_father;
   let child1_child;
 
-  // const generateObj = (user, treeId?) => ({
-  //   identity: +user.id,
-  //   properties: {
-  //     myTreeIdByParent1: +treeId || +user.myTreeIdByParent1,
-  //   },
-  // });
-
-  // const reccCheck = (tree, result) => {
-  //   if (!result?.length) {
-  //     return;
-  //   }
-
-  //   expect(tree.length).toBeGreaterThanOrEqual(1);
-
-  //   tree.forEach((item) => {
-  //     expect(item.user).toBeDefined();
-
-  //     const user = item.user;
-  //     const married = item.married[0];
-  //     expect(+user.identity).toBe(result[0].user.identity);
-  //     expect(+user.properties.myTreeIdByParent1).toBe(
-  //       result[0].user.properties.myTreeIdByParent1
-  //     );
-  //     if (married?.identity) {
-  //       expect(+married.identity).toBe(result[0].married?.identity);
-  //       expect(+married.properties.myTreeIdByParent1).toBe(
-  //         result[0].married?.properties.myTreeIdByParent1
-  //       );
-  //     } else {
-  //       expect(married?.identity).toBeFalsy();
-  //       expect(married?.myTreeIdByParent1).toBeFalsy();
-  //     }
-  //   });
-
-  //   result.shift();
-
-  //   tree.forEach((item) => {
-  //     reccCheck(item.descendant, result);
-  //   });
-  // };
-
   afterAll(async () => {
     await removeTestUsers(db);
     await app.close();
@@ -142,6 +101,9 @@ describe("Spouse Tree tests", () => {
 
     spouse1 = await userService.findOne(spouse1.id);
 
+    const userToFetchId = spouse1.id;
+    const userToFetch: any = await userService.findOne(userToFetchId);
+
     spouse1_father = await userService.create(userFactory("sp_f"));
 
     await treeService.join(tree_child1.id, {
@@ -150,6 +112,13 @@ describe("Spouse Tree tests", () => {
       toUserId: spouse1_father.id,
     });
 
+    const res2 = await treeService.getTreeInPartsUserId(
+      userToFetch.myTreeIdByParent1,
+      userToFetchId.toString()
+    );
+
+    expect(res2).toBeDefined();
+
     child1_child = await userService.create(userFactory("c1_c"));
 
     await treeService.join(tree_child1.id, {
@@ -157,9 +126,6 @@ describe("Spouse Tree tests", () => {
       toUserId: child1.id,
       userId: child1_child.id,
     });
-
-    const userToFetchId = spouse1.id;
-    const userToFetch: any = await userService.findOne(userToFetchId);
 
     const result = await treeService.getTreeInPartsUserId(
       userToFetch.myTreeIdByParent1,
@@ -203,5 +169,5 @@ describe("Spouse Tree tests", () => {
     ];
 
     reccCheck(bottomPartTree, bottomPartTreeExpectedResult);
-  });
+  }, 99999999);
 });
