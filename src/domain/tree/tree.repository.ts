@@ -536,7 +536,7 @@ export class TreeRepository {
                   married: [user],
                 },
               ],
-              married: [fatherSpouse] || null,
+              married: fatherSpouse ? [fatherSpouse] : [],
             },
           ];
 
