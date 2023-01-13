@@ -532,6 +532,31 @@ describe("TreeService", () => {
       relation: TreeRelationType.MARRIED,
     });
 
+    // ----------- SUBTREE SIBLINGS --> MOM1 SIBLINGS -----------
+    // >> MIGHT BE AN ERROR HERE
+    const mom1_sister = await userService.create(userFactory("m1_sis"));
+    const mom1_sister_child = await userService.create(
+      userFactory("m1_sis_child")
+    );
+
+    //  add to tree in bottom
+    // {
+    // "userId": new user,
+    // "toUserId": user in main tree,
+    // "relation": "DESCENDANT"
+    // }
+    await treeService.join(mom1_father_fetched.myTreeIdByParent1, {
+      relation: TreeRelationType.DESCENDANT,
+      toUserId: mom1_father.id,
+      userId: mom1_sister.id,
+    });
+
+    await treeService.join(mom1_father_fetched.myTreeIdByParent1, {
+      relation: TreeRelationType.DESCENDANT,
+      toUserId: mom1_sister.id,
+      userId: mom1_sister_child.id,
+    });
+
     // ---SUBTREE -> HUSBAND BRANCH
     const mom1_father_father = await userService.create(userFactory("m1_f_f"));
     const mom1_father_mom = await userService.create(userFactory("m1_f_m"));
@@ -622,7 +647,7 @@ describe("TreeService", () => {
     });
 
     // const userToFetchId = child1_child.id;
-    const userToFetchId = mom1.id;
+    const userToFetchId = mom1_father.id;
     const userToFetch: any = await userService.findOne(userToFetchId);
 
     const result = await treeService.getTreeInPartsUserId(
@@ -633,10 +658,3 @@ describe("TreeService", () => {
     expect(result).toBeTruthy();
   }, 999999999);
 });
-
-// errors
-// ----- 1. mom1_father
-// spouseId=m1_mom (empty m1_f tree up)
-// ---with non-empty m1_f tree up
-// spouseId = m1_f_m -> look for subtree in parents?
-// what is the correct behaviour?
