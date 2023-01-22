@@ -663,6 +663,33 @@ export class TreeRepository {
       var childId = treeProperties.userId;
     }
 
+    // [KT] switching tree to husband if we are adding child to spouse tree
+    if (childId) {
+      const parentData = await this.query()
+        .fetchUserByUserId(treeProperties.toUserId)
+        .commitWithReturnEntity();
+
+      var husbandTreeId = parentData?.data?.User?.properties?.spouseTreeId;
+
+      if (husbandTreeId) {
+        const [
+          {
+            Husband: { identity, properties },
+          },
+        ] = await this.query()
+          .fetchUserByUserId(treeProperties.toUserId)
+          .raw(
+            `OPTIONAL MATCH(User)-[:USER_MARRIED_USER_TREE_${husbandTreeId}]->(Husband:User)`
+          )
+          .customReturn("Husband")
+          .commit();
+
+        var husband = { id: identity, ...properties };
+        treeProperties.toUserId = husband.id;
+        id = husbandTreeId;
+      }
+    }
+
     // create spouse personal tree
     // add child into spouse personal tree
     const spouses = await this.query()
@@ -674,7 +701,6 @@ export class TreeRepository {
       spouseId = spouses[0].data.UserS.identity;
     }
 
-    // DONE
     const arrayOfSpouses = await this.getArrayOfSpouses(
       treeProperties.toUserId,
       id,
