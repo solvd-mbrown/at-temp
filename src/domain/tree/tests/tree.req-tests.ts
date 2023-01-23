@@ -21,8 +21,9 @@ export const reccCheck = (tree, result) => {
     // expect(+user.properties.myTreeIdByParent1).toBe(
     //   result[0].user.properties.myTreeIdByParent1
     // );
-    if (married?.identity) {
-      expect(+married.identity).toBe(result[0][idx].married?.identity);
+    if (result[0][idx].married?.identity) {
+      expect(married?.identity).toBeTruthy();
+      expect(+married?.identity).toBe(result[0][idx].married?.identity);
       // expect(+married.properties.myTreeIdByParent1).toBe(
       //   result[0].married?.properties.myTreeIdByParent1
       // );
