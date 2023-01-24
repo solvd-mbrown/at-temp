@@ -915,6 +915,7 @@ export class TreeRepository {
     const marriedUser = await this.query()
     .fetchUserByUserId(+treeProperties.userId)
     .commitWithReturnEntity();
+
     let spouseTree = null;
     if(marriedUser && !marriedUser.data.User.properties.myTreeIdByParent1){
       // create spouse personal tree
@@ -951,12 +952,11 @@ export class TreeRepository {
       )
       .commitWithReturnEntity();
 
-    // // create spouse personal tree
+    // create spouse personal tree
     // const spouseTree = await this.addNewTree({
     // name: `SPOUSE_TREE_${spouseId}`,
     // userId: spouseId,
     // });
-
     // subtree spouse
     const spouseUser = await this.query()
       .fetchUserByUserId(+spouseId)
