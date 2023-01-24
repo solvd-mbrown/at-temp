@@ -912,23 +912,52 @@ export class TreeRepository {
       .fetchUserByUserId(+husbandId)
       .commitWithReturnEntity();
 
-    id = husbandUser.data.User.properties.myTreeIdByParent1;
+    const marriedUser = await this.query()
+    .fetchUserByUserId(+treeProperties.userId)
+    .commitWithReturnEntity();
+    let spouseTree = null;
+    if(marriedUser && !marriedUser.data.User.properties.myTreeIdByParent1){
+      // create spouse personal tree
+      spouseTree = await this.addNewTree({
+        name: `SPOUSE_TREE_${spouseId}`,
+        userId: spouseId,
+      });
+
+      await this.query()
+      .createMemberAndMarriedRelations(
+        treeProperties.toUserId,
+        treeProperties.userId,
+        spouseTree.id
+      )
+      .commitWithReturnEntity();
+    }
+
+    if(marriedUser && marriedUser.data.User.properties.myTreeIdByParent1){
+      spouseTree = marriedUser.data.User.properties.myTreeIdByParent1
+      await this.query()
+      .createMemberAndMarriedRelations(
+        treeProperties.toUserId,
+        treeProperties.userId,
+        marriedUser.data.User.properties.myTreeIdByParent1
+      )
+      .commitWithReturnEntity();
+    }
 
     const result = await this.query()
       .createMemberAndMarriedRelations(
         treeProperties.userId, // spouse(current user that is being added into the tree)
         husbandId, // spouse married to
-        id
+        husbandUser.data.User.properties.myTreeIdByParent1
       )
       .commitWithReturnEntity();
 
-    // create spouse personal tree
-    const spouseTree = await this.addNewTree({
-      name: `SPOUSE_TREE_${spouseId}`,
-      userId: spouseId,
-    });
+    // // create spouse personal tree
+    // const spouseTree = await this.addNewTree({
+    // name: `SPOUSE_TREE_${spouseId}`,
+    // userId: spouseId,
+    // });
 
-    // spouse
+    // subtree spouse
     const spouseUser = await this.query()
       .fetchUserByUserId(+spouseId)
       .commitWithReturnEntity();
@@ -1281,7 +1310,6 @@ export class TreeRepository {
     toUserId: number,
     treeId: number
   ): Promise<any> {
-    // >>WHAT IS THE DIFFERENCE TO joinUserToTreeDescendantParent1 ??? 1 PARAM?
 
     // >>DO ALL IN 1 QUERY
     await this.query()
@@ -1433,15 +1461,12 @@ export class TreeRepository {
       .commitWithReturnEntity();
   }
 
-  // =======================================>
-  // DONE
   async getArrayOfSpouses(userId, treeId, spouseId): Promise<any> {
     let result = await this.getRecursiveSpouses(userId, treeId);
 
     // remove current wife -> need to add only to all wifes above
     if (spouseId) {
       result?.filter((object) => {
-        console.log("object>>>>>>>>>>>>>", object);
         return object.identity !== spouseId;
       });
     }
