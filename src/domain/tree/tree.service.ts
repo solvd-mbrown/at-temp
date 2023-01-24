@@ -65,12 +65,14 @@ export class TreeService {
         joinToTreeProperty
       );
     }
+
     if (joinToTreeProperty.relation == "DESCENDANT") {
       result = await this.treeRepository.joinToTreeDescendant(
         id,
         joinToTreeProperty
       );
     }
+
     if (joinToTreeProperty.relation == "MARRIEDSUBTREE") {
       result = await this.treeRepository.joinToTreeMarriedSubTree(
         id,
