@@ -113,7 +113,7 @@ export class FileService {
         });
 
         if (truncated) {
-          bucketParams.ContinuationToken = res.ContinuationToken;
+          bucketParams.ContinuationToken = res.NextContinuationToken;
         }
       }
     };
