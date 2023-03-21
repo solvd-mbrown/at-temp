@@ -580,55 +580,55 @@ export class RepositoryQuery {
   }
 
   public async commit() {
-    // if (process.env.NODE_ENV === "local" || process.env.NODE_ENV === "test") {
+    if (process.env.NODE_ENV === "local" || process.env.NODE_ENV === "test") {
       console.log(
         this.query.interpolate(),
         "\n ------------END OF QUERY-----------"
       );
-    // }
+    }
     return await this.query.run();
   }
 
   public async commitWithReturnEntities() {
     this.query.return(this.createResult(this.returns));
-    // if (process.env.NODE_ENV === "local" || process.env.NODE_ENV === "test") {
+    if (process.env.NODE_ENV === "local" || process.env.NODE_ENV === "test") {
       console.log(
         this.query.interpolate(),
         "\n ------------END OF QUERY-----------"
       );
-    // }
+    }
     return await this.query.run();
   }
   public async commitWithReturnEntitiesRow() {
     this.query.return(this.returns);
-    // if (process.env.NODE_ENV === "local" || process.env.NODE_ENV === "test") {
+    if (process.env.NODE_ENV === "local" || process.env.NODE_ENV === "test") {
       console.log(
         this.query.interpolate(),
         "\n ------------END OF QUERY-----------"
       );
-    // }
+    }
     return await this.query.run();
   }
 
   public async commitWithReturnEntity() {
     this.query.return(this.createResult(this.returns));
-    // if (process.env.NODE_ENV === "local" || process.env.NODE_ENV === "test") {
+    if (process.env.NODE_ENV === "local" || process.env.NODE_ENV === "test") {
       console.log(
         this.query.interpolate(),
         "\n ------------END OF QUERY-----------"
       );
-    // }
+    }
     return await this.query.first();
   }
 
   public async commitWithReturnCount() {
     this.query.return("count(*) as count");
-    // if (process.env.NODE_ENV === "local" || process.env.NODE_ENV === "test") {
+    if (process.env.NODE_ENV === "local" || process.env.NODE_ENV === "test") {
       console.log(
         this.query.interpolate(),
         "\n ------------END OF QUERY-----------"
       );
-    // }
+    }
     return await this.query.first();
   }
 
