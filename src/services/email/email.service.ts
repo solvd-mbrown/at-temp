@@ -11,15 +11,24 @@ export class EmailService {
     private readonly userRepository: UserRepository
   ) {}
 
-  public async generateAndSendStoreReport(emails: string[]) {
+  public async generateAndSendStoreReport(email: string) {
     const users = await this.userRepository.getUsersWithStorageFileId();
-    setTimeout(async () => {
-      const report = await this.fileService.getUploadSizeByEmailReport(users);
-      await this.emailProvider.sendEmail({
-        emails,
-        attachments: [report],
-      });
-    }, 0);
-    return { status: "report request received" };
+    let user = [];
+    for (let item of users) {
+      if (item.email === email) {
+        user.push(item);
+      }
+    }
+    let report = {report : null};
+    if (user.length) {
+      report = await this.fileService.getUploadSizeByEmailReport(user);
+    }
+    return report;
+  }
+
+  public async generateAndSendStoreReportForAllUsers() {
+    const users = await this.userRepository.getUsersWithStorageFileId();
+    const report = await this.fileService.getUploadSizeByEmailReport(users);
+    return report;
   }
 }
