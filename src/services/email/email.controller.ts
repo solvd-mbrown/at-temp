@@ -6,7 +6,12 @@ export class EmailController {
   constructor(private readonly emailService: EmailService) {}
 
   @Get("report")
-  async generateAndSendStoreReport(@Body("emails") emails: string[]) {
-    return this.emailService.generateAndSendStoreReport(emails);
+  async generateAndSendStoreReport(@Body("email") email: string) {
+    return this.emailService.generateAndSendStoreReport(email);
+  }
+
+  @Get("report/all")
+  async generateAndSendStoreReportForAllUsers() {
+    return this.emailService.generateAndSendStoreReportForAllUsers();
   }
 }

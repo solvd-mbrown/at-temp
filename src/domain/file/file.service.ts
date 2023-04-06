@@ -87,7 +87,7 @@ export class FileService {
     return `This action returns ${id} file`;
   }
 
-  async getUploadSizeByEmailReport(users: User[]): Promise<string> {
+  async getUploadSizeByEmailReport(users: User[]): Promise<any> {
     const s3 = this.getS3();
     let groupedByStorePrefix = {};
     let truncated = true;
@@ -131,9 +131,9 @@ export class FileService {
       })
       .filter(Boolean);
 
-    const csv = await converter.json2csvAsync(groupedByEmailJson);
-
-    return csv;
+    // const csv = await converter.json2csvAsync(groupedByEmailJson);
+    // return csv;
+    return groupedByEmailJson;
   }
 
   private convertBytes(bytes: number) {
