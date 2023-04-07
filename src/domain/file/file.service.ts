@@ -3,7 +3,7 @@ import { Logger, Injectable } from "@nestjs/common";
 import { CreateFileDto } from "./dto/create-file.dto";
 import { UpdateFileDto } from "./dto/update-file.dto";
 import { v4 as uuidv4 } from "uuid";
-import { S3_BUCKET, S3_TAG_KEYS } from "./file.constants";
+import { S3_BUCKET_DEV, S3_TAG_KEYS } from "./file.constants";
 import { UserRepository } from "../user/user.repository";
 import * as converter from "json-2-csv";
 import { User } from "../user/entities/user.entity";
@@ -39,7 +39,7 @@ export class FileService {
   async uploadS3(file: Express.Multer.File, fileName: string, email: string) {
     const s3 = this.getS3();
     const params: S3.PutObjectRequest = {
-      Bucket: S3_BUCKET,
+      Bucket: S3_BUCKET_DEV,
       Key: fileName,
       ContentType: file.mimetype,
       Body: file.buffer,
@@ -59,7 +59,7 @@ export class FileService {
   async removeFileFromS3(fileKey) {
     const s3 = this.getS3();
     const params = {
-      Bucket: S3_BUCKET,
+      Bucket: S3_BUCKET_DEV,
       Key: fileKey,
     };
     return new Promise((resolve, reject) => {
@@ -91,7 +91,7 @@ export class FileService {
     const s3 = this.getS3();
     let groupedByStorePrefix = {};
     let truncated = true;
-    let bucketParams: S3.Types.ListObjectsV2Request = { Bucket: S3_BUCKET };
+    let bucketParams: S3.Types.ListObjectsV2Request = { Bucket: S3_BUCKET_DEV };
 
     const usersWithStorageFileIdObject = users.reduce((acc, user) => {
       acc[user.storageFolderId] = user.email;
