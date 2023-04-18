@@ -161,6 +161,9 @@ export class UserRepository {
           "User.introduction": params?.introduction
             ? UtilsRepository.getStringVersion(params?.introduction)
             : null,
+          "User.setting": params?.setting
+            ? UtilsRepository.getStringVersion(params?.setting)
+            : null,
           "User.birthdate": params?.birthdate,
           "User.dateOfDeath": params?.dateOfDeath,
           "User.isDeceased": params?.isDeceased,
