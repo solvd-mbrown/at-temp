@@ -15,6 +15,7 @@ export class UpdateUserDto {
   email?: string;
   phone?: string;
   address?: string;
+  bornAddress?: [];
   spouseTreeId?: string;
   myTreeIdByParent1?: string;
   myTreeIdByParent2?: string;
@@ -24,6 +25,7 @@ export class UpdateUserDto {
   // siblings?: [];
   socialNetworks?: [];
   work?: [];
+  pets?: [];
   education?: [];
   storageFolderId?: string;
 }
