@@ -27,5 +27,6 @@ export class UpdateUserDto {
   work?: [];
   pets?: [];
   education?: [];
+  setting?: [];
   storageFolderId?: string;
 }
