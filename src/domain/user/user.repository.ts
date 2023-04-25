@@ -184,6 +184,15 @@ export class UserRepository {
           "User.kids": params?.kids
             ? UtilsRepository.getStringVersion(params?.kids)
             : null,
+          "User.pets": params?.pets
+            ? UtilsRepository.getStringVersion(params?.pets)
+            : null,
+          "User.setting": params?.setting
+            ? UtilsRepository.getStringVersion(params?.setting)
+            : null,
+          "User.bornAddress": params?.bornAddress
+            ? UtilsRepository.getStringVersion(params?.bornAddress)
+            : null,
           "User.parents": params?.parents
             ? UtilsRepository.getStringVersion(params?.parents)
             : null,
