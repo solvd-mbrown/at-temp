@@ -29,5 +29,4 @@ export class UpdateUserDto {
   education?: [];
   setting?: [];
   storageFolderId?: string;
-  setting?: string;
 }
