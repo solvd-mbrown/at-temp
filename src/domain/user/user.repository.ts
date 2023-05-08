@@ -166,6 +166,7 @@ export class UserRepository {
             : null,
           "User.birthdate": params?.birthdate,
           "User.dateOfDeath": params?.dateOfDeath,
+          "User.anniversaryDate": params?.anniversaryDate,
           "User.isDeceased": params?.isDeceased,
           "User.isActivated": params?.isActivated,
           "User.gender": params?.gender,
