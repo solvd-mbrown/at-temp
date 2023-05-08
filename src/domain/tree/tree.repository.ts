@@ -339,6 +339,8 @@ export class TreeRepository {
     };
   }
 
+  //todo total refactoring Now!!!
+
   async getTreeInPartsUserIdNew(treeId: number, userId: string): Promise<any> {
     const userDataRaw = await this.query()
       .findEntityById("User", +userId)

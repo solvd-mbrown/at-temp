@@ -29,6 +29,7 @@
     "@nestjs/passport": "^9.0.0",
     "@nestjs/platform-express": "^8.0.0",
     "aws-sdk": "^2.1154.0",
+    "class-validator": "^0.13.2",
     "cypher-query-builder": "^6.0.4",
     "firebase-admin": "^11.1.0",
     "json-2-csv": "^3.18.0",

@@ -1,4 +1,7 @@
+import { IsOptional } from 'class-validator';
+
 export class UpdateUserDto {
+  @IsOptional()
   userPictureLink?: string;
   userPictureKey?: string;
   firstName?: string;
@@ -19,14 +22,11 @@ export class UpdateUserDto {
   spouseTreeId?: string;
   myTreeIdByParent1?: string;
   myTreeIdByParent2?: string;
-  // spouse?: [];
-  // kids?: [];
-  // parents?: [];
-  // siblings?: [];
   socialNetworks?: [];
   work?: [];
   pets?: [];
   education?: [];
   setting?: [];
   storageFolderId?: string;
+  anniversaryDate?: string;
 }
