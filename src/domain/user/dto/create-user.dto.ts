@@ -22,4 +22,6 @@ export class CreateUserDto {
   myTreeIdByParent2?: string;
   storageFolderId?: string;
   anniversaryDate?: string;
+  employerAndPosition?: string;
+  pets?: string;
 }
