@@ -185,9 +185,7 @@ export class UserRepository {
           "User.kids": params?.kids
             ? UtilsRepository.getStringVersion(params?.kids)
             : null,
-          "User.pets": params?.pets
-            ? UtilsRepository.getStringVersion(params?.pets)
-            : null,
+          "User.pets": params?.pets,
           "User.bornAddress": params?.bornAddress
             ? UtilsRepository.getStringVersion(params?.bornAddress)
             : null,
@@ -200,9 +198,7 @@ export class UserRepository {
           "User.socialNetworks": params?.socialNetworks
             ? UtilsRepository.getStringVersion(params?.socialNetworks)
             : null,
-          "User.work": params?.work
-            ? UtilsRepository.getStringVersion(params?.work)
-            : null,
+          "User.employerAndPosition": params?.employerAndPosition,
           "User.education": params?.education
             ? UtilsRepository.getStringVersion(params?.education)
             : null,

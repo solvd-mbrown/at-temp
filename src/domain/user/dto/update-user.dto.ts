@@ -23,8 +23,8 @@ export class UpdateUserDto {
   myTreeIdByParent1?: string;
   myTreeIdByParent2?: string;
   socialNetworks?: [];
-  work?: [];
-  pets?: [];
+  employerAndPosition?: string;
+  pets?: string;
   education?: [];
   setting?: [];
   storageFolderId?: string;
