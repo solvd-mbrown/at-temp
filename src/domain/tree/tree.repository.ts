@@ -255,7 +255,6 @@ export class TreeRepository {
       spouseRels[0].CurrentSpouseMarriedTo.properties.myTreeIdByParent1;
 
     // fetch entrire DB by id
-    // [2] >>seems valid-> neede more investigation after filtered out
     const result = await this.query()
       .fetchAllByEntityId(treeId, "Tree")
       .commitWithReturnEntity();
