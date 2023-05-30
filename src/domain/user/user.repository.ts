@@ -226,6 +226,7 @@ export class UserRepository {
   /*
    * Get User Entity from email
    */
+
   public async getUserFromEmail(email: string): Promise<User> {
     const result = await this.query()
       .findUserByEmail(email)
