@@ -148,70 +148,81 @@ export class UserRepository {
   async updateUserEntity(userId, userParams): Promise<any> {
     const params = userParams;
     // @ts-ignore
-    const result = await this.query()
+    let result= null;
+    if(params && params.isInvitedUser) {
+      const user = await this.query()
       .fetchUserByUserId(userId)
-      .updateEntity(
-        "User",
-        Object.entries({
-          "User.userPictureLink": params?.userPictureLink,
-          "User.userPictureKey": params?.userPictureKey,
-          "User.firstName": params?.firstName,
-          "User.maidenName": params?.maidenName,
-          "User.lastName": params?.lastName,
-          "User.introduction": params?.introduction
-            ? UtilsRepository.getStringVersion(params?.introduction)
-            : null,
-          "User.setting": params?.setting
-            ? UtilsRepository.getStringVersion(params?.setting)
-            : null,
-          "User.birthdate": params?.birthdate,
-          "User.dateOfDeath": params?.dateOfDeath,
-          "User.anniversaryDate": params?.anniversaryDate,
-          "User.isDeceased": params?.isDeceased,
-          "User.isActivated": params?.isActivated,
-          "User.gender": params?.gender,
-          "User.hometown": params?.hometown,
-          "User.homeCountry": params?.homeCountry,
-          "User.email": params?.email,
-          "User.phone": params?.phone,
-          "User.address": params?.address,
-          "User.spouseTreeId": params?.spouseTreeId,
-          "User.myTreeIdByParent1": params?.myTreeIdByParent1,
-          "User.myTreeIdByParent2": params?.myTreeIdByParent2,
-          "User.storageFolderId": params?.storageFolderId,
-          "User.spouse": params?.spouse
-            ? UtilsRepository.getStringVersion(params?.spouse)
-            : null,
-          "User.kids": params?.kids
-            ? UtilsRepository.getStringVersion(params?.kids)
-            : null,
-          "User.pets": params?.pets,
-          "User.bornAddress": params?.bornAddress
-            ? UtilsRepository.getStringVersion(params?.bornAddress)
-            : null,
-          "User.parents": params?.parents
-            ? UtilsRepository.getStringVersion(params?.parents)
-            : null,
-          "User.siblings": params?.siblings
-            ? UtilsRepository.getStringVersion(params?.siblings)
-            : null,
-          "User.socialNetworks": params?.socialNetworks
-            ? UtilsRepository.getStringVersion(params?.socialNetworks)
-            : null,
-          "User.employerAndPosition": params?.employerAndPosition,
-          "User.education": params?.education
-            ? UtilsRepository.getStringVersion(params?.education)
-            : null,
-        }).reduce((valuesAcc, [key, value]) => {
-          return value !== undefined && value !== null
-            ? {
-                ...valuesAcc,
-                [key]: value,
-              }
-            : valuesAcc;
-        }, {})
-      )
       .commitWithReturnEntity();
+      if(user && user.data.User.properties.isActivated) {
+        throw new BadRequestException(CUSTOM_ERROR_MESSAGE.USER_EXIST_ERROR);
+      }
+   } else{
+     result = await this.query()
+     .fetchUserByUserId(userId)
+     .updateEntity(
+       "User",
+       Object.entries({
+         "User.userPictureLink": params?.userPictureLink,
+         "User.userPictureKey": params?.userPictureKey,
+         "User.firstName": params?.firstName,
+         "User.maidenName": params?.maidenName,
+         "User.lastName": params?.lastName,
+         "User.introduction": params?.introduction
+           ? UtilsRepository.getStringVersion(params?.introduction)
+           : null,
+         "User.setting": params?.setting
+           ? UtilsRepository.getStringVersion(params?.setting)
+           : null,
+         "User.birthdate": params?.birthdate,
+         "User.dateOfDeath": params?.dateOfDeath,
+         "User.anniversaryDate": params?.anniversaryDate,
+         "User.isDeceased": params?.isDeceased,
+         "User.isActivated": params?.isActivated,
+         "User.gender": params?.gender,
+         "User.hometown": params?.hometown,
+         "User.homeCountry": params?.homeCountry,
+         "User.email": params?.email,
+         "User.phone": params?.phone,
+         "User.address": params?.address,
+         "User.spouseTreeId": params?.spouseTreeId,
+         "User.myTreeIdByParent1": params?.myTreeIdByParent1,
+         "User.myTreeIdByParent2": params?.myTreeIdByParent2,
+         "User.storageFolderId": params?.storageFolderId,
+         "User.spouse": params?.spouse
+           ? UtilsRepository.getStringVersion(params?.spouse)
+           : null,
+         "User.kids": params?.kids
+           ? UtilsRepository.getStringVersion(params?.kids)
+           : null,
+         "User.pets": params?.pets,
+         "User.bornAddress": params?.bornAddress
+           ? UtilsRepository.getStringVersion(params?.bornAddress)
+           : null,
+         "User.parents": params?.parents
+           ? UtilsRepository.getStringVersion(params?.parents)
+           : null,
+         "User.siblings": params?.siblings
+           ? UtilsRepository.getStringVersion(params?.siblings)
+           : null,
+         "User.socialNetworks": params?.socialNetworks
+           ? UtilsRepository.getStringVersion(params?.socialNetworks)
+           : null,
+         "User.employerAndPosition": params?.employerAndPosition,
+         "User.education": params?.education
+           ? UtilsRepository.getStringVersion(params?.education)
+           : null,
+       }).reduce((valuesAcc, [key, value]) => {
+         return value !== undefined && value !== null
+           ? {
+             ...valuesAcc,
+             [key]: value,
+           }
+           : valuesAcc;
+       }, {})
+     )
+     .commitWithReturnEntity();
+   }
+
 
     if (result !== null) {
       const data = result.data;
