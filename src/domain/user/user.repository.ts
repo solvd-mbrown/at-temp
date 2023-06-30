@@ -154,7 +154,12 @@ export class UserRepository {
       .fetchUserByUserId(userId)
       .commitWithReturnEntity();
       if(user && user.data.User.properties.isActivated) {
-        throw new BadRequestException(CUSTOM_ERROR_MESSAGE.USER_EXIST_ERROR);
+        // throw new BadRequestException(CUSTOM_ERROR_MESSAGE.USER_EXIST_ERROR);
+        return {
+          response: {
+            isActivated: true
+          },
+        };
       }
    } else{
      result = await this.query()
