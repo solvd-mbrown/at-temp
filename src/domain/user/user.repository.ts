@@ -149,18 +149,15 @@ export class UserRepository {
     const params = userParams;
     // @ts-ignore
     let result= null;
-    if(params && params.isInvitedUser) {
-      const user = await this.query()
-      .fetchUserByUserId(userId)
-      .commitWithReturnEntity();
-      if(user && user.data.User.properties.isActivated) {
-        // throw new BadRequestException(CUSTOM_ERROR_MESSAGE.USER_EXIST_ERROR);
+    const user = await this.query()
+    .fetchUserByUserId(userId)
+    .commitWithReturnEntity();
+    if(params && params.isInvitedUser && user && user.data.User.properties.isActivated) {
         return {
           response: {
             isActivated: true
           },
         };
-      }
    } else{
      result = await this.query()
      .fetchUserByUserId(userId)
