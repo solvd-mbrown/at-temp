@@ -2064,7 +2064,7 @@ export const buildRootPartTree = (
   // @ts-ignore
   let subTreeRel = this.getMarriedSubTreeRelByTreeId(data.rList, treeId);
   // @ts-ignore
-  let stopPoint = userId;
+  // let stopPoint = userId;
   let tree = null;
 
   if (!rootUser) {
@@ -2084,7 +2084,7 @@ export const buildRootPartTree = (
     data.nList,
     descendantRel,
     marriedRel,
-    stopPoint
+    // stopPoint
   );
   return tree;
 };
@@ -2095,9 +2095,16 @@ export const buildPartTree = (data: any, userId: string, treeId: string) => {
   // @ts-ignore
   let marriedRel = this.getMarriedRelByTreeId(data.rList, treeId);
   // @ts-ignore
-  // let subTreeRel = this.getMarriedSubTreeRelByTreeId(data.rList, treeId);
+  let subTreeRel = this.getMarriedSubTreeRelByTreeId(data.rList, treeId);
   // @ts-ignore
-  let rootUser = [{ identity: userId }];
+  let rootUser = rootUser = this.getRootUser(
+    data.nList,
+    descendantRel,
+    marriedRel,
+    subTreeRel,
+    treeId
+  );
+  // let rootUser = [{ identity: userId }];
   // @ts-ignore
   let tree = this.buildTreeFromRelations(
     rootUser,
@@ -2119,9 +2126,17 @@ export const buildPartTreeWithoutSubTreeRel = (
   // @ts-ignore
   let marriedRel = this.getMarriedRelByTreeId(data.rList, treeId);
   // @ts-ignore
+  let subTreeRel = this.getMarriedSubTreeRelByTreeId(data.rList, treeId);
+  // @ts-ignore
   let tree = null;
   // @ts-ignore
-  let rootUser = [{ identity: userId }];
+  let rootUser = this.getRootUser(
+    data.nList,
+    descendantRel,
+    marriedRel,
+    subTreeRel,
+    treeId
+  );
   // @ts-ignore
   tree = this.buildTreeFromRelations(
     rootUser,
@@ -2555,10 +2570,10 @@ export const buildRootPartTreeFromRelations = (
       });
 
       let isBuild = true;
-      if (resultItem[0]?.identity == stopPoint) {
-        isBuild = false;
-        currentLevelCount = levelCount;
-      }
+      // if (resultItem[0]?.identity == stopPoint) {
+      //   isBuild = false;
+      //   currentLevelCount = levelCount;
+      // }
 
       let married = null;
       if (marRel?.length) {

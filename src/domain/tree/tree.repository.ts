@@ -399,10 +399,10 @@ export class TreeRepository {
               .commitWithReturnEntities();
             var rootPartTreeUser = [res[0]?.data.User];
           }
-
           const bottomPartTree = await cypher.buildPartTreeWithoutSubTreeRel(
             data,
-            parentId,
+            rootPartTreeUser[0].identity,
+            // @ts-ignore
             treeId.toString()
           );
 
@@ -428,9 +428,9 @@ export class TreeRepository {
           return {
             id: data.Tree.identity,
             ...data.Tree.properties,
-            rootPartTree: rootPartTree ? rootPartTree[0] : null,
+            // rootPartTree: rootPartTree ? rootPartTree[0] : null,
             subTree: subTree ? subTree[0] : null,
-            bottomPartTree: bottomPartTree ? bottomPartTree[0] : null,
+            tree: bottomPartTree ? bottomPartTree[0] : null,
           };
         }
         break;
