@@ -185,7 +185,7 @@ export class TreeRepository {
     }
 
     const spouses = await this.query()
-      .fetchUserByUserId(+parentId)
+      .fetchUserByUserId(+userId)
       .resolveUsersSpouseByRelationByTreeId(treeId.toString())
       .commitWithReturnEntities();
     let spouseId = null;
