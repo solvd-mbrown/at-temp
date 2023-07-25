@@ -2487,7 +2487,7 @@ export const buildTreeFromRelations = (
         resultItem.push({
           user: resultItem[0],
           descendant: descendants.length ? descendants.flat() : [],
-          married: married ? married : [],
+          married: married ? [{user: {...married[0]}}] : [],
           parentsSubTree: parentsSubTree,
         });
       } else {
@@ -2495,7 +2495,7 @@ export const buildTreeFromRelations = (
         resultItem.push({
           user: resultItem[0],
           descendant: descendants.length ? descendants.flat() : [],
-          married: married ? married : [],
+          married: married ? [{user: {...married[0]}}] : [],
         });
       }
 
@@ -2588,7 +2588,7 @@ export const buildRootPartTreeFromRelations = (
         resultItem.push({
           user: resultItem[0],
           descendant: descendants.length ? descendants.flat() : [],
-          married: married ? married : [],
+          married: married ? [{user: {...married[0]}}] : [],
         });
       }
 
