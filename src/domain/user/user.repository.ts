@@ -1,7 +1,6 @@
 import { BadRequestException, Inject, Injectable, Scope } from "@nestjs/common";
 import { Connection } from "cypher-query-builder";
 import * as cypher from "src/services/database/repository.utils";
-import { ConfigService } from "@nestjs/config";
 import {
   CUSTOM_ERROR_MESSAGE,
   DATABASE_CONNECTION,
@@ -12,8 +11,7 @@ import { UtilsRepository } from "src/utils/utils.repository";
 @Injectable({ scope: Scope.REQUEST })
 export class UserRepository {
   constructor(
-    @Inject(DATABASE_CONNECTION) private readonly connection: Connection,
-    private readonly configService: ConfigService
+    @Inject(DATABASE_CONNECTION) private readonly connection: Connection
   ) {}
   private query(): cypher.RepositoryQuery {
     return new cypher.RepositoryQuery(this.connection);
@@ -40,15 +38,14 @@ export class UserRepository {
       .deleteEntityById("User", id)
       .commitWithReturnEntity();
     if (result) {
-      const data = result.data;
-      return {
-        response: "done",
+        return {
+            response: "done",
       };
     }
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
-  async getUserEntity(id: number): Promise<any> {
+  async getUserEntity(id: number): Promise<User> {
     const result = await this.query()
       .fetchUserByUserId(id)
       .commitWithReturnEntity();
@@ -88,17 +85,17 @@ export class UserRepository {
         .commitWithReturnEntities();
 
       if (siblingsArr && siblingsArr?.length && siblingsArr[0].data.UserKList) {
-        let famalyLine = siblingsArr[0].data.UserKList;
-        if (famalyLine.length > 1) {
-          famalyLine = famalyLine.filter((object) => {
+        let familyLine = siblingsArr[0].data.UserKList;
+        if (familyLine.length > 1) {
+          familyLine = familyLine.filter((object) => {
             return object.identity != id;
           });
-          siblings = famalyLine;
+          siblings = familyLine;
         }
       }
     }
 
-    const childrens = await this.query()
+    const children = await this.query()
       .fetchUserByUserId(id)
       .resolveUsersChildrenByRelation(
         result.data.User.properties.myTreeIdByParent1
@@ -106,16 +103,16 @@ export class UserRepository {
       .commitWithReturnEntities();
 
     let kids = [];
-    if (childrens && childrens.length && childrens[0].data.UserKList) {
-      kids = childrens[0].data.UserKList;
+    if (children && children.length && children[0].data.UserKList) {
+      kids = children[0].data.UserKList;
     }
 
     if (
-      !childrens[0].data.UserKList.length &&
+      !children[0].data.UserKList.length &&
       spouses &&
       spouses[0].data.UserS
     ) {
-      const spouseChildrens = await this.query()
+      const spouseChildren = await this.query()
         .fetchUserByUserId(spouses[0].data.UserS.identity)
         .resolveUsersChildrenByRelation(
           spouses[0].data.UserS.properties.myTreeIdByParent1
@@ -123,11 +120,11 @@ export class UserRepository {
         .commitWithReturnEntities();
 
       if (
-        spouseChildrens &&
-        spouseChildrens.length &&
-        spouseChildrens[0].data.UserKList
+        spouseChildren &&
+        spouseChildren.length &&
+        spouseChildren[0].data.UserKList
       ) {
-        kids = spouseChildrens[0].data.UserKList;
+        kids = spouseChildren[0].data.UserKList;
       }
     }
 
@@ -136,6 +133,7 @@ export class UserRepository {
       data.User.properties.parents = parents.length ? parents : null;
       data.User.properties.siblings = siblings.length ? siblings : null;
       data.User.properties.spouse = spouse.length ? spouse : null;
+            data.User.properties.spouse = spouse.length ? spouse : null;
       data.User.properties.kids = kids.length ? kids : null;
       return {
         id: data.User.identity,
@@ -145,9 +143,8 @@ export class UserRepository {
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
-  async updateUserEntity(userId, userParams): Promise<any> {
+  async updateUserEntity(userId: number, userParams: any): Promise<any> {
     const params = userParams;
-    // @ts-ignore
     const result = await this.query()
       .fetchUserByUserId(userId)
       .updateEntity(
@@ -239,6 +236,7 @@ export class UserRepository {
         ...data.User.properties,
       };
     }
+    return null;
   }
 
   public async getUsersWithStorageFileId(): Promise<User[]> {
@@ -253,6 +251,6 @@ export class UserRepository {
     if (result[0]?.Users) {
       return result[0]?.Users as User[];
     }
-    return null;
+    return [];
   }
 }
