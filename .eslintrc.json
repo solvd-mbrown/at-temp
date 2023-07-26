@@ -1,0 +1,63 @@
+{
+	"env": {
+		"browser": true,
+		"es2021": true,
+		"react-native/react-native": true
+	},
+	"extends": [
+		"eslint:recommended",
+		"plugin:react/recommended",
+		"plugin:react-hooks/recommended",
+		"@react-native-community",
+		"prettier"
+	],
+	"parserOptions": {
+		"ecmaFeatures": {
+			"jsx": true
+		},
+		"ecmaVersion": "latest",
+		"sourceType": "module"
+	},
+	"plugins": ["react", "react-native", "react-hooks", "prettier"],
+	"rules": {
+		"linebreak-style": ["error", "unix"],
+		"quotes": [
+			"error",
+			"single",
+			{"avoidEscape": true, "allowTemplateLiterals": true}
+		],
+		"semi": ["error", "always"],
+		"no-undef": "error",
+		"no-multiple-empty-lines": ["error", {"max": 2, "maxEOF": 0}],
+		"eol-last": "error",
+		"no-alert": "off",
+		"react-native/no-unused-styles": "error",
+		"react-native/no-inline-styles": "warn",
+		"react-native/split-platform-components": "error",
+		"react-native/no-raw-text": "error",
+		"no-undefined": "error",
+		"no-use-before-define": "warn",
+		"react/display-name": "error",
+		"arrow-parens": ["error", "as-needed", {"requireForBlockBody": false}],
+		"no-multi-spaces": ["error", {"ignoreEOLComments": true}],
+		"comma-dangle": [
+			"error",
+			{
+				"arrays": "always-multiline",
+				"objects": "always-multiline",
+				"imports": "always-multiline",
+				"exports": "always-multiline",
+				"functions": "never"
+			}
+		]
+	},
+	"settings": {
+		"react": {
+			"fragment": "Fragment", // Fragment to use (may be a property of <pragma>), default to "Fragment"
+			"version": "detect" // React version. "detect" automatically picks the version you have installed.
+		}
+	},
+	"globals": {
+    "JSX": true
+	}
+}
