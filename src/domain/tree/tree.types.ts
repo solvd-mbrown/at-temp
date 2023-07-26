@@ -1,0 +1,7 @@
+export enum HusbandTreeUserType {
+  HUSBAND = "HUSBAND",
+  SPOUSE_WITH_SUBTREE = "SPOUSE_WITH_SUBTREE",
+  SPOUSE_NO_SUBTREE = "SPOUSE_NO_SUBTREE",
+}
+
+
