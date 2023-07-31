@@ -15,7 +15,9 @@ import { CreateFileDto } from "./dto/create-file.dto";
 import { UpdateFileDto } from "./dto/update-file.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { FirebaseAuthGuard } from "src/services/auth/firebase/firebase-auth.guard";
+import {ApiTags} from "@nestjs/swagger";
 
+@ApiTags('file')
 @Controller("file")
 // @UseGuards(FirebaseAuthGuard)
 export class FileController {

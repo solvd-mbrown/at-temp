@@ -94,9 +94,9 @@ describe("Husband Tree tests", () => {
     const child2 = await userService.create(userFactory("c2"));
 
     await treeService.join(tree_f1.id, {
-      relation: TreeRelationType.DESCENDANT,
-      toUserId: father1.id,
-      userId: child1.id,
+        relation: TreeRelationType.DESCENDANT,
+        toUserId: father1.id,
+        userId: child1.id,
     });
 
     const tree_res = await treeService.getTreeInPartsUserId(
@@ -105,23 +105,23 @@ describe("Husband Tree tests", () => {
     );
 
     await treeService.join(tree_f1.id, {
-      userId: mom1.id,
-      toUserId: father1.id,
-      relation: TreeRelationType.MARRIED,
+        userId: mom1.id,
+        toUserId: father1.id,
+        relation: TreeRelationType.MARRIED,
     });
 
     const father1_father = await userService.create(userFactory("f1_f"));
 
     await treeService.join(tree_f1.id, {
-      relation: TreeRelationType.DESCENDANT,
-      toUserId: father1_father.id,
-      userId: father1.id,
+        relation: TreeRelationType.DESCENDANT,
+        toUserId: father1_father.id,
+        userId: father1.id,
     });
 
     await treeService.join(tree_f1.id, {
-      relation: TreeRelationType.DESCENDANT,
-      toUserId: father1.id,
-      userId: child2.id,
+        relation: TreeRelationType.DESCENDANT,
+        toUserId: father1.id,
+        userId: child2.id,
     });
 
     const userToFetchId = child1.id;

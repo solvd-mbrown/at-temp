@@ -12,7 +12,9 @@ import { PostService } from "./post.service";
 import { CreatePostDto } from "./dto/create-post.dto";
 import { UpdatePostDto } from "./dto/update-post.dto";
 import { FirebaseAuthGuard } from "src/services/auth/firebase/firebase-auth.guard";
+import {ApiTags} from "@nestjs/swagger";
 
+@ApiTags('post')
 @Controller("post")
 // @UseGuards(FirebaseAuthGuard)
 export class PostController {
