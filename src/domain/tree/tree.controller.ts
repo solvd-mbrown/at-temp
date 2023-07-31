@@ -5,11 +5,21 @@ import { UpdateTreeDto } from './dto/update-tree.dto';
 import { JoinToTreeDto } from './dto/join-to-tree.dto';
 import {ApiTags} from "@nestjs/swagger";
 
+
 @ApiTags('tree')
 @Controller('tree')
 export class TreeController {
   constructor(private readonly treeService: TreeService) {}
 
+  @Get("all/:id")
+  findOneByUUID(@Param("id") id: string) {
+    return this.treeService.findOneByUUID(id);
+  }
+
+  @Get("members/:id")
+  getTreeMembers(@Param("id") id: string) {
+    return this.treeService.getTreeMembers(+id);
+  }
   @Post()
   async create(@Body() createTreeDto: CreateTreeDto) {
     const result = await this.treeService.create(createTreeDto);
@@ -38,6 +48,11 @@ export class TreeController {
   async remove(@Param('id') id: string) {
     const result = await this.treeService.remove(+id);
     return { data: result };
+  }
+
+  @Delete("user/:id")
+  removeUserFromTree(@Param("id") id: string) {
+    return this.treeService.removeUserFromTree(+id);
   }
 
   @Post(':id/join')
