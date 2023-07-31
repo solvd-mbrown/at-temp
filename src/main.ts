@@ -6,7 +6,10 @@ import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static'; // Import ServeStaticModule
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, {
+            cors: true,
+    });
+
     // Serve static files
     const serveStaticOptions = {
         rootPath: join(__dirname, '..', 'public'),
@@ -30,7 +33,8 @@ async function bootstrap() {
 
     SwaggerModule.setup('api', app, document);
 
-    await app.listen(80);
+  await app.listen(process.env.PORT || 3000);
+    console.log(`Application is up and running on ${await app.getUrl()}`);
 }
 
 
