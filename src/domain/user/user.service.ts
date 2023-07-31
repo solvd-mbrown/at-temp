@@ -12,8 +12,7 @@ export class UserService {
   ) {}
 
   async create(usersProperties): Promise<User> {
-    const result = await this.userRepository.addNewUser(usersProperties);
-    return result;
+    return await this.userRepository.addNewUser(usersProperties);
   }
 
   findAll() {
@@ -21,31 +20,29 @@ export class UserService {
   }
 
   async findOne(id: number): Promise<User> {
-    const result = await this.userRepository.getUserEntity(id);
-    return result;
+    return await this.userRepository.getUserEntity(id);
+
   }
 
   async findOneByEmail(email: string): Promise<User> {
-    const result = await this.userRepository.getUserFromEmail(email);
-    return result;
+    return await this.userRepository.getUserFromEmail(email);
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    const result = await this.userRepository.updateUserEntity(
+    return await this.userRepository.updateUserEntity(
       id,
       updateUserDto
     );
-    return result;
+
   }
 
   async remove(id: number) {
-    const result = await this.userRepository.deleteUser(id);
-    return result;
+    return await this.userRepository.deleteUser(id);
+
   }
 
   public async initUser(jwt: string) {
     const jwtParsed = await this.firebaseService.validate(jwt);
-    const result = await this.userRepository.getUserFromEmail(jwtParsed.email);
-    return result;
+    return await this.userRepository.getUserFromEmail(jwtParsed.email);
   }
 }

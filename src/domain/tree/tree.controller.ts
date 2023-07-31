@@ -1,82 +1,48 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-} from "@nestjs/common";
-import { TreeService } from "./tree.service";
-import { CreateTreeDto } from "./dto/create-tree.dto";
-import { UpdateTreeDto } from "./dto/update-tree.dto";
-import { JoinToTreeDto } from "./dto/join-to-tree.dto";
-import { FirebaseAuthGuard } from "src/services/auth/firebase/firebase-auth.guard";
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { TreeService } from './tree.service';
+import { CreateTreeDto } from './dto/create-tree.dto';
+import { UpdateTreeDto } from './dto/update-tree.dto';
+import { JoinToTreeDto } from './dto/join-to-tree.dto';
+import {ApiTags} from "@nestjs/swagger";
 
-@Controller("tree")
-// @UseGuards(FirebaseAuthGuard)
+@ApiTags('tree')
+@Controller('tree')
 export class TreeController {
   constructor(private readonly treeService: TreeService) {}
 
-  @Post("add")
-  create(@Body() createTreeDto: CreateTreeDto) {
-    return this.treeService.create(createTreeDto);
+  @Post()
+  async create(@Body() createTreeDto: CreateTreeDto) {
+    const result = await this.treeService.create(createTreeDto);
+    return { data: result };
   }
 
   @Get()
-  findAll() {
-    return this.treeService.findAll();
+  async findAll() {
+    const result = this.treeService.findAll();
+    return { data: result };
   }
 
-  @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.treeService.findOne(+id);
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    const result = await this.treeService.findOne(+id);
+    return { data: result };
   }
 
-  @Get("all/:id")
-  findOneByUUID(@Param("id") id: string) {
-    return this.treeService.findOneByUUID(id);
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updateTreeDto: UpdateTreeDto) {
+    const result = await this.treeService.update(+id, updateTreeDto);
+    return { data: result };
   }
 
-  @Get("members/:id")
-  getTreeMembers(@Param("id") id: string) {
-    return this.treeService.getTreeMembers(+id);
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    const result = await this.treeService.remove(+id);
+    return { data: result };
   }
 
-  @Get("partTree/:treeId/:userId")
-  getPartTreeByUserId(
-    @Param("treeId") treeId: string,
-    @Param("userId") userId: string
-  ) {
-    return this.treeService.getPartTreeByUserId(+treeId, +userId);
-  }
-
-  @Get("treeInParts/:treeId/:userId")
-  getTreeInPartsUserId(
-    @Param("treeId") treeId: string,
-    @Param("userId") userId: string
-  ) {
-    return this.treeService.getTreeInPartsUserId(+treeId, userId);
-  }
-
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() updateTreeDto: UpdateTreeDto) {
-    return this.treeService.update(+id, updateTreeDto);
-  }
-
-  @Patch("jointo/:id")
-  join(@Param("id") id: string, @Body() joinToTreeDto: JoinToTreeDto) {
-    return this.treeService.join(+id, joinToTreeDto);
-  }
-
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.treeService.remove(+id);
-  }
-
-  @Delete("user/:id")
-  removeUserFromTree(@Param("id") id: string) {
-    return this.treeService.removeUserFromTree(+id);
+  @Post(':id/join')
+  async join(@Param('id') id: string, joinToTreeDto: JoinToTreeDto) {
+    const result = await this.treeService.join(+id, joinToTreeDto);
+    return { data: result };
   }
 }

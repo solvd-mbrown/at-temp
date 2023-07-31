@@ -1,7 +1,6 @@
 import { BadRequestException, Inject, Injectable, Scope } from "@nestjs/common";
 import { Connection } from "cypher-query-builder";
 import * as cypher from "src/services/database/repository.utils";
-import { ConfigService } from "@nestjs/config";
 import {
   CUSTOM_ERROR_MESSAGE,
   DATABASE_CONNECTION,
@@ -12,8 +11,7 @@ import { UtilsRepository } from "src/utils/utils.repository";
 @Injectable({ scope: Scope.REQUEST })
 export class UserRepository {
   constructor(
-    @Inject(DATABASE_CONNECTION) private readonly connection: Connection,
-    private readonly configService: ConfigService
+    @Inject(DATABASE_CONNECTION) private readonly connection: Connection
   ) {}
   private query(): cypher.RepositoryQuery {
     return new cypher.RepositoryQuery(this.connection);
@@ -40,15 +38,14 @@ export class UserRepository {
       .deleteEntityById("User", id)
       .commitWithReturnEntity();
     if (result) {
-      const data = result.data;
-      return {
-        response: "done",
+        return {
+            response: "done",
       };
     }
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
-  async getUserEntity(id: number): Promise<any> {
+  async getUserEntity(id: number): Promise<User> {
     const result = await this.query()
       .fetchUserByUserId(id)
       .commitWithReturnEntity();
@@ -88,17 +85,17 @@ export class UserRepository {
         .commitWithReturnEntities();
 
       if (siblingsArr && siblingsArr?.length && siblingsArr[0].data.UserKList) {
-        let famalyLine = siblingsArr[0].data.UserKList;
-        if (famalyLine.length > 1) {
-          famalyLine = famalyLine.filter((object) => {
+        let familyLine = siblingsArr[0].data.UserKList;
+        if (familyLine.length > 1) {
+          familyLine = familyLine.filter((object) => {
             return object.identity != id;
           });
-          siblings = famalyLine;
+          siblings = familyLine;
         }
       }
     }
 
-    const childrens = await this.query()
+    const children = await this.query()
       .fetchUserByUserId(id)
       .resolveUsersChildrenByRelation(
         result.data.User.properties.myTreeIdByParent1
@@ -106,16 +103,16 @@ export class UserRepository {
       .commitWithReturnEntities();
 
     let kids = [];
-    if (childrens && childrens.length && childrens[0].data.UserKList) {
-      kids = childrens[0].data.UserKList;
+    if (children && children.length && children[0].data.UserKList) {
+      kids = children[0].data.UserKList;
     }
 
     if (
-      !childrens[0].data.UserKList.length &&
+      !children[0].data.UserKList.length &&
       spouses &&
       spouses[0].data.UserS
     ) {
-      const spouseChildrens = await this.query()
+      const spouseChildren = await this.query()
         .fetchUserByUserId(spouses[0].data.UserS.identity)
         .resolveUsersChildrenByRelation(
           spouses[0].data.UserS.properties.myTreeIdByParent1
@@ -123,11 +120,11 @@ export class UserRepository {
         .commitWithReturnEntities();
 
       if (
-        spouseChildrens &&
-        spouseChildrens.length &&
-        spouseChildrens[0].data.UserKList
+        spouseChildren &&
+        spouseChildren.length &&
+        spouseChildren[0].data.UserKList
       ) {
-        kids = spouseChildrens[0].data.UserKList;
+        kids = spouseChildren[0].data.UserKList;
       }
     }
 
@@ -136,6 +133,7 @@ export class UserRepository {
       data.User.properties.parents = parents.length ? parents : null;
       data.User.properties.siblings = siblings.length ? siblings : null;
       data.User.properties.spouse = spouse.length ? spouse : null;
+            data.User.properties.spouse = spouse.length ? spouse : null;
       data.User.properties.kids = kids.length ? kids : null;
       return {
         id: data.User.identity,
@@ -145,86 +143,72 @@ export class UserRepository {
     throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
   }
 
-  async updateUserEntity(userId, userParams): Promise<any> {
+  async updateUserEntity(userId: number, userParams: any): Promise<any> {
     const params = userParams;
-    // @ts-ignore
-    let result= null;
-    const user = await this.query()
-    .fetchUserByUserId(userId)
-    .commitWithReturnEntity();
-    if(params && params.isInvitedUser && user && user.data.User.properties.isActivated) {
-        return {
-          response: {
-            isActivated: true
-          },
-        };
-   } else{
-     result = await this.query()
-     .fetchUserByUserId(userId)
-     .updateEntity(
-       "User",
-       Object.entries({
-         "User.userPictureLink": params?.userPictureLink,
-         "User.userPictureKey": params?.userPictureKey,
-         "User.firstName": params?.firstName,
-         "User.maidenName": params?.maidenName,
-         "User.lastName": params?.lastName,
-         "User.introduction": params?.introduction
-           ? UtilsRepository.getStringVersion(params?.introduction)
-           : null,
-         "User.setting": params?.setting
-           ? UtilsRepository.getStringVersion(params?.setting)
-           : null,
-         "User.birthdate": params?.birthdate,
-         "User.dateOfDeath": params?.dateOfDeath,
-         "User.anniversaryDate": params?.anniversaryDate,
-         "User.isDeceased": params?.isDeceased,
-         "User.isActivated": params?.isActivated,
-         "User.gender": params?.gender,
-         "User.hometown": params?.hometown,
-         "User.homeCountry": params?.homeCountry,
-         "User.email": params?.email,
-         "User.phone": params?.phone,
-         "User.address": params?.address,
-         "User.spouseTreeId": params?.spouseTreeId,
-         "User.myTreeIdByParent1": params?.myTreeIdByParent1,
-         "User.myTreeIdByParent2": params?.myTreeIdByParent2,
-         "User.storageFolderId": params?.storageFolderId,
-         "User.spouse": params?.spouse
-           ? UtilsRepository.getStringVersion(params?.spouse)
-           : null,
-         "User.kids": params?.kids
-           ? UtilsRepository.getStringVersion(params?.kids)
-           : null,
-         "User.pets": params?.pets,
-         "User.bornAddress": params?.bornAddress
-           ? UtilsRepository.getStringVersion(params?.bornAddress)
-           : null,
-         "User.parents": params?.parents
-           ? UtilsRepository.getStringVersion(params?.parents)
-           : null,
-         "User.siblings": params?.siblings
-           ? UtilsRepository.getStringVersion(params?.siblings)
-           : null,
-         "User.socialNetworks": params?.socialNetworks
-           ? UtilsRepository.getStringVersion(params?.socialNetworks)
-           : null,
-         "User.employerAndPosition": params?.employerAndPosition,
-         "User.education": params?.education
-           ? UtilsRepository.getStringVersion(params?.education)
-           : null,
-       }).reduce((valuesAcc, [key, value]) => {
-         return value !== undefined && value !== null
-           ? {
-             ...valuesAcc,
-             [key]: value,
-           }
-           : valuesAcc;
-       }, {})
-     )
-     .commitWithReturnEntity();
-   }
-
+    const result = await this.query()
+      .fetchUserByUserId(userId)
+      .updateEntity(
+        "User",
+        Object.entries({
+          "User.userPictureLink": params?.userPictureLink,
+          "User.userPictureKey": params?.userPictureKey,
+          "User.firstName": params?.firstName,
+          "User.maidenName": params?.maidenName,
+          "User.lastName": params?.lastName,
+          "User.introduction": params?.introduction
+            ? UtilsRepository.getStringVersion(params?.introduction)
+            : null,
+          "User.setting": params?.setting
+            ? UtilsRepository.getStringVersion(params?.setting)
+            : null,
+          "User.birthdate": params?.birthdate,
+          "User.dateOfDeath": params?.dateOfDeath,
+          "User.anniversaryDate": params?.anniversaryDate,
+          "User.isDeceased": params?.isDeceased,
+          "User.isActivated": params?.isActivated,
+          "User.gender": params?.gender,
+          "User.hometown": params?.hometown,
+          "User.homeCountry": params?.homeCountry,
+          "User.email": params?.email,
+          "User.phone": params?.phone,
+          "User.address": params?.address,
+          "User.spouseTreeId": params?.spouseTreeId,
+          "User.myTreeIdByParent1": params?.myTreeIdByParent1,
+          "User.myTreeIdByParent2": params?.myTreeIdByParent2,
+          "User.storageFolderId": params?.storageFolderId,
+          "User.spouse": params?.spouse
+            ? UtilsRepository.getStringVersion(params?.spouse)
+            : null,
+          "User.kids": params?.kids
+            ? UtilsRepository.getStringVersion(params?.kids)
+            : null,
+          "User.pets": params?.pets,
+          "User.bornAddress": params?.bornAddress
+            ? UtilsRepository.getStringVersion(params?.bornAddress)
+            : null,
+          "User.parents": params?.parents
+            ? UtilsRepository.getStringVersion(params?.parents)
+            : null,
+          "User.siblings": params?.siblings
+            ? UtilsRepository.getStringVersion(params?.siblings)
+            : null,
+          "User.socialNetworks": params?.socialNetworks
+            ? UtilsRepository.getStringVersion(params?.socialNetworks)
+            : null,
+          "User.employerAndPosition": params?.employerAndPosition,
+          "User.education": params?.education
+            ? UtilsRepository.getStringVersion(params?.education)
+            : null,
+        }).reduce((valuesAcc, [key, value]) => {
+          return value !== undefined && value !== null
+            ? {
+                ...valuesAcc,
+                [key]: value,
+              }
+            : valuesAcc;
+        }, {})
+      )
+      .commitWithReturnEntity();
 
     if (result !== null) {
       const data = result.data;
@@ -252,6 +236,7 @@ export class UserRepository {
         ...data.User.properties,
       };
     }
+    return null;
   }
 
   public async getUsersWithStorageFileId(): Promise<User[]> {
@@ -266,6 +251,6 @@ export class UserRepository {
     if (result[0]?.Users) {
       return result[0]?.Users as User[];
     }
-    return null;
+    return [];
   }
 }

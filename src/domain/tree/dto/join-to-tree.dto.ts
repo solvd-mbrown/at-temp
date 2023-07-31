@@ -1,7 +1,8 @@
-import { TreeRelationType } from "../tree.constants";
-
 export class JoinToTreeDto {
   userId: number;
-  relation: TreeRelationType;
-  toUserId: number;
+    name: any;
+
+    relation: any;
+    relationType: any;
+    relationId: any;
 }
