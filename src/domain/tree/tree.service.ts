@@ -16,9 +16,9 @@ export class TreeService {
         return await this.treeRepository.addNewTree(treeProperties);
     }
 
-    findAll() {
-        return `This action returns all tree`;
-    }
+async findAll(): Promise<Tree[]> {
+    return await this.treeRepository.getAllTrees();
+}
 
     async findOne(id: number) {
         return await this.treeRepository.getTree(id);

@@ -89,7 +89,7 @@ export class TreeRepository {
             .commitWithReturnEntity();
 
         if (result) {
-            const data = result.data;
+            const {data} = result;
             const tree = cypher.buildTree(data, id);
             return {
                 id: data.Tree.identity,
@@ -347,5 +347,20 @@ export class TreeRepository {
         return Promise.resolve(undefined);
 
     }
+async getAllTrees(): Promise<Tree[]> {
+  const result = await this.query()
+    .matchAllEntities("Tree")
+    .commitWithReturnEntity();
+
+  if (result) {
+    return result.data.map(tree => ({
+      id: tree.Tree.identity,
+      ...tree.Tree.properties
+    }));
+  }
+
+  throw new BadRequestException(CUSTOM_ERROR_MESSAGE.DB_QUERY_ERROR);
+}
+
 }
 

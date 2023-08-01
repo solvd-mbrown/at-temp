@@ -2038,6 +2038,15 @@ export class RepositoryQuery {
             return this;
 
     }
+
+    matchAllEntities(tree: string) {
+        this.query.raw(`
+      MATCH (n:${tree})
+      RETURN n
+    `);
+        return this;
+
+    }
 }
 
 export function addCreateDateToProperties(

@@ -3,7 +3,7 @@ import {SwaggerModule, DocumentBuilder} from '@nestjs/swagger';
 import {AppModule} from './app.module';
 import { writeFileSync } from 'fs';
 import { join } from 'path';
-import { ServeStaticModule } from '@nestjs/serve-static'; // Import ServeStaticModule
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
@@ -18,7 +18,7 @@ async function bootstrap() {
 
     const config = new DocumentBuilder()
         .setTitle('Tree API')
-        .setDescription('Arr Tree API Documentation')
+        .setDescription('Arr-Tree API Documentation')
         .setVersion('0.1')
         .addTag('tree')
         .addTag('user')
