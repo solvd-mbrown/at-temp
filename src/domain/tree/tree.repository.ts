@@ -126,7 +126,7 @@ export class TreeRepository {
             .commitWithReturnEntity();
 
         if (result) {
-            const data = result.data;
+            const {data} = result;
             const tree = cypher.buildTree(data, data.Tree.identity);
             return {
                 id: data.Tree.identity,

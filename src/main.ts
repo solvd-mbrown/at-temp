@@ -27,12 +27,11 @@ async function bootstrap() {
         .addTag('file')
         .addBearerAuth()
         .build();
-    const document = SwaggerModule.createDocument(app, config);
 
+    const document = SwaggerModule.createDocument(app, config);
     writeFileSync(join(__dirname, '..', 'public', 'swagger-spec.json'), JSON.stringify(document, null, 2));
 
     SwaggerModule.setup('api', app, document);
-
   await app.listen(process.env.PORT || 3000);
     console.log(`Application is up and running on ${await app.getUrl()}`);
 }
